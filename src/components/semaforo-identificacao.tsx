@@ -6,6 +6,7 @@
  * entre os dois sítios.
  */
 import type { AlunoResumo } from "@/lib/movimento";
+import type { TipoRegisto } from "@/lib/constantes";
 
 /**
  * Foto do aluno ao lado do nome.
@@ -52,8 +53,15 @@ export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
  * Não mostra assiduidade nem histórico de faltas de propósito: isso não é
  * da conta do porteiro (nem do admin, aqui). O aluno consulta o seu na área
  * pessoal.
+ *
+ * `tipo` (entrada/saída) é obrigatório e vem de quem chama, nunca de
+ * `estadoPorta` — este é só um facto de horário ("há uma aula a decorrer"),
+ * não sabe se o movimento em curso é uma entrada ou uma saída. É o `tipo`
+ * que decide se esse facto quer dizer "chegou atrasado" (só faz sentido
+ * numa entrada) ou nada de especial (numa saída, estar a sair a meio de
+ * uma aula não é chegar atrasado a lado nenhum).
  */
-export function EstadoPortaEHorario({ aluno }: { aluno: AlunoResumo }) {
+export function EstadoPortaEHorario({ aluno, tipo }: { aluno: AlunoResumo; tipo: TipoRegisto }) {
   const estadoPorta = aluno.estadoPorta;
   if (!estadoPorta) return null;
 
@@ -72,7 +80,7 @@ export function EstadoPortaEHorario({ aluno }: { aluno: AlunoResumo }) {
           }`}
         />
         Porta {aberta ? "aberta" : "fechada"}
-        {estadoPorta.atrasado && (
+        {estadoPorta.atrasado && tipo === "entrada" && (
           <span className="rounded bg-amber-200 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-900 dark:text-amber-100">
             Chegou atrasado
           </span>

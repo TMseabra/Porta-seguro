@@ -7,6 +7,7 @@ import {
   confirmarIdentidadeQR,
 } from "./acoes";
 import type { AlunoResumo, LinhaRegisto, ResultadoMovimento } from "@/lib/movimento";
+import type { TipoRegisto } from "@/lib/constantes";
 import { LeitorQR } from "./leitor-qr";
 import {
   CartaoAluno,
@@ -19,11 +20,11 @@ type Estado =
   | { passo: "vazio" }
   | { passo: "a-ler" }
   | { passo: "erro"; mensagem: string }
-  | { passo: "resultado"; aluno: AlunoResumo; autorizado: boolean; motivo: string }
+  | { passo: "resultado"; aluno: AlunoResumo; autorizado: boolean; motivo: string; tipo: TipoRegisto }
   // `idToken` é o único fio que liga os passos: quem, quando e como são
   // sempre recalculados no servidor a partir dele (ver acoes.ts).
   | { passo: "pendente"; aluno: AlunoResumo; motivo: string; idToken: string }
-  | { passo: "confirmar-identidade"; aluno: AlunoResumo; idToken: string };
+  | { passo: "confirmar-identidade"; aluno: AlunoResumo; idToken: string; tipo: TipoRegisto };
 
 const ROTULOS_ESTADO: Record<string, string> = {
   autorizado: "Autorizado",
@@ -69,6 +70,7 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
       aluno: resultado.aluno,
       autorizado: resultado.autorizado,
       motivo: resultado.motivo,
+      tipo: resultado.linha.tipo,
     });
     setLinhas((atuais) => [resultado.linha, ...atuais]);
   }
@@ -92,6 +94,7 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
         motivo: paisAutorizaram
           ? "Saída fora do horário confirmada por telefone com os pais."
           : "Pais contactados; saída não autorizada.",
+        tipo: resultado.linha.tipo,
       });
       setLinhas((atuais) => [resultado.linha, ...atuais]);
     });
@@ -114,13 +117,14 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
         passo: "confirmar-identidade",
         aluno: resultado.aluno,
         idToken: resultado.idToken,
+        tipo: resultado.tipo,
       });
     });
   }
 
   function responderIdentidade(eEsteAluno: boolean) {
     if (estado.passo !== "confirmar-identidade") return;
-    const { idToken } = estado;
+    const { idToken, tipo } = estado;
 
     iniciarTransicao(async () => {
       const resultado = await confirmarIdentidadeQR(idToken, eEsteAluno);
@@ -137,6 +141,7 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
           aluno: resultado.aluno,
           autorizado: false,
           motivo: resultado.motivo,
+          tipo,
         });
         return;
       }
@@ -184,14 +189,14 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
               <Semaforo cor={estado.autorizado ? "verde" : "vermelho"}>
                 <CartaoAluno aluno={estado.aluno} />
                 <p className="mt-2 text-sm">{estado.motivo}</p>
-                <EstadoPortaEHorario aluno={estado.aluno} />
+                <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
               </Semaforo>
             )}
 
             {estado.passo === "confirmar-identidade" && (
               <Semaforo cor="amarelo">
                 <CartaoAluno aluno={estado.aluno} />
-                <EstadoPortaEHorario aluno={estado.aluno} />
+                <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
                 <p className="mt-3 text-sm font-medium">É esta a pessoa à tua frente?</p>
                 <div className="mt-2 flex gap-2">
                   <BotaoResposta onClick={() => responderIdentidade(true)} disabled={aEnviar}>

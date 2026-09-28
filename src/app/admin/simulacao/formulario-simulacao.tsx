@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { simularPassagem, confirmarSaidaSimulada } from "./acoes";
 import type { AlunoResumo, ResultadoMovimento } from "@/lib/movimento";
+import type { TipoRegisto } from "@/lib/constantes";
 import { SelectPersonalizado } from "@/components/select-personalizado";
 import {
   CartaoAluno,
@@ -20,7 +21,7 @@ export interface AlunoParaSeletor {
 type Estado =
   | { passo: "formulario" }
   | { passo: "erro"; mensagem: string }
-  | { passo: "resultado"; aluno: AlunoResumo; autorizado: boolean; motivo: string }
+  | { passo: "resultado"; aluno: AlunoResumo; autorizado: boolean; motivo: string; tipo: TipoRegisto }
   | {
       passo: "pendente";
       aluno: AlunoResumo;
@@ -70,6 +71,7 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
       aluno: resultado.aluno,
       autorizado: resultado.autorizado,
       motivo: resultado.motivo,
+      tipo: resultado.linha.tipo,
     });
   }
 
@@ -102,6 +104,7 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
         motivo: paisAutorizaram
           ? "Saída fora do horário confirmada por telefone com os pais."
           : "Pais contactados; saída não autorizada.",
+        tipo: resultado.linha.tipo,
       });
     });
   }
@@ -173,7 +176,7 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
         <Semaforo cor={estado.autorizado ? "verde" : "vermelho"}>
           <CartaoAluno aluno={estado.aluno} />
           <p className="mt-2 text-sm">{estado.motivo}</p>
-          <EstadoPortaEHorario aluno={estado.aluno} />
+          <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
         </Semaforo>
       )}
 

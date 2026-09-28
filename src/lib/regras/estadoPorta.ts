@@ -7,6 +7,16 @@
  * porteiro precisa de perceber num relance se aquela pessoa devia mesmo
  * estar ali àquela hora. Não tem nada a ver com assiduidade — isso é
  * histórico, e o porteiro não tem acesso a esses dados.
+ *
+ * De propósito NÃO sabe se o movimento em curso é uma entrada ou uma
+ * saída — só descreve o horário ("há uma aula a decorrer agora"). Quem
+ * usa o resultado é que decide o que isso significa: para uma entrada,
+ * `atrasado` quer dizer "chegou tarde"; para uma saída, quer só dizer "está
+ * a sair a meio de uma aula" — coisas diferentes com o mesmo facto de
+ * horário por trás. Foi por o `motivo` de aqui dizer sempre "chegou depois
+ * da hora de entrada", mesmo em saídas, que a portaria chegou a mostrar
+ * "atraso" a alguém que estava só a sair — a frase ficou aqui neutra, e a
+ * palavra "atraso" só aparece no ecrã quando é mesmo uma entrada.
  */
 
 import type { IHorario } from "@/models/Horario";
@@ -55,7 +65,7 @@ export function calcularEstadoPorta(
   if (blocoAtual) {
     return {
       estado: "aberta",
-      motivo: `Aula a decorrer: ${blocoAtual.disciplina} (${blocoAtual.horaInicio}–${blocoAtual.horaFim}). Chegou depois da hora de entrada.`,
+      motivo: `Aula a decorrer: ${blocoAtual.disciplina} (${blocoAtual.horaInicio}–${blocoAtual.horaFim}).`,
       atrasado: true,
     };
   }

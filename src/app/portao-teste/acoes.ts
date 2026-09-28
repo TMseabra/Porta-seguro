@@ -36,7 +36,7 @@ import { exigirPerfil } from "@/lib/permissoes";
 import { Utilizador, Turma, Horario, Registo, Ocorrencia, TokenQR } from "@/models";
 import type { ITokenQR } from "@/models";
 import { validarTokenQR, proximoTipoRegisto, encontrarBlocoADecorrer } from "@/lib/regras";
-import type { MetodoRegisto } from "@/lib/constantes";
+import type { MetodoRegisto, TipoRegisto } from "@/lib/constantes";
 import {
   processarMovimento,
   confirmarSaidaComPais as confirmarSaidaComPaisPartilhado,
@@ -135,6 +135,12 @@ export type ResultadoLeituraQR =
       ok: true;
       confirmarIdentidade: true;
       aluno: AlunoResumo;
+      /** Direção fixa deste código (RF15) — só para o ecrã saber se está a
+       * mostrar uma entrada ou uma saída (ex.: legenda "Chegou atrasado"
+       * só faz sentido numa entrada). A decisão em si continua a ser
+       * sempre recalculada no servidor a partir do idToken, nunca deste
+       * campo. */
+      tipo: TipoRegisto;
       /** Id do código lido. É a ÚNICA coisa que o ecrã guarda entre passos:
        * quem, quando e como são sempre recalculados no servidor a partir
        * deste id (ver `contextoDoCodigo`). */
@@ -218,6 +224,7 @@ export async function lerCodigoQR(token: string): Promise<ResultadoLeituraQR> {
     ok: true,
     confirmarIdentidade: true,
     aluno: resumoDoAluno(aluno, turma?.nome, horarios, momentoDecisao),
+    tipo: tokenQR.tipo,
     idToken: tokenQR._id.toString(),
   };
 }

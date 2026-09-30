@@ -127,9 +127,12 @@ export function ShellPainel({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-[68px] items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#080c12]/90 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 lg:hidden">
-            <Logo className="h-8 w-8" decorativa />
-            <LogoTexto className="h-4" />
+          <div className="flex min-w-0 items-center gap-2 lg:hidden">
+            <Logo className="h-8 w-8 shrink-0" decorativa />
+            <div className="min-w-0">
+              <LogoTexto className="h-4" />
+              <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500 dark:text-slate-400">{titulo}</p>
+            </div>
           </div>
           <div className="hidden text-sm text-slate-500 lg:block">
             Área reservada <span className="mx-2 text-slate-300 dark:text-slate-700">/</span>
@@ -164,19 +167,20 @@ export function ShellPainel({
         {ehAluno && (
           <nav
             aria-label="Navegação rápida"
-            className="flex gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2 lg:hidden dark:border-white/[.08] dark:bg-[#0b0f14]"
+            className="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2.5 lg:hidden dark:border-white/[.08] dark:bg-[#0b0f14]"
           >
             {NAV_ALUNO.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={item.chave === ativo ? "page" : undefined}
-                className={`hover-highlight shrink-0 rounded-lg border border-transparent px-3 py-2 text-xs font-medium ${
+                className={`hover-highlight flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-semibold transition-colors ${
                   item.chave === ativo
-                    ? "bg-blue-700 text-white"
-                    : "text-slate-600 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-blue-950/50 dark:hover:text-blue-300"
+                    ? "border-blue-700 bg-blue-700 text-white shadow-sm shadow-blue-950/20"
+                    : "border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-white/10 dark:bg-white/[.03] dark:text-slate-300 dark:hover:bg-blue-950/50 dark:hover:text-blue-300"
                 }`}
               >
+                <span aria-hidden="true" className="text-sm leading-none">{item.icon}</span>
                 {item.label}
               </Link>
             ))}

@@ -54,10 +54,10 @@ export function ThemeToggle() {
       onClick={alternar}
       aria-label={`Mudar para modo ${escuro ? "claro" : "escuro"}`}
       title={`Mudar para modo ${escuro ? "claro" : "escuro"}`}
-      className="hover-highlight flex h-9 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10"
+      className="hover-highlight group flex h-10 shrink-0 items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-indigo-400/30 dark:bg-indigo-400/10 dark:text-indigo-100 dark:hover:bg-indigo-400/20 dark:focus-visible:outline-indigo-300"
     >
-      <span aria-hidden>{escuro ? "☀" : "☾"}</span>
-      <span className="hidden sm:inline">{escuro ? "Modo claro" : "Modo escuro"}</span>
+      <span aria-hidden className="text-base leading-none">{escuro ? "☀️" : "🌙"}</span>
+      <span>{escuro ? "Claro" : "Escuro"}</span>
     </button>
   );
 }

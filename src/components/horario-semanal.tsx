@@ -107,7 +107,7 @@ export function HorarioSemanal({
         return (
           <div
             key={dia}
-            className={`overflow-hidden rounded-xl border transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5 ${
+            className={`hover-highlight overflow-hidden rounded-xl border transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5 ${
               emDestaque
                 ? "border-blue-300 bg-blue-50 hover:border-blue-400 dark:border-blue-700 dark:bg-blue-950/40"
                 : "border-slate-200 bg-slate-50/60 hover:border-blue-300 dark:border-slate-800 dark:bg-slate-800/40 dark:hover:border-blue-700"
@@ -118,7 +118,7 @@ export function HorarioSemanal({
               onClick={() => alternar(dia)}
               aria-expanded={aberto}
               aria-controls={`${idBase}-dia-${dia}`}
-              className={`flex w-full items-center justify-between gap-2 text-left ${tamanhoGrande ? "p-4 lg:p-5" : "p-3.5"}`}
+              className={`hover-highlight flex w-full items-center justify-between gap-2 text-left ${tamanhoGrande ? "p-4 lg:p-5" : "p-3.5"}`}
             >
               <span
                 className={`flex flex-wrap items-center gap-2 font-semibold ${tamanhoGrande ? "text-base lg:text-lg" : "text-sm"}`}
@@ -142,7 +142,7 @@ export function HorarioSemanal({
                 className={`flex flex-col px-3.5 pb-3.5 ${tamanhoGrande ? "gap-3 lg:px-5 lg:pb-5 lg:text-base" : "gap-1.5 text-sm"}`}
               >
                 {doDia.map((bloco, indice) => (
-                  <li key={indice} className="flex flex-col">
+                  <li key={indice} className="hover-highlight rounded-lg border border-transparent px-2 py-1.5 hover:bg-white/70 dark:hover:bg-slate-900/60">
                     <span
                       className={`font-mono tabular-nums text-blue-700 dark:text-blue-400 ${tamanhoGrande ? "text-sm" : "text-xs"}`}
                     >

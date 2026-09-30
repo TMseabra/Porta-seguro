@@ -37,6 +37,7 @@ export function GeradorQR({
   tokenInicial,
   podeGerar,
   podeEscolherHora,
+  compacto = false,
 }: {
   tokenInicial: TokenGerado | null;
   /** Falso para quem está a aceder por PC (RF15: o código destina-se ao
@@ -45,6 +46,8 @@ export function GeradorQR({
   /** Só verdadeiro para a conta de teste — dá para escolher a data/hora
    * que a leitura na portaria deve usar, em vez da hora real. */
   podeEscolherHora: boolean;
+  /** Versão compacta para o cartão do painel principal. */
+  compacto?: boolean;
 }) {
   const [token, setToken] = useState<TokenGerado | null>(tokenInicial);
   const [segundos, setSegundos] = useState(() =>
@@ -112,9 +115,9 @@ export function GeradorQR({
           <img
             src={token.imagemDataUrl}
             alt="Código QR para a portaria"
-            width={240}
-            height={240}
-            className="rounded-xl border border-slate-200 p-2 dark:border-slate-700"
+            width={compacto ? 160 : 240}
+            height={compacto ? 160 : 240}
+            className={`hover-highlight rounded-xl border border-slate-200 p-2 dark:border-slate-700 ${compacto ? "h-36 w-36" : ""}`}
           />
           <p className="rounded-full bg-blue-50 px-3 py-1 font-mono text-sm tabular-nums text-blue-800 dark:bg-blue-950/50 dark:text-blue-300">
             Válido por mais {Math.floor(segundos / 60)}:{String(segundos % 60).padStart(2, "0")}
@@ -170,7 +173,7 @@ export function GeradorQR({
           type="button"
           onClick={gerar}
           disabled={aGerar}
-          className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
+          className="hover-highlight rounded-lg border border-transparent bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
         >
           {aGerar ? "A gerar..." : token ? "Gerar novo código" : "Gerar código QR"}
         </button>

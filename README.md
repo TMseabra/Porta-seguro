@@ -122,3 +122,7 @@ npm test
 ## Deployment
 
 Deployed on **Vercel**, connected to this repository. Environment variables are configured in the Vercel project settings, mirroring `.env.example`.
+
+## License
+
+[MIT](LICENSE)

@@ -1,7 +1,7 @@
 import { exigirPerfil } from "@/lib/permissoes";
 import { diaDaSemanaEmLisboa } from "@/lib/datas";
 import { HorarioSemanal } from "@/components/horario-semanal";
-import { ShellPainel, TituloPagina, Cartao } from "../shell";
+import { TituloPagina, Cartao } from "../shell";
 import { horarioDoAluno } from "../dados-aluno";
 
 export default async function PaginaHorario() {
@@ -9,7 +9,7 @@ export default async function PaginaHorario() {
   const { turma, blocos } = await horarioDoAluno(sessao.user.id);
 
   return (
-    <ShellPainel sessao={sessao} ativo="horario" titulo="Horário">
+    <>
       <TituloPagina
         titulo="O meu horário"
         descricao={turma?.nome ? `Horário semanal da turma ${turma.nome}.` : undefined}
@@ -21,6 +21,6 @@ export default async function PaginaHorario() {
           <p className="py-8 text-center text-sm text-slate-500">Ainda não tens turma atribuída.</p>
         )}
       </Cartao>
-    </ShellPainel>
+    </>
   );
 }

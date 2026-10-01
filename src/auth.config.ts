@@ -11,6 +11,8 @@ import type { NextAuthConfig } from "next-auth";
  * arrancar. Por isso os fornecedores reais só são acrescentados no
  * `auth.ts`, que só corre em rotas de servidor normais (runtime Node.js).
  */
+const PAGINAS_PUBLICAS = new Set(["/", "/funcionalidades", "/seguranca", "/sobre"]);
+
 export const authConfig = {
   pages: {
     signIn: "/login",
@@ -35,11 +37,12 @@ export const authConfig = {
       const autenticado = !!auth?.user;
       const caminho = request.nextUrl.pathname;
 
-      // A página de entrada do site é pública: é o que alguém de fora vê
-      // antes de ter (ou não) conta. Não redireciona quem já tem sessão —
+      // As páginas de apresentação são públicas: é o que alguém de fora vê
+      // antes de ter (ou não) conta. Não redirecionam quem já tem sessão —
       // pode querer voltar aqui de propósito, e o botão do cabeçalho passa
-      // a apontar para o painel.
-      if (caminho === "/") {
+      // a apontar para o painel. Lista fechada de propósito: uma página
+      // nova só fica pública se for acrescentada aqui.
+      if (PAGINAS_PUBLICAS.has(caminho)) {
         return true;
       }
 

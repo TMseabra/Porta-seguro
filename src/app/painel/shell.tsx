@@ -5,32 +5,17 @@ import { LogoTexto } from "@/components/logo-texto";
 import { signOut } from "@/auth";
 import type { Perfil } from "@/lib/constantes";
 import { ThemeToggle } from "../theme-provider";
+import { NAV_ALUNO } from "./nav-itens";
+import { atalhosDoPerfil } from "./atalhos";
+import { NavLateral, NavRapida, TituloAtual, type ItemNav } from "./nav-painel";
 
 /**
  * Moldura comum a todas as páginas da área reservada: menu lateral, barra
- * de topo e navegação rápida no telemóvel. Cada item do menu do aluno é uma
- * página própria (/painel/qr, /painel/horario, ...) — esta peça só sabe qual
- * está ativa para a destacar, o conteúdo vem de quem a usa.
+ * de topo e navegação rápida no telemóvel. É usada UMA vez, no layout
+ * (src/app/painel/layout.tsx) — por isso não é redesenhada ao mudar de
+ * página, só o conteúdo do meio troca. Qual item está ativo é decidido no
+ * browser (nav-painel.tsx), a partir do endereço atual.
  */
-
-export type ItemAluno = "painel" | "qr" | "horario" | "assiduidade" | "movimentos" | "definicoes";
-
-export const NAV_ALUNO: { chave: ItemAluno; href: string; label: string; icon: string }[] = [
-  { chave: "painel", href: "/painel", label: "Painel", icon: "▦" },
-  { chave: "qr", href: "/painel/qr", label: "Código QR", icon: "▧" },
-  { chave: "horario", href: "/painel/horario", label: "Horário", icon: "◷" },
-  { chave: "assiduidade", href: "/painel/assiduidade", label: "Assiduidade", icon: "◉" },
-  { chave: "movimentos", href: "/painel/movimentos", label: "Movimentos", icon: "⟳" },
-  { chave: "definicoes", href: "/painel/definicoes", label: "Definições", icon: "⚙" },
-];
-
-export interface AtalhoDoPainel {
-  href: string;
-  titulo: string;
-  descricao: string;
-  icone: React.ReactNode;
-  perfis: Perfil[];
-}
 
 export const ROTULO_PERFIL: Record<Perfil, string> = {
   aluno: "Aluno",
@@ -42,20 +27,7 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
   admin: "Administrador",
 };
 
-export function ShellPainel({
-  sessao,
-  ativo,
-  titulo,
-  atalhos = [],
-  children,
-}: {
-  sessao: Session;
-  ativo: ItemAluno;
-  titulo: string;
-  /** Atalhos dos perfis que não são aluno (menu lateral). */
-  atalhos?: AtalhoDoPainel[];
-  children: React.ReactNode;
-}) {
+export function ShellPainel({ sessao, children }: { sessao: Session; children: React.ReactNode }) {
   const ehAluno = sessao.user.perfil === "aluno";
   const iniciais = (sessao.user.name ?? "PS")
     .split(/\s+/)
@@ -64,12 +36,16 @@ export function ShellPainel({
     .join("")
     .toUpperCase();
 
-  const classeItem = (selecionado: boolean) =>
-    `hover-highlight flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm transition ${
-      selecionado
-        ? "bg-blue-700 font-semibold text-white shadow-sm shadow-blue-950/20"
-        : "text-slate-600 hover:bg-slate-100 hover:text-blue-700 dark:text-slate-400 dark:hover:bg-white/[.05] dark:hover:text-white"
-    }`;
+  const itens: ItemNav[] = ehAluno
+    ? NAV_ALUNO.map((item) => ({ href: item.href, label: item.label, icon: item.icon }))
+    : [
+        { href: "/painel", label: "Painel", icon: "▦" },
+        ...atalhosDoPerfil(sessao.user.perfil).map((atalho) => ({
+          href: atalho.href,
+          label: atalho.titulo,
+          icon: <span className="text-blue-600 dark:text-blue-300">{atalho.icone}</span>,
+        })),
+      ];
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-950 dark:bg-[#080b10] dark:text-slate-100">
@@ -82,33 +58,7 @@ export function ShellPainel({
           </span>
         </Link>
         <p className="px-3 pb-3 text-[10px] font-bold uppercase tracking-[.18em] text-slate-500">Menu principal</p>
-        <nav aria-label="Menu principal" className="space-y-1">
-          {ehAluno ? (
-            NAV_ALUNO.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={item.chave === ativo ? "page" : undefined}
-                className={classeItem(item.chave === ativo)}
-              >
-                <span className="w-4 text-center text-base">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))
-          ) : (
-            <>
-              <Link href="/painel" aria-current="page" className={classeItem(true)}>
-                <span>▦</span>Painel
-              </Link>
-              {atalhos.map((atalho) => (
-                <Link key={atalho.href + atalho.titulo} href={atalho.href} className={classeItem(false)}>
-                  <span className="text-blue-600 dark:text-blue-300">{atalho.icone}</span>
-                  {atalho.titulo}
-                </Link>
-              ))}
-            </>
-          )}
-        </nav>
+        <NavLateral itens={itens} />
         <form
           className="mt-auto"
           action={async () => {
@@ -129,14 +79,13 @@ export function ShellPainel({
         <header className="sticky top-0 z-30 flex h-[68px] items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#080c12]/90 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2 lg:hidden">
             <Logo className="h-8 w-8 shrink-0" decorativa />
-            <div className="min-w-0">
-              <LogoTexto className="h-4" />
-              <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500 dark:text-slate-400">{titulo}</p>
-            </div>
+            {/* No telemóvel fica só o escudo e o nome da página: o nome do
+                site por extenso não cabia ao lado do botão do tema. */}
+            <p className="truncate text-sm font-semibold"><TituloAtual itens={itens} /></p>
           </div>
           <div className="hidden text-sm text-slate-500 lg:block">
             Área reservada <span className="mx-2 text-slate-300 dark:text-slate-700">/</span>
-            <span className="text-slate-800 dark:text-slate-300">{titulo}</span>
+            <span className="text-slate-800 dark:text-slate-300"><TituloAtual itens={itens} /></span>
           </div>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
@@ -164,28 +113,7 @@ export function ShellPainel({
           </div>
         </header>
 
-        {ehAluno && (
-          <nav
-            aria-label="Navegação rápida"
-            className="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2.5 lg:hidden dark:border-white/[.08] dark:bg-[#0b0f14]"
-          >
-            {NAV_ALUNO.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={item.chave === ativo ? "page" : undefined}
-                className={`hover-highlight flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-semibold transition-colors ${
-                  item.chave === ativo
-                    ? "border-blue-700 bg-blue-700 text-white shadow-sm shadow-blue-950/20"
-                    : "border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-white/10 dark:bg-white/[.03] dark:text-slate-300 dark:hover:bg-blue-950/50 dark:hover:text-blue-300"
-                }`}
-              >
-                <span aria-hidden="true" className="text-sm leading-none">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        )}
+        {ehAluno && <NavRapida itens={itens} />}
 
         <main className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 xl:px-10">
           {children}

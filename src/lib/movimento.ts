@@ -141,6 +141,10 @@ export async function processarMovimento(
   registadoPorId: string,
   metodo: MetodoRegisto,
   momento: Date,
+  /** Só nas simulações: quem está a testar escolhe se é entrada ou saída,
+   * em vez de a direção alternar com o último registo. Num movimento real
+   * fica sempre `undefined` — aí é a regra de alternância que decide. */
+  tipoForcado?: TipoRegisto,
 ): Promise<ResultadoMovimento> {
   await ligarBaseDados();
 
@@ -168,7 +172,7 @@ export async function processarMovimento(
   const ultimoRegisto = await Registo.findOne({ alunoId: aluno._id, dataHora: { $lt: momento } })
     .sort({ dataHora: -1 })
     .lean();
-  const tipo = proximoTipoRegisto(ultimoRegisto?.tipo);
+  const tipo = tipoForcado ?? proximoTipoRegisto(ultimoRegisto?.tipo);
 
   if (tipo === "entrada") {
     const decisao = decidirEntrada({ suspenso: aluno.suspenso }, horarios, momento);

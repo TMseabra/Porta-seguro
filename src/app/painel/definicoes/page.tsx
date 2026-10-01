@@ -3,7 +3,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { signOut } from "@/auth";
 import { Utilizador, Turma } from "@/models";
 import { ThemeToggle } from "@/app/theme-provider";
-import { ShellPainel, TituloPagina, Cartao, ROTULO_PERFIL } from "../shell";
+import { TituloPagina, Cartao, ROTULO_PERFIL } from "../shell";
 
 export default async function PaginaDefinicoes() {
   const sessao = await exigirPerfil(["aluno"]);
@@ -26,7 +26,7 @@ export default async function PaginaDefinicoes() {
   ];
 
   return (
-    <ShellPainel sessao={sessao} ativo="definicoes" titulo="Definições">
+    <>
       <TituloPagina titulo="Definições" descricao="Os teus dados e preferências." />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -73,6 +73,6 @@ export default async function PaginaDefinicoes() {
           </Cartao>
         </div>
       </div>
-    </ShellPainel>
+    </>
   );
 }

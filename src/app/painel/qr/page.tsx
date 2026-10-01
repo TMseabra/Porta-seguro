@@ -1,6 +1,6 @@
 import { exigirPerfil } from "@/lib/permissoes";
 import { GeradorQR } from "@/app/area-pessoal/gerador-qr";
-import { ShellPainel, TituloPagina, Cartao } from "../shell";
+import { TituloPagina, Cartao } from "../shell";
 import { tokenInicialDoAluno, permissoesQR } from "../dados-aluno";
 
 export default async function PaginaQR() {
@@ -11,7 +11,7 @@ export default async function PaginaQR() {
   ]);
 
   return (
-    <ShellPainel sessao={sessao} ativo="qr" titulo="Código QR">
+    <>
       <TituloPagina
         titulo="Código QR"
         descricao="Mostra este código na portaria para entrar ou sair da escola."
@@ -35,6 +35,6 @@ export default async function PaginaQR() {
           </ul>
         </Cartao>
       </div>
-    </ShellPainel>
+    </>
   );
 }

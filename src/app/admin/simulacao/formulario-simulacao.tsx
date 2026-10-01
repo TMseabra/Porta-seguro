@@ -5,6 +5,7 @@ import { simularPassagem, confirmarSaidaSimulada } from "./acoes";
 import type { AlunoResumo, ResultadoMovimento } from "@/lib/movimento";
 import type { TipoRegisto } from "@/lib/constantes";
 import { SelectPersonalizado } from "@/components/select-personalizado";
+import { EscolhaTipoPassagem, type TipoEscolhido } from "@/components/escolha-tipo-passagem";
 import {
   CartaoAluno,
   EstadoPortaEHorario,
@@ -48,6 +49,7 @@ function agoraNoBrowser(): { data: string; hora: string } {
 export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) {
   const [alunoId, setAlunoId] = useState(alunos[0]?.id ?? "");
   const [{ data, hora }, setDataHora] = useState(agoraNoBrowser);
+  const [tipo, setTipo] = useState<TipoEscolhido>("auto");
   const [estado, setEstado] = useState<Estado>({ passo: "formulario" });
   const [aEnviar, iniciarTransicao] = useTransition();
 
@@ -80,7 +82,7 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
     if (!alunoId) return;
 
     iniciarTransicao(async () => {
-      const resultado = await simularPassagem(alunoId, data, hora);
+      const resultado = await simularPassagem(alunoId, data, hora, tipo === "auto" ? undefined : tipo);
       aplicarResultado(resultado);
     });
   }
@@ -156,6 +158,8 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
             Agora
           </button>
         </div>
+
+        <EscolhaTipoPassagem valor={tipo} onAlterar={setTipo} />
 
         <button
           type="submit"

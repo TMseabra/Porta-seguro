@@ -4,7 +4,7 @@ import { Registo } from "@/models";
 import { limitesDoMesEmLisboa, partesEmLisboa, formatarData, formatarHora } from "@/lib/datas";
 import { calcularAssiduidade, type RegistoParaAssiduidade } from "@/lib/relatorios/calcularAssiduidade";
 import { AssiduidadeMensal, type LinhaDiaAssinalar } from "@/app/area-pessoal/assiduidade-mensal";
-import { ShellPainel, TituloPagina } from "../shell";
+import { TituloPagina } from "../shell";
 import { horarioDoAluno } from "../dados-aluno";
 
 export default async function PaginaAssiduidade() {
@@ -37,7 +37,7 @@ export default async function PaginaAssiduidade() {
     }));
 
   return (
-    <ShellPainel sessao={sessao} ativo="assiduidade" titulo="Assiduidade">
+    <>
       <TituloPagina
         titulo="A minha assiduidade"
         descricao="Calculada a partir das tuas entradas na portaria e do horário da turma."
@@ -52,6 +52,6 @@ export default async function PaginaAssiduidade() {
         taxaPresenca={assiduidade.taxaPresenca}
         diasAssinalar={diasAssinalar}
       />
-    </ShellPainel>
+    </>
   );
 }

@@ -26,6 +26,37 @@ describe("limitesDoDiaEmLisboa", () => {
     expect(momento.getTime()).toBeLessThan(fim.getTime());
     expect(diaDaSemanaEmLisboa(inicio)).toBe(diaDaSemanaEmLisboa(momento));
   });
+
+  // Regressão: o fim do dia era `inicio + 24h`. No dia em que a hora de
+  // verão acaba (25 horas), isso ainda caía dentro do próprio dia, e
+  // `calcularAssiduidade` entrava num ciclo infinito que encravava o
+  // servidor — aconteceu a sério no 1.º dia de outubro de 2026.
+  it("no fim da hora de verão (25 de outubro de 2026), o dia tem 25 horas e o fim é a meia-noite seguinte", () => {
+    const { inicio, fim } = limitesDoDiaEmLisboa(new Date("2026-10-25T12:00:00.000Z"));
+    expect(inicio.toISOString()).toBe("2026-10-24T23:00:00.000Z");
+    expect(fim.toISOString()).toBe("2026-10-26T00:00:00.000Z");
+    expect(limitesDoDiaEmLisboa(fim).inicio.getTime()).toBe(fim.getTime());
+  });
+
+  it("no início da hora de verão (28 de março de 2027), o dia tem 23 horas e não invade o dia seguinte", () => {
+    const { inicio, fim } = limitesDoDiaEmLisboa(new Date("2027-03-28T12:00:00.000Z"));
+    expect(inicio.toISOString()).toBe("2027-03-28T00:00:00.000Z");
+    expect(fim.toISOString()).toBe("2027-03-28T23:00:00.000Z");
+    expect(limitesDoDiaEmLisboa(fim).inicio.getTime()).toBe(fim.getTime());
+  });
+
+  it("percorrer um mês dia a dia termina sempre, mesmo com mudança de hora", () => {
+    for (const [ano, mes, diasEsperados] of [[2026, 10, 31], [2027, 3, 31], [2026, 9, 30]] as const) {
+      const periodo = limitesDoMesEmLisboa(ano, mes);
+      let cursor = periodo.inicio;
+      let dias = 0;
+      while (cursor < periodo.fim && dias < 40) {
+        cursor = limitesDoDiaEmLisboa(cursor).fim;
+        dias++;
+      }
+      expect(dias).toBe(diasEsperados);
+    }
+  });
 });
 
 describe("limitesDoMesEmLisboa", () => {

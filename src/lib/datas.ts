@@ -174,15 +174,28 @@ export function formatarData(data: Date): string {
  * instante marca em Lisboa (0h mais o deslocamento do fuso nesse dia) e
  * corrigimos a diferença — funciona também nos dias de mudança de hora,
  * porque o deslocamento é lido a partir do próprio candidato.
+ *
+ * O `fim` é a meia-noite do dia SEGUINTE, calculada da mesma forma — e não
+ * `inicio + 24h`. Nos dias de mudança de hora o dia não tem 24 horas: o
+ * último domingo de outubro tem 25, e aí `inicio + 24h` ainda caía dentro
+ * do próprio dia; quem percorre o mês dia a dia (`calcularAssiduidade`)
+ * voltava sempre ao mesmo dia e ficava num ciclo infinito, que encravava o
+ * servidor inteiro. No último domingo de março (23 horas) passava 1 hora
+ * para o dia seguinte, e uma entrada nessa hora contava no dia errado.
  */
 export function limitesDoDiaEmLisboa(data: Date): { inicio: Date; fim: Date } {
   const { ano, mes, dia } = partesEmLisboa(data);
+  return {
+    inicio: meiaNoiteEmLisboa(ano, mes, dia),
+    // `Date.UTC` aceita dia 32, 33... e passa sozinho para o mês seguinte.
+    fim: meiaNoiteEmLisboa(ano, mes, dia + 1),
+  };
+}
+
+function meiaNoiteEmLisboa(ano: number, mes: number, dia: number): Date {
   const candidato = new Date(Date.UTC(ano, mes - 1, dia, 0, 0, 0));
   const desvioMinutos = minutosDoDiaEmLisboa(candidato);
-
-  const inicio = new Date(candidato.getTime() - desvioMinutos * 60 * 1000);
-  const fim = new Date(inicio.getTime() + 24 * 60 * 60 * 1000);
-  return { inicio, fim };
+  return new Date(candidato.getTime() - desvioMinutos * 60 * 1000);
 }
 
 /**

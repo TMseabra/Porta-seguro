@@ -36,6 +36,9 @@ export async function simularPassagem(
   alunoId: string,
   data: string,
   hora: string,
+  /** "entrada" / "saida" para forçar a direção; qualquer outra coisa (ou
+   * nada) mantém a alternância automática com o último registo. */
+  tipo?: string,
 ): Promise<ResultadoMovimento> {
   const sessao = await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();
@@ -50,7 +53,12 @@ export async function simularPassagem(
     return { ok: false, erro: "Data ou hora inválida." };
   }
 
-  return processarMovimento(aluno, sessao.user.id, "simulacao", momento);
+  // O valor vem do browser: só passam os dois valores válidos. Uma Server
+  // Action é um endereço HTTP normal e o tipo TypeScript não existe depois
+  // de compilado — sem esta verificação aceitava-se qualquer texto.
+  const tipoForcado = tipo === "entrada" || tipo === "saida" ? tipo : undefined;
+
+  return processarMovimento(aluno, sessao.user.id, "simulacao", momento, tipoForcado);
 }
 
 /** Grava, na simulação, o resultado de "os pais autorizaram a saída?". */

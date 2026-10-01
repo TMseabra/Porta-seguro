@@ -3,7 +3,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Registo } from "@/models";
 import { chaveDoDiaEmLisboa, formatarData, formatarHora, NOMES_DIAS_SEMANA, diaDaSemanaEmLisboa } from "@/lib/datas";
 import type { EstadoRegisto } from "@/lib/constantes";
-import { ShellPainel, TituloPagina, Cartao } from "../shell";
+import { TituloPagina, Cartao } from "../shell";
 
 /** Quantos movimentos mostrar — chega para ver as últimas semanas sem
  * carregar o histórico inteiro de um ano letivo de uma vez. */
@@ -37,7 +37,7 @@ export default async function PaginaMovimentos() {
   const saidas = registos.length - entradas;
 
   return (
-    <ShellPainel sessao={sessao} ativo="movimentos" titulo="Movimentos">
+    <>
       <TituloPagina
         titulo="Movimentos"
         descricao="Todas as tuas entradas e saídas registadas na portaria."
@@ -82,7 +82,7 @@ export default async function PaginaMovimentos() {
           )}
         </div>
       )}
-    </ShellPainel>
+    </>
   );
 }
 

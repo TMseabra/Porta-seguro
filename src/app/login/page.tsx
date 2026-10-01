@@ -5,6 +5,7 @@ import { LogoTexto } from "@/components/logo-texto";
 import { redirect } from "next/navigation";
 import { FormularioCredenciais } from "./formulario-credenciais";
 import { entrarComGoogle } from "./acoes";
+import { ThemeToggle } from "../theme-provider";
 
 /**
  * Mensagens para os códigos de erro que o Auth.js acrescenta ao URL
@@ -46,13 +47,14 @@ export default async function PaginaLogin({
   return (
     <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <header className="border-b border-slate-200 bg-blue-50 dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex w-full max-w-3xl items-center px-6 py-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-3">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-400"
           >
             ← Página principal
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

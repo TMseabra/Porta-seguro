@@ -1,6 +1,6 @@
 # PortãoSeguro
 
-A school entry/exit logging system: students identify themselves at the gate with a short-lived QR code, and the system decides — automatically, from the class schedule — whether that entry or exit is on time, late, or needs a parent's confirmation. Built as the final project for **UFCD 10790 (Programming Project)**, a 3rd-year vocational Computer Programming course in Portugal.
+A school entry/exit logging system: students identify themselves at the gate with a short-lived QR code, and the system decides — automatically, from the class schedule  whether that entry or exit is on time, late, or needs a parent's confirmation. Built as the final project for (Programming Project), a 3rd-year vocational Computer Programming course in Portugal.
 
 ## What it does
 

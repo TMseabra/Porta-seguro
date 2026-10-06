@@ -39,6 +39,13 @@ export interface ITokenQR {
    */
   momentoSimulado?: Date;
   /**
+   * Só nos códigos de simulação da conta de teste: verdadeiro quando o
+   * aluno escolheu à mão se o código é de entrada ou de saída (em vez de a
+   * direção alternar com o último registo). Ver `tipoDoCodigo.ts` — na
+   * leitura, a escolha só é respeitada se o movimento for uma simulação.
+   */
+  tipoEscolhido?: boolean;
+  /**
    * Quando é que este código já deu origem a um registo de entrada/saída.
    * `usado` marca a LEITURA (o porteiro apontou a câmara); este marca a
    * conclusão. Serve para o mesmo código não poder gerar dois movimentos
@@ -62,6 +69,8 @@ const TokenQRSchema = new Schema<ITokenQR>(
     tipo: { type: String, enum: TIPOS_REGISTO, required: true },
 
     momentoSimulado: { type: Date },
+
+    tipoEscolhido: { type: Boolean },
 
     movimentoRegistadoEm: { type: Date },
   },

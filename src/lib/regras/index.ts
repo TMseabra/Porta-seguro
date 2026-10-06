@@ -17,6 +17,11 @@ export {
 export { encontrarBlocoADecorrer } from "./horarios";
 export { proximoTipoRegisto } from "./proximoTipo";
 export {
+  tipoEsperadoNaLeitura,
+  tipoForcadoNoMovimento,
+  type CodigoParaTipo,
+} from "./tipoDoCodigo";
+export {
   calcularEstadoPorta,
   type EstadoPorta,
   type ResultadoEstadoPorta,

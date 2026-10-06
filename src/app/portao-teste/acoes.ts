@@ -35,7 +35,12 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { exigirPerfil } from "@/lib/permissoes";
 import { Utilizador, Turma, Horario, Registo, Ocorrencia, TokenQR } from "@/models";
 import type { ITokenQR } from "@/models";
-import { validarTokenQR, proximoTipoRegisto, encontrarBlocoADecorrer } from "@/lib/regras";
+import {
+  validarTokenQR,
+  tipoEsperadoNaLeitura,
+  tipoForcadoNoMovimento,
+  encontrarBlocoADecorrer,
+} from "@/lib/regras";
 import type { MetodoRegisto, TipoRegisto } from "@/lib/constantes";
 import {
   processarMovimento,
@@ -181,7 +186,10 @@ export async function lerCodigoQR(token: string): Promise<ResultadoLeituraQR> {
   })
     .sort({ dataHora: -1 })
     .lean();
-  const tipoEsperado = proximoTipoRegisto(ultimoRegisto?.tipo);
+  // Num código de simulação com a direção escolhida à mão, é essa a direção
+  // esperada (ver tipoDoCodigo.ts); em qualquer outro, é a alternância.
+  const metodoDoCodigo: MetodoRegisto = tokenQR.momentoSimulado ? "simulacao" : "qr";
+  const tipoEsperado = tipoEsperadoNaLeitura(tokenQR, metodoDoCodigo, ultimoRegisto?.tipo);
 
   // `alunoIdQueApresenta` é sempre o dono do token: não há, neste ecrã,
   // nenhuma segunda fonte que diga quem está fisicamente a apresentá-lo —
@@ -278,7 +286,13 @@ export async function confirmarIdentidadeQR(
     };
   }
 
-  const movimento = await processarMovimento(aluno, sessao.user.id, metodo, momento);
+  const movimento = await processarMovimento(
+    aluno,
+    sessao.user.id,
+    metodo,
+    momento,
+    tipoForcadoNoMovimento(tokenQR, metodo),
+  );
 
   // Só marca o código como gasto quando um registo foi mesmo criado. Numa
   // saída que fica pendente (à espera do contacto com os pais), o código

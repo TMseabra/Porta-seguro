@@ -57,10 +57,17 @@ export type ResultadoGeracaoQR =
  * para dar para demonstrar a entrada por QR em qualquer dia/hora sem
  * esperar pelo momento certo. A validade do próprio código continua real
  * (1 minuto a partir de agora), para se manter mesmo scanável.
+ *
+ * Numa simulação, a conta de teste pode ainda escolher se o código é de
+ * `"entrada"` ou de `"saida"` (`tipoEscolhido`), em vez de a direção
+ * alternar com o último registo — para dar para testar uma saída sem ter
+ * de simular primeiro uma entrada. Só vale com uma data/hora simulada: um
+ * código real nunca tem a direção escolhida à mão.
  */
 export async function gerarNovoTokenQR(
   dataSimulada?: string,
   horaSimulada?: string,
+  tipoEscolhido?: string,
 ): Promise<ResultadoGeracaoQR> {
   const sessao = await exigirPerfil(["aluno"]);
   const ehContaDeTeste = sessao.user.email === EMAIL_CONTA_DE_TESTE_QR;
@@ -95,7 +102,14 @@ export async function gerarNovoTokenQR(
       .sort({ dataHora: -1 })
       .lean(),
   ]);
-  const tipo = proximoTipoRegisto(ultimoRegisto?.tipo);
+  // O valor vem do browser (uma Server Action é um endereço HTTP normal,
+  // e o tipo TypeScript não existe depois de compilado): só se aceitam os
+  // dois valores válidos, e só para a conta de teste numa simulação.
+  const tipoForcado: TipoRegisto | undefined =
+    momentoSimulado && (tipoEscolhido === "entrada" || tipoEscolhido === "saida")
+      ? tipoEscolhido
+      : undefined;
+  const tipo = tipoForcado ?? proximoTipoRegisto(ultimoRegisto?.tipo);
 
   // Aleatório e imprevisível — não dá para adivinhar o código de outro
   // aluno a tentar valores ao acaso.
@@ -110,6 +124,7 @@ export async function gerarNovoTokenQR(
     validoAte,
     tipo,
     momentoSimulado: momentoSimulado ?? undefined,
+    tipoEscolhido: tipoForcado ? true : undefined,
   });
 
   const imagemDataUrl = await QRCode.toDataURL(token, { margin: 1, width: 240 });

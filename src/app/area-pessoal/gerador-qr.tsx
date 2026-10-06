@@ -8,6 +8,7 @@ import {
   type EstadoTokenQR,
 } from "./acoes";
 import type { TipoRegisto } from "@/lib/constantes";
+import { EscolhaTipoPassagem, type TipoEscolhido } from "@/components/escolha-tipo-passagem";
 
 /** Cada quantos segundos se pergunta ao servidor se o código já foi lido. */
 const INTERVALO_VERIFICACAO_MS = 2000;
@@ -57,6 +58,7 @@ export function GeradorQR({
   const [erro, setErro] = useState<string | null>(null);
   const [aGerar, iniciarTransicao] = useTransition();
   const [simularHora, setSimularHora] = useState(false);
+  const [tipoSimulado, setTipoSimulado] = useState<TipoEscolhido>("auto");
   const [{ data: dataSimulada, hora: horaSimulada }, setDataHoraSimulada] =
     useState(agoraNoBrowser);
 
@@ -82,7 +84,7 @@ export function GeradorQR({
     iniciarTransicao(async () => {
       const resultado =
         podeEscolherHora && simularHora && dataSimulada && horaSimulada
-          ? await gerarNovoTokenQR(dataSimulada, horaSimulada)
+          ? await gerarNovoTokenQR(dataSimulada, horaSimulada, tipoSimulado === "auto" ? undefined : tipoSimulado)
           : await gerarNovoTokenQR();
       if (!resultado.ok) {
         setErro(resultado.erro);
@@ -136,23 +138,26 @@ export function GeradorQR({
             Simular outra data/hora
           </label>
           {simularHora && (
-            <div className="flex flex-wrap gap-2">
-              <input
-                type="date"
-                value={dataSimulada}
-                onChange={(evento) =>
-                  setDataHoraSimulada((atual) => ({ ...atual, data: evento.target.value }))
-                }
-                className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
-              />
-              <input
-                type="time"
-                value={horaSimulada}
-                onChange={(evento) =>
-                  setDataHoraSimulada((atual) => ({ ...atual, hora: evento.target.value }))
-                }
-                className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
-              />
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap gap-2">
+                <input
+                  type="date"
+                  value={dataSimulada}
+                  onChange={(evento) =>
+                    setDataHoraSimulada((atual) => ({ ...atual, data: evento.target.value }))
+                  }
+                  className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
+                />
+                <input
+                  type="time"
+                  value={horaSimulada}
+                  onChange={(evento) =>
+                    setDataHoraSimulada((atual) => ({ ...atual, hora: evento.target.value }))
+                  }
+                  className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
+                />
+              </div>
+              <EscolhaTipoPassagem valor={tipoSimulado} onAlterar={setTipoSimulado} />
             </div>
           )}
         </div>

@@ -5,7 +5,7 @@ import { LogoTexto } from "@/components/logo-texto";
 import { redirect } from "next/navigation";
 import { FormularioCredenciais } from "./formulario-credenciais";
 import { entrarComGoogle } from "./acoes";
-import { ThemeToggle } from "../theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
 
 /**
  * Mensagens para os códigos de erro que o Auth.js acrescenta ao URL
@@ -54,7 +54,7 @@ export default async function PaginaLogin({
           >
             ← Página principal
           </Link>
-          <ThemeToggle />
+          <ModeToggle />
         </div>
       </header>
 

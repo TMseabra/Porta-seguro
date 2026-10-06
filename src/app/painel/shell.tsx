@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 import { LogoTexto } from "@/components/logo-texto";
 import { signOut } from "@/auth";
 import type { Perfil } from "@/lib/constantes";
-import { ThemeToggle } from "../theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
 import { NAV_ALUNO } from "./nav-itens";
 import { atalhosDoPerfil } from "./atalhos";
 import { NavLateral, NavRapida, TituloAtual, type ItemNav } from "./nav-painel";
@@ -88,7 +88,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
             <span className="text-slate-800 dark:text-slate-300"><TituloAtual itens={itens} /></span>
           </div>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            <ThemeToggle />
+            <ModeToggle />
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold">{sessao.user.name}</span>
               <span className="block text-xs text-slate-500">{ROTULO_PERFIL[sessao.user.perfil]}</span>

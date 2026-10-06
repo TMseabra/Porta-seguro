@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { Logo } from "@/components/logo";
 import { LogoTexto } from "@/components/logo-texto";
-import { ThemeToggle } from "@/app/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
 
 /**
  * Cabeçalho, fundo e rodapé comuns às páginas públicas (/, /funcionalidades,
@@ -57,7 +57,7 @@ export async function LayoutPublico({ ativa, children }: { ativa: PaginaPublica;
           </nav>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <ModeToggle />
             <Link
               href={destino}
               className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 dark:bg-white dark:text-slate-950 dark:hover:bg-blue-200 sm:px-5"

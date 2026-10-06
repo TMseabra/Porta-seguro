@@ -2,7 +2,7 @@ import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { signOut } from "@/auth";
 import { Utilizador, Turma } from "@/models";
-import { ThemeToggle } from "@/app/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
 import { TituloPagina, Cartao, ROTULO_PERFIL } from "../shell";
 
 export default async function PaginaDefinicoes() {
@@ -51,7 +51,7 @@ export default async function PaginaDefinicoes() {
           <Cartao>
             <h2 className="mb-1 font-semibold">Aparência</h2>
             <p className="mb-4 text-sm text-slate-500">Alterna entre o modo claro e o escuro.</p>
-            <ThemeToggle />
+            <ModeToggle />
           </Cartao>
 
           <Cartao>

@@ -23,8 +23,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // lang="pt-PT" para o navegador e os leitores de ecrã saberem que o
     // conteúdo está em português de Portugal.
+    // suppressHydrationWarning: o next-themes muda a classe do <html> (claro/
+    // escuro) antes de o React arrancar — sem isto o React avisava que o
+    // servidor e o browser não coincidem. Só vale para este elemento.
     <html
       lang="pt-PT"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

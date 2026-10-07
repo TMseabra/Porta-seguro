@@ -10,18 +10,7 @@ export interface ProfessorComHorario {
   blocos: BlocoHorario[];
 }
 
-/**
- * O horário de uma TURMA (todas as disciplinas, vários professores) e o
- * horário de UM PROFESSOR (as suas próprias aulas, em turmas diferentes)
- * são coisas diferentes — por isso vivem em componentes separados,
- * escolhidos aqui consoante quem está a ver:
- *
- *  - professor -> só as SUAS aulas (`MeuHorario`); nunca o horário
- *    completo de uma turma, que mostraria também as aulas dos colegas.
- *  - admin -> pode alternar entre ver por turma (`SeletorTurma`) ou
- *    escolher um professor e ver só as aulas dele.
- *  - coordenador/dt -> só por turma, como já era.
- */
+/** Professor vê só as SUAS aulas; admin alterna entre por turma e por professor; coordenador/dt só por turma. */
 export function VistaHorario({
   turmas,
   meuHorario,
@@ -31,8 +20,7 @@ export function VistaHorario({
   turmas: TurmaComHorario[];
   meuHorario?: BlocoHorario[];
   professores?: ProfessorComHorario[];
-  /** Que aba mostrar ao abrir a página (só para o admin) — vem do link que
-   * trouxe a pessoa até aqui (o Painel tem um atalho para cada vista). */
+  /** Aba inicial (só admin), vinda do atalho do Painel. */
   vistaInicial?: "turma" | "pessoal";
 }) {
   if (meuHorario) {
@@ -46,12 +34,7 @@ export function VistaHorario({
   return <SeletorTurma turmas={turmas} />;
 }
 
-/**
- * As aulas de UM professor, com um filtro opcional por turma — nunca o
- * horário completo de uma turma (que mostraria também os colegas). O
- * filtro serve só para "tenho horas com esta turma?", não para navegar
- * para o horário dela.
- */
+/** Aulas de UM professor, com filtro opcional por turma; nunca o horário completo da turma. */
 function MeuHorario({ blocos }: { blocos: BlocoHorario[] }) {
   const turmasComAulas = [...new Set(blocos.map((b) => b.turma).filter(Boolean))] as string[];
   const [turmaFiltro, setTurmaFiltro] = useState<string | null>(null);

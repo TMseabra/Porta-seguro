@@ -1,9 +1,6 @@
 /**
- * Desenha o relatório de assiduidade em PDF (RF11), com `pdf-lib` — a
- * biblioteca não tem noção de "tabela": desenha-se texto a coordenadas
- * exatas, por isso as funções `escrever`/`novaLinha` abaixo fazem as vezes
- * de um cursor de escrita simples, de cima para baixo, com paginação
- * automática quando o espaço acaba.
+ * Relatório em PDF (RF11) com `pdf-lib`, que não tem tabelas: `escrever`/`novaLinha` fazem de cursor de
+ * escrita de cima para baixo, com paginação automática.
  */
 
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";

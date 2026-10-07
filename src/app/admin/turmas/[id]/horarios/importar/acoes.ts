@@ -1,16 +1,8 @@
 "use server";
 
 /**
- * Importação do horário de uma turma a partir de um ficheiro Excel (RF10 —
- * decisão do aluno). Duas Server Actions:
- *
- *  1. `analisarExcel` só LÊ o ficheiro e devolve uma pré-visualização —
- *     não grava nada. Assim a pessoa vê o que o site percebeu (e os erros)
- *     antes de qualquer coisa mudar a sério.
- *  2. `confirmarImportacao` recebe as linhas já analisadas (não volta a ler
- *     o ficheiro) e substitui o horário da turma pelas linhas sem erros —
- *     por isso pede a palavra-chave de confirmação, tal como editar ou
- *     remover um bloco à mão.
+ * Importação de horário por Excel (RF10): `analisarExcel` só lê e pré-visualiza; `confirmarImportacao`
+ * substitui o horário da turma (por isso pede a palavra-chave de confirmação).
  */
 
 import * as XLSX from "xlsx";
@@ -24,7 +16,6 @@ export type ResultadoAnalise =
   | { ok: false; erro: string }
   | { ok: true; turmaNome: string; linhas: LinhaImportada[] };
 
-/** Só lê e valida — não escreve nada na base de dados. */
 export async function analisarExcel(turmaId: string, formData: FormData): Promise<ResultadoAnalise> {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();
@@ -39,9 +30,7 @@ export async function analisarExcel(turmaId: string, formData: FormData): Promis
     return { ok: false, erro: "Escolhe um ficheiro Excel (.xlsx)." };
   }
 
-  // Um horário de uma turma são umas dezenas de linhas — nunca chega perto
-  // disto. O limite existe para um ficheiro enorme (ou preparado de
-  // propósito) não pôr o servidor a descomprimir megabytes em memória.
+  // Um horário são dezenas de linhas; o limite evita descomprimir ficheiros enormes em memória.
   const MAX_BYTES = 2 * 1024 * 1024;
   if (ficheiro.size > MAX_BYTES) {
     return { ok: false, erro: "O ficheiro é demasiado grande (máximo 2 MB)." };
@@ -78,12 +67,7 @@ export async function analisarExcel(turmaId: string, formData: FormData): Promis
 
 export type ResultadoImportacao = { ok: true; total: number } | { ok: false; erro: string };
 
-/**
- * Substitui TODO o horário da turma pelas linhas dadas (só as que já não
- * têm erros — o formulário só deixa chegar aqui linhas válidas). Apaga os
- * blocos antigos e cria os novos como uma operação só, para nunca ficar a
- * meio (turma sem horário nenhum) se algo falhar a meio da importação.
- */
+/** Substitui TODO o horário da turma numa operação só, para nunca ficar sem horário se algo falhar. */
 export async function confirmarImportacao(
   turmaId: string,
   linhas: LinhaImportada[],
@@ -108,10 +92,7 @@ export async function confirmarImportacao(
     return { ok: false, erro: "Não há nenhuma linha válida para importar." };
   }
 
-  // Transação (não usada mais nenhures neste projeto) de propósito aqui:
-  // isto é um "substituir tudo" — sem isto, uma falha a meio (ex.: um erro
-  // de rede a criar os novos blocos, já depois de apagar os antigos)
-  // deixava a turma sem horário nenhum, pior do que antes de importar.
+  // Transação só aqui: sem ela, uma falha depois de apagar os blocos antigos deixava a turma sem horário.
   const session = await Horario.startSession();
   try {
     await session.withTransaction(async () => {

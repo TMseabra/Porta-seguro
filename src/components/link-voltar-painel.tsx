@@ -1,12 +1,6 @@
 import { LinkVoltar } from "./link-voltar";
 
-/**
- * Link para voltar ao painel principal — usado no topo de cada ecrã de
- * primeiro nível que só um perfil específico vê (portaria, consultas,
- * horários, área pessoal). Para ecrãs mais fundo na hierarquia (ex.: os
- * formulários dentro da administração), usa `LinkVoltar` diretamente,
- * apontado ao ecrã-pai lógico em vez de saltar sempre para o painel.
- */
+/** Voltar ao painel, nos ecrãs de 1.º nível. Mais fundo na hierarquia usa-se `LinkVoltar` com o ecrã-pai. */
 export function LinkVoltarPainel() {
   return <LinkVoltar href="/painel" label="Painel" />;
 }

@@ -14,18 +14,8 @@ const ROTULOS: Record<Aba, string> = {
 };
 
 /**
- * As três partes da área pessoal (código QR, horário, assiduidade) tinham-se
- * tornado uma página comprida a fazer scroll — separadas em abas, cada uma
- * ocupa o ecrã todo, mais fácil de ler tanto no telemóvel como no PC (onde
- * a aba do horário usa a largura toda para caber mais dias lado a lado).
- *
- * Segue o padrão de teclado do WAI-ARIA para "tabs": as setas esquerda/
- * direita movem o foco entre os botões e já trocam de aba (não é preciso
- * Enter a seguir — é assim que um leitor de ecrã espera que um `role="tab"`
- * se comporte), Home/Fim saltam para a primeira/última. `aria-controls` +
- * `role="tabpanel"` ligam cada botão ao conteúdo que ele mostra, para um
- * leitor de ecrã anunciar a ligação — antes o botão e o conteúdo não
- * tinham nenhuma relação formal entre si.
+ * Abas (QR, horário, assiduidade) com o teclado do WAI-ARIA: setas trocam de aba, Home/Fim saltam,
+ * `aria-controls` + `role="tabpanel"` ligam cada botão ao seu conteúdo.
  */
 export function AbasAreaPessoal({
   qr,
@@ -91,9 +81,7 @@ export function AbasAreaPessoal({
               id={`${idBase}-tab-${chave}`}
               aria-selected={ativo}
               aria-controls={`${idBase}-painel-${chave}`}
-              // Roving tabindex: só a aba ativa está no ciclo normal do Tab;
-              // as outras alcançam-se com as setas, tal como o padrão WAI-ARIA
-              // de "tabs" espera (Tab entra/sai do grupo, setas movem dentro).
+              // Roving tabindex: só a aba ativa está no ciclo do Tab; as outras alcançam-se com as setas.
               tabIndex={ativo ? 0 : -1}
               onClick={() => setAba(chave)}
               onKeyDown={(evento) => aoTeclar(evento, indice)}

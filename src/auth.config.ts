@@ -1,34 +1,23 @@
 import type { NextAuthConfig } from "next-auth";
 
-/**
- * Configuração "leve" do Auth.js: só a parte que decide QUEM PODE VER QUE
- * PÁGINAS. Não inclui os fornecedores de login (Credentials, Google).
- *
- * Existe separada do `auth.ts` por uma razão técnica importante: o
- * `middleware.ts` corre no runtime Edge da Vercel, que não suporta módulos
- * nativos (o Argon2id do Credentials) nem ligações TCP (o Mongoose). Se
- * este ficheiro importasse esses fornecedores, o middleware deixava de
- * arrancar. Por isso os fornecedores reais só são acrescentados no
- * `auth.ts`, que só corre em rotas de servidor normais (runtime Node.js).
- */
 const PAGINAS_PUBLICAS = new Set(["/", "/funcionalidades", "/seguranca", "/sobre"]);
 
+/**
+ * Configuração "leve" do Auth.js: só decide quem pode ver que páginas. Fica separada do auth.ts para o
+ * proxy não importar módulos nativos (Argon2id) nem o Mongoose; os fornecedores de login só existem no auth.ts.
+ */
 export const authConfig = {
   pages: {
     signIn: "/login",
-    // Qualquer erro do Auth.js (ex.: login Google recusado por não haver
-    // conta) volta para o ecrã de login, em vez da página de erro genérica.
+    // Qualquer erro do Auth.js (ex.: Google recusado) volta ao login.
     error: "/login",
   },
 
   session: {
     strategy: "jwt",
-    // Um dia letivo. O perfil viaja dentro do próprio token e não é
-    // reconfirmado na base de dados a cada pedido (seria uma consulta
-    // extra sempre) — ou seja, um aluno apagado ou suspenso continuaria a
-    // entrar enquanto o token fosse válido. Com o valor por omissão do
-    // Auth.js (30 dias) isso era um mês; oito horas fecham a janela sem
-    // obrigar o porteiro a voltar a autenticar-se a meio da manhã.
+    // Um dia letivo. O perfil viaja no token e não é revalidado na BD a cada pedido, por isso um aluno
+    // apagado ou suspenso continuaria a entrar até o token expirar: 8h (e não os 30 dias por omissão)
+    // fecham essa janela.
     maxAge: 8 * 60 * 60,
   },
 
@@ -37,29 +26,24 @@ export const authConfig = {
       const autenticado = !!auth?.user;
       const caminho = request.nextUrl.pathname;
 
-      // As páginas de apresentação são públicas: é o que alguém de fora vê
-      // antes de ter (ou não) conta. Não redirecionam quem já tem sessão —
-      // pode querer voltar aqui de propósito, e o botão do cabeçalho passa
-      // a apontar para o painel. Lista fechada de propósito: uma página
-      // nova só fica pública se for acrescentada aqui.
+      // Páginas de apresentação, públicas e sem redirecionar quem tem sessão. Lista fechada: uma página
+      // nova só é pública se for acrescentada aqui.
       if (PAGINAS_PUBLICAS.has(caminho)) {
         return true;
       }
 
       if (caminho === "/login") {
-        // Quem já tem sessão iniciada não precisa de voltar a ver o login.
         if (autenticado) {
           return Response.redirect(new URL("/painel", request.nextUrl));
         }
         return true;
       }
 
-      // Em qualquer outra página: só passa quem tiver sessão. Devolver
-      // `false` faz o Auth.js redirecionar sozinho para `pages.signIn`.
+      // Qualquer outra página exige sessão; false faz o Auth.js redirecionar para o login.
       return autenticado;
     },
   },
 
-  // Os fornecedores reais (Credentials, Google) só existem em auth.ts.
+  // Os fornecedores reais (Credentials, Google) estão em auth.ts.
   providers: [],
 } satisfies NextAuthConfig;

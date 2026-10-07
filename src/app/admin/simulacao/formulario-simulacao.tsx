@@ -31,12 +31,7 @@ type Estado =
       momentoISO: string;
     };
 
-/**
- * Data e hora ATUAIS deste computador ("do browser", como pedido) — não a
- * hora de Lisboa, de propósito: o formulário serve para poupar o
- * preenchimento manual quando se quer só testar "agora mesmo", e "agora
- * mesmo" é o relógio de quem está a usar o site, não um fuso fixo.
- */
+/** Relógio do browser, de propósito (não o fuso de Lisboa): "agora" é o de quem usa o site. */
 function agoraNoBrowser(): { data: string; hora: string } {
   const agora = new Date();
   const doisDigitos = (n: number) => String(n).padStart(2, "0");

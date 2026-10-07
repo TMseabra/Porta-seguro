@@ -1,10 +1,4 @@
-/**
- * Lógica de autorização de login por email + palavra-passe.
- *
- * Está separada do ficheiro `auth.ts` de propósito, para ser fácil de testar
- * isoladamente (chamar esta função diretamente, sem ter de simular um pedido
- * HTTP completo ao Auth.js).
- */
+/** Login por email + palavra-passe, separado do auth.ts para se poder testar sem simular um pedido ao Auth.js. */
 
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Utilizador, TentativaLogin, MAX_TENTATIVAS, JANELA_MINUTOS } from "@/models";
@@ -20,27 +14,17 @@ export interface UtilizadorAutenticado {
 }
 
 /**
- * Verifica um par email + palavra-passe contra a base de dados — SEM o
- * segundo fator.
- *
- * Está separada de `autorizarCredenciais` porque o ecrã de login precisa
- * dela sozinha no primeiro passo: para saber a quem enviar o código, é
- * preciso primeiro confirmar que a palavra-passe está certa (senão qualquer
- * pessoa fazia o sistema enviar emails para contas que não são suas).
- *
- * Devolve `null` tanto para email inexistente como para palavra-passe
- * errada — nunca diz qual dos dois falhou, para não ajudar alguém a
- * adivinhar que contas existem.
+ * Verifica email + palavra-passe, sem o 2FA. Existe à parte porque o ecrã de login precisa dela no 1.º passo:
+ * só depois de confirmar a palavra-passe se envia o código (senão qualquer pessoa fazia o sistema mandar
+ * emails para contas alheias). Devolve null tanto para email inexistente como para password errada,
+ * para não revelar que contas existem.
  */
 export async function verificarCredenciais(
   email: unknown,
   palavraPasse: unknown,
   ip?: string,
 ): Promise<UtilizadorAutenticado | null> {
-  // A comparação com `typeof` não é só defensiva contra enganos: sem ela,
-  // um atacante podia enviar um OBJETO em vez de texto (ex.: `{"$ne": null}`)
-  // e o Mongoose usava-o como operador na consulta abaixo, devolvendo o
-  // primeiro utilizador que existisse — a injeção clássica de NoSQL.
+  // typeof: sem isto, um objeto ({"$ne": null}) entrava como operador na consulta (injeção NoSQL).
   if (typeof email !== "string" || typeof palavraPasse !== "string") {
     return null;
   }
@@ -49,9 +33,8 @@ export async function verificarCredenciais(
 
   const emailNormalizado = email.trim().toLowerCase();
 
-  // Limite de tentativas ANTES de verificar a palavra-passe: além de
-  // travar quem anda a adivinhar passwords, evita gastar 19 MiB de
-  // memória por tentativa a calcular o Argon2id de quem já está bloqueado.
+  // Limite de tentativas ANTES do Argon2id: trava quem adivinha passwords e evita gastar 19 MiB de
+  // memória por tentativa de quem já está bloqueado.
   const desde = new Date(Date.now() - JANELA_MINUTOS * 60 * 1000);
   const falhasRecentes = await TentativaLogin.countDocuments({
     email: emailNormalizado,
@@ -61,14 +44,12 @@ export async function verificarCredenciais(
     return null;
   }
 
-  // `.select("+palavraPasse")` é necessário porque este campo tem
-  // `select: false` no modelo (ver src/models/Utilizador.ts) — por omissão
-  // não viria na consulta.
+  // select("+palavraPasse"): o campo tem select: false no modelo.
   const utilizador = await Utilizador.findOne({
     email: emailNormalizado,
   }).select("+palavraPasse");
 
-  // Sem conta, ou conta que só tem login por Google (sem palavra-passe).
+  // Sem conta, ou conta só com login por Google.
   if (!utilizador || !utilizador.palavraPasse) {
     await registarFalha(emailNormalizado, ip);
     return null;
@@ -84,8 +65,7 @@ export async function verificarCredenciais(
     return null;
   }
 
-  // Entrou: as falhas anteriores deixam de contar, para quem só se enganou
-  // a escrever não ficar bloqueado a seguir.
+  // Entrou: as falhas anteriores deixam de contar.
   await TentativaLogin.deleteMany({ email: emailNormalizado });
 
   return {
@@ -97,13 +77,9 @@ export async function verificarCredenciais(
 }
 
 /**
- * O que o Auth.js chama para decidir se alguém entra: palavra-passe certa
- * E, nas contas admin/gestor, o código de 6 dígitos enviado por email.
- *
- * A verificação do código é feita AQUI, e não só no ecrã de login, porque
- * uma Server Action é um endereço HTTP normal — quem soubesse a
- * palavra-passe do admin podia chamar o `signIn` diretamente e saltar o
- * passo do código se ele vivesse só na interface.
+ * Chamado pelo Auth.js para decidir se alguém entra: password certa e, em admin/gestor, o código por email.
+ * O código verifica-se AQUI e não só no ecrã: uma Server Action é um endereço HTTP normal, e quem soubesse
+ * a password do admin chamava o signIn diretamente e saltava o passo.
  */
 export async function autorizarCredenciais(
   email: unknown,
@@ -125,14 +101,7 @@ export async function autorizarCredenciais(
   return utilizador;
 }
 
-/**
- * Guarda uma tentativa falhada. O registo apaga-se sozinho ao fim da
- * janela (índice TTL — ver o modelo), por isso não é preciso limpar nada.
- *
- * Uma falha a gravar isto nunca pode impedir alguém de entrar: se a
- * escrita falhar, o login segue o seu caminho normal (só fica sem
- * contagem), em vez de rebentar com o pedido inteiro.
- */
+/** Guarda uma falha de login (o índice TTL apaga-a sozinho). Se a escrita falhar, o login segue em frente. */
 async function registarFalha(email: string, ip?: string): Promise<void> {
   try {
     await TentativaLogin.create({ email, ip, quando: new Date() });

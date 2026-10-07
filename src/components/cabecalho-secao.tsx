@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 
-/**
- * Cabeçalho partilhado por todas as páginas "internas" do site (depois do
- * login): espaço reservado para o logotipo, título/subtítulo da secção, e
- * um link para voltar ao ecrã lógico anterior. A mesma estrutura que já
- * existe em /portao-teste e /horarios, extraída para não repetir o mesmo
- * bloco de HTML em cada página nova.
- */
+/** Cabeçalho das páginas internas (logótipo, título, voltar), extraído para não repetir HTML. */
 export function CabecalhoSecao({
   titulo,
   subtitulo,
@@ -19,7 +13,6 @@ export function CabecalhoSecao({
   subtitulo?: string;
   voltarHref: string;
   voltarLabel: string;
-  /** Botão/link extra do lado direito, ex.: "+ Novo curso". */
   acao?: React.ReactNode;
 }) {
   return (

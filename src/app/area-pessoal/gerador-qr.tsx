@@ -10,21 +10,14 @@ import {
 import type { TipoRegisto } from "@/lib/constantes";
 import { EscolhaTipoPassagem, type TipoEscolhido } from "@/components/escolha-tipo-passagem";
 
-/** Cada quantos segundos se pergunta ao servidor se o código já foi lido. */
 const INTERVALO_VERIFICACAO_MS = 2000;
 
-/** Quantos segundos faltam até `validoAteISO`, nunca negativo. */
 function segundosRestantes(validoAteISO: string): number {
   const restam = Math.round((new Date(validoAteISO).getTime() - Date.now()) / 1000);
   return Math.max(0, restam);
 }
 
-/**
- * Data e hora ATUAIS deste computador ("do browser") — mesmo critério do
- * `/admin/simulacao` (ver `formulario-simulacao.tsx`): poupa escrever a
- * data à mão quando se quer só testar "agora mesmo". A pessoa continua
- * livre para mudar os campos depois.
- */
+/** Data e hora do browser, como em `/admin/simulacao`: poupa escrever à mão. */
 function agoraNoBrowser(): { data: string; hora: string } {
   const agora = new Date();
   const doisDigitos = (n: number) => String(n).padStart(2, "0");
@@ -41,13 +34,10 @@ export function GeradorQR({
   compacto = false,
 }: {
   tokenInicial: TokenGerado | null;
-  /** Falso para quem está a aceder por PC (RF15: o código destina-se ao
-   * telemóvel) — exceto a conta de teste, usada para a defesa oral. */
+  /** Falso em PC (RF15: o código é para o telemóvel), exceto na conta de teste. */
   podeGerar: boolean;
-  /** Só verdadeiro para a conta de teste — dá para escolher a data/hora
-   * que a leitura na portaria deve usar, em vez da hora real. */
+  /** Só na conta de teste: data/hora que a portaria usa em vez da real. */
   podeEscolherHora: boolean;
-  /** Versão compacta para o cartão do painel principal. */
   compacto?: boolean;
 }) {
   const [token, setToken] = useState<TokenGerado | null>(tokenInicial);
@@ -62,9 +52,7 @@ export function GeradorQR({
   const [{ data: dataSimulada, hora: horaSimulada }, setDataHoraSimulada] =
     useState(agoraNoBrowser);
 
-  // Um único intervalo faz as duas coisas: atualiza a contagem decrescente
-  // E pergunta ao servidor se o código já foi lido — não vale a pena dois
-  // temporizadores separados para o mesmo código.
+  // Um só intervalo atualiza a contagem e pergunta ao servidor se o código já foi lido.
   useEffect(() => {
     if (!token || estado.usado) return;
 
@@ -98,9 +86,7 @@ export function GeradorQR({
   }
 
   const expirado = token !== null && !estado.usado && segundos <= 0;
-  // Uma vez usado (lido pelo porteiro), a imagem do QR desaparece sempre —
-  // é a única forma de garantir que ninguém a mostra a outra pessoa depois
-  // de já ter servido.
+  // Depois de lido, a imagem desaparece sempre, para ninguém a mostrar a outra pessoa.
   const mostrarImagem = token && !expirado && !estado.usado;
 
   return (
@@ -194,7 +180,6 @@ export function GeradorQR({
   );
 }
 
-/** Etiqueta que diz para que serve o código — só entrar, ou só sair. */
 function RotuloDirecao({ tipo }: { tipo: TipoRegisto }) {
   return (
     <span
@@ -209,7 +194,6 @@ function RotuloDirecao({ tipo }: { tipo: TipoRegisto }) {
   );
 }
 
-/** Mensagem mostrada assim que o código deixa de estar por usar. */
 function ResultadoLeitura({
   estado,
   tipo,

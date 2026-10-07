@@ -16,7 +16,6 @@ export default async function PaginaAssiduidade() {
 
   const [{ horarios }, registos] = await Promise.all([
     horarioDoAluno(sessao.user.id),
-    // Registos de simulação do admin nunca contam como presença/falta real.
     Registo.find({
       alunoId: sessao.user.id,
       dataHora: { $gte: periodo.inicio, $lt: periodo.fim },

@@ -22,13 +22,7 @@ import { CabecalhoSecao } from "@/components/cabecalho-secao";
 import { HorarioSemanal, type BlocoHorario } from "@/components/horario-semanal";
 import type { TokenGerado } from "./acoes";
 
-/**
- * Área pessoal do aluno: o código QR para a portaria (RF15), o horário da
- * sua turma e a sua própria assiduidade do mês.
- *
- * O aluno vê sempre e só os SEUS dados — o id vem da sessão, nunca de um
- * parâmetro do endereço, por isso não há forma de pedir os de outra pessoa.
- */
+/** Área pessoal do aluno. O id vem da sessão, nunca do endereço: não há forma de pedir dados de outra pessoa. */
 export default async function PaginaAreaPessoal() {
   const sessao = await exigirPerfil(["aluno"]);
   await ligarBaseDados();
@@ -40,8 +34,7 @@ export default async function PaginaAreaPessoal() {
 
   const aluno = await Utilizador.findById(sessao.user.id).select("turmaId").lean();
 
-  // Se já houver um código válido (ex.: a pessoa atualizou a página), mostra
-  // logo esse, em vez de obrigar a gerar outro sem necessidade.
+  // Reaproveita um código ainda válido (ex.: página atualizada).
   const tokenExistente = await TokenQR.findOne({
     alunoId: sessao.user.id,
     usado: false,
@@ -66,9 +59,7 @@ export default async function PaginaAreaPessoal() {
     aluno?.turmaId
       ? Horario.find({ turmaId: aluno.turmaId }).sort({ diaSemana: 1, horaInicio: 1 }).lean()
       : [],
-    // `metodo: "simulacao"` fica de fora: são registos de demonstração da
-    // ferramenta do admin, não movimentos reais — nunca podem aparecer como
-    // presença/falta real do aluno.
+    // Sem registos de simulação: não são movimentos reais.
     Registo.find({
       alunoId: sessao.user.id,
       dataHora: { $gte: periodo.inicio, $lt: periodo.fim },
@@ -84,9 +75,7 @@ export default async function PaginaAreaPessoal() {
     periodo,
   );
 
-  // Nome do professor de cada bloco — o aluno vê quem dá cada aula, mas só
-  // isso: nenhuma outra informação sobre o professor, nem em que outras
-  // turmas dá aulas.
+  // O aluno vê o nome do professor de cada aula e mais nada.
   const idsProfessores = [
     ...new Set(
       horarios.map((h) => h.professorId?.toString()).filter((id): id is string => Boolean(id)),

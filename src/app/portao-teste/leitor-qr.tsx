@@ -4,16 +4,9 @@ import { useEffect, useRef } from "react";
 
 const ID_ELEMENTO = "leitor-qr-portaria";
 
-/**
- * Câmara de leitura do código QR (RF15). Isolado num componente próprio
- * porque a câmara só deve estar ligada enquanto este componente estiver
- * montado — o pai monta-o só quando o porteiro escolhe "Ler código QR" e
- * desmonta-o logo a seguir a uma leitura, o que já liberta a câmara.
- */
+/** Câmara de leitura do QR (RF15). O pai monta-o só quando se escolhe "Ler código QR"; desmontar liberta a câmara. */
 export function LeitorQR({ onLido }: { onLido: (token: string) => void }) {
-  // Guardado em ref (em vez de estar nas dependências do efeito) para o
-  // efeito só correr uma vez por montagem, sem reiniciar a câmara sempre
-  // que o componente-pai gera uma nova função `onLido`.
+  // Em ref para o efeito correr uma vez só e não reiniciar a câmara a cada `onLido` novo.
   const onLidoRef = useRef(onLido);
   useEffect(() => {
     onLidoRef.current = onLido;
@@ -22,13 +15,8 @@ export function LeitorQR({ onLido }: { onLido: (token: string) => void }) {
   useEffect(() => {
     let cancelado = false;
     let leitorAtual: import("html5-qrcode").Html5Qrcode | null = null;
-    // Só pode existir UMA chamada a `.stop()` em curso: tanto o callback de
-    // sucesso como a limpeza do useEffect (ao desmontar) precisam de parar
-    // a câmara, e chamá-la das duas vezes ao mesmo tempo é exatamente o que
-    // causava o ecrã a ficar preso a preto no Safari do iPhone — o Chrome
-    // tolera duas paragens simultâneas, o WebKit não. Guardando a promessa
-    // aqui, quem chegar primeiro faz a paragem a sério; o outro só espera
-    // por essa mesma promessa em vez de chamar `.stop()` outra vez.
+    // Só uma chamada a `.stop()` de cada vez: duas paragens em simultâneo deixavam o ecrã preto no Safari
+    // do iPhone (o Chrome tolera, o WebKit não).
     let promessaParagem: Promise<void> | null = null;
     function pararUmaVez(): Promise<void> {
       promessaParagem ??= leitorAtual ? leitorAtual.stop().catch(() => {}) : Promise.resolve();
@@ -47,11 +35,7 @@ export function LeitorQR({ onLido }: { onLido: (token: string) => void }) {
           { facingMode: "environment" },
           { fps: 10, qrbox: 220 },
           (textoDecodificado) => {
-            // Espera a câmara estar mesmo parada antes de avisar o pai —
-            // só aí é que o pai desmonta este componente. Avisar primeiro e
-            // parar depois é o que dava a corrida: o React começava a
-            // desmontar (chamando `.clear()`) enquanto o `.stop()` do
-            // sucesso ainda estava a meio.
+            // Só avisa o pai com a câmara parada; senão o pai desmontava (`.clear()`) com o `.stop()` a meio.
             pararUmaVez().then(() => onLidoRef.current(textoDecodificado));
           },
           () => {

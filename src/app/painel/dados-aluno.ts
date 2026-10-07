@@ -1,8 +1,6 @@
 /**
- * Dados partilhados pelas páginas do aluno em /painel/*. Não é "use server"
- * de propósito: são funções chamadas por páginas do servidor, não ações que
- * o browser possa chamar. O id do aluno vem sempre da sessão — nunca do
- * endereço — por isso ninguém consegue pedir os dados de outra pessoa.
+ * Dados das páginas do aluno. Não é "use server": são chamadas por páginas, não pelo browser. O id vem
+ * sempre da sessão.
  */
 import QRCode from "qrcode";
 import { headers } from "next/headers";
@@ -12,8 +10,6 @@ import { TokenQR, Utilizador, Horario, Turma } from "@/models";
 import type { TokenGerado } from "@/app/area-pessoal/acoes";
 import type { BlocoHorario } from "@/components/horario-semanal";
 
-/** Se já houver um código válido (ex.: a página foi atualizada), mostra
- * esse, em vez de obrigar a gerar outro. */
 export async function tokenInicialDoAluno(alunoId: string): Promise<TokenGerado | null> {
   await ligarBaseDados();
   const token = await TokenQR.findOne({ alunoId, usado: false, validoAte: { $gt: new Date() } }).lean();
@@ -26,15 +22,13 @@ export async function tokenInicialDoAluno(alunoId: string): Promise<TokenGerado 
   };
 }
 
-/** RF15: o código gera-se no telemóvel — só a conta de teste gera no PC. */
+/** RF15: o código gera-se no telemóvel; só a conta de teste gera no PC. */
 export async function permissoesQR(email?: string | null) {
   const userAgent = (await headers()).get("user-agent");
   const ehContaDeTeste = email === EMAIL_CONTA_DE_TESTE_QR;
   return { podeGerar: ehUserAgentDeTelemovel(userAgent) || ehContaDeTeste, podeEscolherHora: ehContaDeTeste };
 }
 
-/** Turma e horário do aluno, já com o nome do professor de cada aula (e
- * só isso — nenhuma outra informação sobre o professor). */
 export async function horarioDoAluno(alunoId: string) {
   await ligarBaseDados();
   const aluno = await Utilizador.findById(alunoId).select("turmaId").lean();

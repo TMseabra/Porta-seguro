@@ -3,11 +3,7 @@
 import { useActionState, useState } from "react";
 import { entrarComCredenciais, type EstadoLogin } from "./acoes";
 
-/**
- * Componente de cliente porque usa `useActionState`, um hook do React que
- * guarda o estado devolvido pela Server Action e sabe quando o formulário
- * está a ser submetido (para desativar o botão).
- */
+/** Cliente por causa do `useActionState`. */
 export function FormularioCredenciais() {
   const [estado, acao, aEnviar] = useActionState<EstadoLogin, FormData>(entrarComCredenciais, {
     passo: "credenciais",
@@ -15,11 +11,7 @@ export function FormularioCredenciais() {
   const [passwordVisivel, setPasswordVisivel] = useState(false);
   const [codigo, setCodigo] = useState("");
   const pedeCodigo = estado.passo === "codigo";
-  // Campos "controlados" de propósito: depois de uma Server Action que não
-  // navega para outra página (ex.: login recusado), o browser repõe o
-  // <form> nativo aos valores iniciais — apagava o que a pessoa tinha
-  // escrito. Guardar o valor no estado do React sobrevive a esse reset,
-  // porque é o React a decidir o que aparece no campo, não o browser.
+  // Controlados: depois de uma Server Action sem navegação o browser repunha o <form> e apagava o escrito.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -66,9 +58,7 @@ export function FormularioCredenciais() {
         <label className="flex flex-col gap-1 text-sm">
           Código de acesso
           <input
-            // `inputMode="numeric"` faz o telemóvel abrir logo o teclado de
-            // números; `autoComplete="one-time-code"` deixa o iOS/Android
-            // sugerir o código a partir da notificação do email.
+            // `inputMode="numeric"` abre o teclado de números; `one-time-code` deixa o iOS/Android sugerir o código.
             type="text"
             name="codigo"
             required
@@ -100,7 +90,6 @@ export function FormularioCredenciais() {
   );
 }
 
-/** Olho aberto: a palavra-passe está oculta, clicar mostra-a. */
 function IconeOlho() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden>
@@ -116,7 +105,6 @@ function IconeOlho() {
   );
 }
 
-/** Olho riscado: a palavra-passe está visível, clicar oculta-a. */
 function IconeOlhoFechado() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden>

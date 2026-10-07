@@ -1,10 +1,6 @@
 import type { Perfil } from "@/lib/constantes";
 
-/**
- * Atalhos dos perfis que não são aluno. Usados em dois sítios: no menu
- * lateral (layout) e nos cartões da página /painel — por isso vivem aqui e
- * não dentro de nenhum dos dois.
- */
+/** Atalhos dos perfis que não são aluno, usados no menu lateral e nos cartões de /painel. */
 export interface AtalhoDoPainel {
   href: string;
   titulo: string;

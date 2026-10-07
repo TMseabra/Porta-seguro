@@ -4,7 +4,6 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Curso, Turma, Utilizador } from "@/models";
 import { CabecalhoSecao } from "@/components/cabecalho-secao";
 
-/** Ecrã inicial da administração (UC03/RF08-RF10): atalhos para cada CRUD. */
 export default async function PaginaAdmin() {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();

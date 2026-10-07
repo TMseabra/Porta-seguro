@@ -1,29 +1,18 @@
 /**
- * Alerta por email sempre que alguém faz login (endurecimento de segurança,
- * não fazia parte da análise original — decisão do aluno).
- *
- * Usa a API do Resend diretamente com `fetch`, em vez do SDK oficial: é um
- * único pedido POST, e evitar mais uma dependência mantém o código mais
- * fácil de explicar — não há nada "escondido" dentro de uma biblioteca.
- *
- * Nunca deixa uma falha aqui impedir o login: se as variáveis de ambiente
- * não estiverem definidas, ou o Resend responder com erro, o login segue
- * normalmente e o problema fica só registado no log do servidor.
+ * Emails do sistema (alerta de login, código do 2FA, aviso de movimento) pela API do Resend com
+ * fetch, sem SDK: é um único POST e fica mais fácil de explicar.
+ * Uma falha aqui nunca impede o login: só fica registada no log do servidor.
  */
 
 import { formatarDataHora } from "@/lib/datas";
 import { EMAIL_CONTA_DE_TESTE_QR } from "@/lib/dispositivo";
 import type { Perfil, TipoRegisto } from "@/lib/constantes";
 
-/** Azul do resto do site (Tailwind blue-700), para o email ficar com a
- * mesma identidade visual em vez de parecer um alerta genérico de sistema. */
 const AZUL = "#1d4ed8";
 
 /**
- * Escapa texto antes de o meter no HTML do email. A maioria dos valores
- * aqui vem da nossa própria base de dados, mas o endereço IP vem de um
- * cabeçalho do pedido (`x-forwarded-for`) — controlável por quem o envia —
- * e nunca deve ser colado diretamente num HTML sem passar por isto.
+ * Escapa texto para o HTML do email. O IP vem de um cabeçalho do pedido (x-forwarded-for),
+ * que quem envia controla.
  */
 function escaparHtml(texto: string): string {
   return texto
@@ -34,11 +23,8 @@ function escaparHtml(texto: string): string {
 }
 
 /**
- * Envolve o conteúdo de um email num cartão simples, com o nome do site no
- * topo. Escrito com `<table>` e estilos inline (não uma folha CSS à parte)
- * de propósito — é a única forma de um email ficar igual na Gmail, no
- * Outlook e no resto: a maioria destes clientes ignora `<style>` no
- * cabeçalho e alguns até removem `<div>`s inteiros.
+ * Cartão de email com <table> e estilos inline: é o que a Gmail e o Outlook respeitam
+ * (ignoram o <style> do cabeçalho).
  */
 function moldura(tituloTopo: string, corTopo: string, corpoHtml: string): string {
   return `<!doctype html>
@@ -72,8 +58,6 @@ function moldura(tituloTopo: string, corTopo: string, corpoHtml: string): string
 </html>`;
 }
 
-/** Uma linha "rótulo: valor" dentro do cartão — usado nos três emails para
- * mostrar a informação-chave (quem, quando, com quê) de forma consistente. */
 function linha(rotulo: string, valor: string): string {
   return `<tr>
     <td style="padding:6px 0;color:#64748b;font-size:13px;white-space:nowrap;vertical-align:top;">${rotulo}</td>
@@ -82,20 +66,10 @@ function linha(rotulo: string, valor: string): string {
 }
 
 /**
- * Envia um email pela API do Resend. Nunca lança — mas DEVOLVE se conseguiu
- * ou não: os avisos (login, movimento) ignoram esse valor e seguem em
- * frente, enquanto o código do segundo fator precisa mesmo de saber se o
- * email saiu, senão pedia à pessoa um código que nunca lhe chegou.
- *
- * "onboarding@resend.dev" é o remetente de testes do Resend: funciona sem
- * verificar um domínio próprio, mas só entrega ao(s) email(s) com que a
- * conta Resend foi criada — sem verificar um domínio, enviar para outros
- * endereços falha (fica registado no log, não é um erro visível para quem
- * usa o sistema).
- *
- * Vai sempre `text` E `html`: o texto simples é o que um leitor de ecrã ou
- * um cliente de email antigo mostra quando não interpreta HTML — nunca é
- * só decoração, é o mesmo conteúdo em duas formas.
+ * Envia pelo Resend. Nunca lança, mas devolve se saiu: o 2FA precisa de saber, para não pedir
+ * um código que nunca chegou.
+ * O remetente de testes (onboarding@resend.dev) só entrega ao email da conta Resend, até haver
+ * um domínio verificado. Vai texto e HTML: o texto é o que leitores de ecrã e clientes antigos mostram.
  */
 async function enviarEmail(
   destinatario: string,
@@ -133,22 +107,14 @@ async function enviarEmail(
   }
 }
 
-/** O segundo fator está ligado se houver forma de enviar o email. */
 export function emailConfigurado(): boolean {
   return Boolean(process.env.RESEND_API_KEY);
 }
 
 /**
- * Envia o código de 6 dígitos do segundo fator. Devolve `false` se o email
- * não saiu — nesse caso quem chamou recusa o login, em vez de ficar à
- * espera de um código que ninguém recebeu.
- *
- * `EMAIL_2FA_DESTINO` existe por causa da limitação do remetente de testes
- * do Resend explicada acima: sem um domínio verificado, o código nunca
- * chegaria a "admin@portaoseguro.pt". Com essa variável preenchida, os
- * códigos vão todos para a caixa de correio indicada (o email de segurança
- * de quem administra o sistema), que é o único endereço a que o Resend
- * entrega nessas condições.
+ * Envia o código do 2FA; devolve false se o email não saiu (e o login é recusado).
+ * EMAIL_2FA_DESTINO: sem domínio verificado o Resend só entrega ao email da conta, por isso
+ * os códigos vão todos para lá.
  */
 export async function enviarCodigoVerificacao(
   nome: string,
@@ -182,11 +148,8 @@ export async function enviarCodigoVerificacao(
 }
 
 /**
- * Perfis cujo login gera alerta por email. Só contas com poder sobre os
- * dados de outras pessoas: um aluno a entrar na sua própria área é o caso
- * normal e enchia a caixa de correio sem acrescentar nada. O porteiro
- * também fica de fora — não consegue alterar nada além dos registos que
- * já faz no dia a dia.
+ * Perfis cujo login gera alerta: contas com poder sobre dados de outros. Alunos e porteiro
+ * ficam de fora para não encher a caixa de correio.
  */
 const PERFIS_COM_ALERTA_DE_LOGIN: Perfil[] = [
   "professor",
@@ -196,13 +159,10 @@ const PERFIS_COM_ALERTA_DE_LOGIN: Perfil[] = [
   "admin",
 ];
 
-/** Alerta ao administrador quando entra uma conta de nível superior
- * (endurecimento de segurança — não fazia parte da análise original).
- *
- * O endereço IP vai no aviso para dar pelo menos uma pista de ONDE partiu o
- * acesso ("foi da escola ou de fora?"). Não serve para provar quem foi: numa
- * escola toda a gente sai pelo mesmo endereço, e num telemóvel ele muda
- * sozinho. É uma pista para investigar, nunca uma prova. */
+/**
+ * Avisa a administração dos logins de contas com mais permissões. O IP dá uma pista de onde
+ * partiu o acesso, não uma prova: numa escola todos saem pelo mesmo endereço.
+ */
 export async function notificarLogin(
   nome: string,
   email: string,
@@ -221,10 +181,7 @@ export async function notificarLogin(
     `${nome} (${email}, perfil "${perfil}") entrou no PortãoSeguro.\n\n` +
     `Quando: ${quando}\n` +
     `Endereço IP: ${enderecoIp}\n\n` +
-    // Não há troca de palavra-passe self-service no sistema — só um admin
-    // pode mudar a de outra pessoa (src/app/admin/alunos/acoes.ts). Por
-    // isso a instrução aponta para o informático da escola, não para um
-    // link que não existe.
+    // Não há troca de palavra-passe self-service: só um admin muda a de outra pessoa.
     "Se não reconheces este acesso, dirige-te ao informático da escola " +
     "e pede para trocar a palavra-passe dessa conta.";
 
@@ -247,22 +204,10 @@ export async function notificarLogin(
 }
 
 /**
- * Avisa o próprio aluno (por email) sempre que tem uma entrada ou saída
- * registada na portaria — decisão do aluno, para poder acompanhar em tempo
- * real quando entra/sai da escola.
- *
- * Manda-se para o email da CONTA do aluno (não para um admin fixo): cada
- * aluno só recebe avisos sobre si próprio.
- *
- * EXCEÇÃO: a conta de teste (`EMAIL_CONTA_DE_TESTE_QR`) usa um domínio da
- * escola real (eclisboa.net), que o Resend recusa entregar sem um domínio
- * verificado — a mesma limitação do `EMAIL_2FA_DESTINO` (ver
- * `enviarCodigoVerificacao`). Sem este desvio, o email desta conta falhava
- * sempre, em silêncio, e nunca dava para mostrar este aviso a funcionar na
- * defesa oral. Note-se que isto é só um problema da conta de DEMONSTRAÇÃO:
- * as contas reais dos alunos ficam sujeitas à mesma limitação enquanto o
- * Resend não tiver um domínio verificado — não há nada a corrigir no
- * código para isso, é preciso mesmo verificar um domínio.
+ * Avisa o aluno de cada entrada/saída registada, no email da própria conta.
+ * Exceção: a conta de teste (EMAIL_CONTA_DE_TESTE_QR) tem um domínio real que o Resend recusa
+ * sem domínio verificado, por isso vai para EMAIL_2FA_DESTINO, como o 2FA. As contas reais
+ * ficam sujeitas à mesma limitação.
  */
 export async function notificarMovimento(
   nomeAluno: string,

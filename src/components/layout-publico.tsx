@@ -4,14 +4,7 @@ import { Logo } from "@/components/logo";
 import { LogoTexto } from "@/components/logo-texto";
 import { ModeToggle } from "@/components/mode-toggle";
 
-/**
- * Cabeçalho, fundo e rodapé comuns às páginas públicas (/, /funcionalidades,
- * /seguranca, /sobre). Cada uma é uma página própria — antes eram secções
- * da página inicial a que se chegava por âncoras (#funcionalidades...).
- *
- * O fundo no modo escuro é sempre o mesmo (`FUNDO`), em todas as secções:
- * antes a página misturava faixas pretas com outras azuladas.
- */
+/** Cabeçalho, fundo e rodapé das páginas públicas. O fundo escuro é sempre o mesmo (`FUNDO`). */
 
 export type PaginaPublica = "inicio" | "funcionalidades" | "seguranca" | "sobre";
 
@@ -26,8 +19,8 @@ export async function LayoutPublico({ ativa, children }: { ativa: PaginaPublica;
   const destino = sessao?.user ? "/painel" : "/login";
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-950 dark:bg-[#080b10] dark:text-slate-100">
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#080b10]/90">
+    <div className="flex min-h-screen flex-col bg-white text-slate-950 dark:bg-[#000000] dark:text-slate-100">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#000000]/90">
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-3 px-5 sm:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="PortãoSeguro — página principal">
             <Logo className="h-10 w-10" decorativa />
@@ -104,7 +97,6 @@ export async function LayoutPublico({ ativa, children }: { ativa: PaginaPublica;
   );
 }
 
-/** Cabeçalho de topo das páginas secundárias (/funcionalidades, ...). */
 export function TopoPagina({ etiqueta, titulo, descricao }: { etiqueta: string; titulo: React.ReactNode; descricao: string }) {
   return (
     <section className="border-b border-slate-100 dark:border-white/[.06]">
@@ -117,7 +109,6 @@ export function TopoPagina({ etiqueta, titulo, descricao }: { etiqueta: string; 
   );
 }
 
-/** Cartão das páginas públicas — mesmo fundo em todas, claro ou escuro. */
 export function CartaoPublico({ titulo, icone, children }: { titulo: string; icone?: string; children: React.ReactNode }) {
   return (
     <article className="hover-highlight rounded-2xl border border-slate-200 bg-white p-6 dark:border-white/[.08] dark:bg-white/[.03]">

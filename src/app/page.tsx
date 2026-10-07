@@ -19,7 +19,7 @@ export default async function PaginaInicial() {
   return (
     <LayoutPublico ativa="inicio">
       <section className="relative isolate overflow-hidden border-b border-slate-100 dark:border-white/[.06]">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_15%_35%,rgba(37,99,235,.08),transparent_38%)]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_15%_35%,rgba(37,99,235,.08),transparent_38%)] dark:hidden" />
         <div className="mx-auto grid min-h-[650px] max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_.9fr] lg:gap-8 lg:py-20">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[.14em] text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
@@ -50,7 +50,7 @@ export default async function PaginaInicial() {
             <div className="absolute h-80 w-80 rounded-full bg-blue-100 blur-3xl dark:bg-blue-500/10" />
             <div className="relative w-[290px] rounded-[42px] border-[7px] border-slate-950 bg-slate-950 p-2 shadow-2xl shadow-slate-900/25 sm:w-[310px] dark:border-slate-700">
               <div className="absolute left-1/2 top-2 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
-              <div className="min-h-[535px] overflow-hidden rounded-[32px] bg-[#0c1118] px-4 pb-5 pt-10 text-white">
+              <div className="min-h-[535px] overflow-hidden rounded-[32px] bg-[#0a0a0a] px-4 pb-5 pt-10 text-white">
                 <div className="flex items-center justify-between"><div><p className="text-[10px] text-white/45">Segunda, 26 de maio</p><p className="mt-1 text-lg font-bold">Olá, João 👋</p></div><span className="text-white/70">♧</span></div>
                 {/* eslint-disable-next-line @next/next/no-img-element -- QR gerado no servidor como data URL, não há nada para o next/image otimizar */}
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/[.04] p-3.5"><div className="flex items-center justify-between text-[10px] font-semibold text-white/60"><span>Código QR temporário</span><span className="text-emerald-400">● ATIVO</span></div><div className="mx-auto mt-3 flex h-40 w-40 items-center justify-center rounded-lg bg-white p-2"><img src={qr} alt="Exemplo de código QR temporário" className="h-full w-full" /></div><p className="mt-3 text-center text-[10px] text-white/45">Válido por</p><p className="text-center text-lg font-bold text-blue-400">00:58</p><span className="mt-3 block w-full rounded-lg border border-white/10 py-2 text-center text-[10px] text-white/75">↻ Gerar novo código</span></div>

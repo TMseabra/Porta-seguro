@@ -1,24 +1,15 @@
-/**
- * Modelo: horarios
- *
- * Um bloco de aula de uma turma: dia da semana + hora de início + hora de
- * fim. É com base nestes blocos que o sistema decide se uma saída está
- * dentro do horário letivo e se uma entrada é um atraso (Fase 3).
- */
+/** Modelo: horarios. Bloco de aula (dia + início + fim): serve para decidir saídas e atrasos. */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 
-// Formato "HH:MM", com horas de 00 a 23 e minutos de 00 a 59.
 const REGEX_HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export interface IHorario {
   _id: Types.ObjectId;
   turmaId: Types.ObjectId;
-  /** 0 = domingo, 1 = segunda, ... 6 = sábado (mesma convenção do JavaScript). */
+  /** 0 = domingo ... 6 = sábado (como o JavaScript). */
   diaSemana: number;
-  /** Hora de início, formato "HH:MM". */
   horaInicio: string;
-  /** Hora de fim, formato "HH:MM". */
   horaFim: string;
   disciplina: string;
   professorId?: Types.ObjectId;
@@ -52,20 +43,15 @@ const HorarioSchema = new Schema<IHorario>(
   { timestamps: true },
 );
 
-// Validação que compara dois campos entre si (horaFim depois de horaInicio):
-// usa-se um "hook" em vez de `validate` no campo, porque o Mongoose só nos dá
-// acesso ao documento completo (para ler `this.horaInicio`) neste ponto.
-// Comparamos as strings "HH:MM" diretamente: com zeros à esquerda, a ordem
-// alfabética coincide sempre com a ordem cronológica.
+// Hook e não `validate` no campo: só aqui se acede ao documento inteiro. Com zeros à esquerda, a ordem
+// alfabética de "HH:MM" é a cronológica.
 HorarioSchema.pre("validate", function () {
   if (this.horaFim <= this.horaInicio) {
     throw new Error("A hora de fim tem de ser depois da hora de início.");
   }
 });
 
-// Índice principal deste modelo: a Fase 3 vai perguntar constantemente
-// "que blocos tem esta turma neste dia da semana?" — este índice composto
-// torna essa consulta imediata mesmo com muitos horários na base de dados.
+// Consulta mais frequente: blocos de uma turma num dia.
 HorarioSchema.index({ turmaId: 1, diaSemana: 1 });
 
 export const Horario: Model<IHorario> =

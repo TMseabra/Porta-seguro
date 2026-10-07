@@ -1,19 +1,9 @@
 /**
- * Interpretação das linhas de um Excel de horário (RF10 — decisão do
- * aluno: quem faz os horários trabalha em Excel, não faz sentido obrigar a
- * escrever bloco a bloco na administração). Função pura — sem BD, sem
- * ficheiro — recebe as linhas já lidas pela biblioteca `xlsx` e a lista de
- * professores já existentes (para resolver o nome escrito na coluna
- * "Professor" num id), devolve cada linha anotada com o que percebeu e
- * com os erros encontrados, para mostrar uma pré-visualização antes de
- * gravar nada a sério.
- *
- * Formato esperado (cabeçalhos na 1.ª linha, ordem livre):
- *   Dia | Início | Fim | Disciplina | Professor | Sala
- *
- * "Dia" aceita o nome (Segunda, Segunda-feira, ...) ou o número 0-6 (0 =
- * domingo, como o resto do projeto). "Professor" tem de corresponder ao
- * nome completo de uma conta já existente com perfil professor ou dt.
+ * Interpreta as linhas de um Excel de horário (RF10). Função pura: recebe as linhas lidas pelo `xlsx`
+ * e a lista de professores, e devolve cada linha com o que percebeu e os erros, para pré-visualizar
+ * antes de gravar. Formato (cabeçalhos na 1.ª linha, ordem livre): Dia | Início | Fim | Disciplina |
+ * Professor | Sala. "Dia" aceita o nome ou 0-6 (0 = domingo); "Professor" tem de ser o nome completo
+ * de uma conta professor/dt.
  */
 
 export interface ProfessorDisponivel {
@@ -22,8 +12,7 @@ export interface ProfessorDisponivel {
 }
 
 export interface LinhaImportada {
-  /** Número da linha no Excel (a 1.ª linha de dados é a 2, porque a 1 é o
-   * cabeçalho) — para a pessoa localizar o erro na folha original. */
+  /** Número da linha no Excel (a 1.ª de dados é a 2), para localizar o erro na folha. */
   numeroLinha: number;
   diaSemana?: number;
   horaInicio?: string;
@@ -50,8 +39,7 @@ const NOMES_DIAS: Record<string, number> = {
   sabado: 6,
 };
 
-/** Tira acentos e maiúsculas para comparar texto sem depender de como
- * cada pessoa escreveu ("Terça", "terca", "TERÇA-FEIRA" contam todos). */
+/** Tira acentos e maiúsculas: "Terça", "terca" e "TERÇA-FEIRA" contam todos. */
 function normalizar(texto: string): string {
   return texto
     .normalize("NFD")
@@ -60,7 +48,6 @@ function normalizar(texto: string): string {
     .toLowerCase();
 }
 
-/** Converte o texto (ou número) da coluna "Dia" no dia da semana (0-6). */
 export function diaSemanaDeTexto(valor: string): number | undefined {
   const normalizado = normalizar(valor);
   if (normalizado in NOMES_DIAS) return NOMES_DIAS[normalizado];
@@ -73,9 +60,7 @@ export function diaSemanaDeTexto(valor: string): number | undefined {
 
 const REGEX_HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
-/** Aceita tanto "08:30" como o número decimal que o Excel usa por vezes
- * para horas (ex.: 0.354166... = 08:30) quando a célula não vem já como
- * texto. */
+/** Aceita "08:30" ou o decimal que o Excel usa por vezes para horas (0.3541... = 08:30). */
 function normalizarHora(valor: unknown): string | undefined {
   if (typeof valor === "string") {
     const texto = valor.trim();
@@ -95,11 +80,7 @@ function textoDaCelula(valor: unknown): string {
   return String(valor).trim();
 }
 
-/**
- * Cada linha do Excel já vem como um objeto (chave = cabeçalho da coluna,
- * valor = conteúdo da célula) — é o formato que `XLSX.utils.sheet_to_json`
- * devolve. Aceita os cabeçalhos com ou sem acento/maiúsculas.
- */
+/** Cada linha vem como objeto (cabeçalho -> célula), o formato de XLSX.utils.sheet_to_json. */
 export function interpretarLinhasExcel(
   linhas: Array<Record<string, unknown>>,
   professoresDisponiveis: ProfessorDisponivel[],
@@ -109,8 +90,7 @@ export function interpretarLinhasExcel(
   );
 
   return linhas.map((linha, indice) => {
-    // As chaves do objeto vêm tal como estão na 1.ª linha do Excel — aceita
-    // "Dia", "dia", "DIA", etc. comparando normalizado.
+    // Aceita os cabeçalhos com ou sem acento e maiúsculas.
     const porChaveNormalizada = new Map(
       Object.entries(linha).map(([chave, valor]) => [normalizar(chave), valor]),
     );

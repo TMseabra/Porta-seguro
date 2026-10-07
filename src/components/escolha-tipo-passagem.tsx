@@ -11,14 +11,8 @@ const OPCOES: { valor: TipoEscolhido; rotulo: string }[] = [
 ];
 
 /**
- * Escolha da direção numa SIMULAÇÃO (ferramenta do admin e QR da conta de
- * teste). "Automático" mantém a regra normal — alterna com o último
- * registo; as outras duas forçam a direção, para dar para testar uma saída
- * sem ter de simular primeiro uma entrada, por exemplo.
- *
- * Feito com <input type="radio"> a sério (escondidos, com a etiqueta a
- * fazer de botão): assim as setas do teclado mudam de opção e um leitor de
- * ecrã anuncia-o como um grupo de escolha única, sem código extra.
+ * Direção numa simulação: "Automático" alterna com o último registo; as outras forçam. Usa <input type="radio">
+ * escondidos: setas e leitores de ecrã funcionam sem código extra.
  */
 export function EscolhaTipoPassagem({
   valor,

@@ -6,18 +6,11 @@ import { turmasDoUtilizador } from "@/lib/ambito";
 import { FiltroConsulta } from "./filtro-consulta";
 import { CabecalhoSecao } from "@/components/cabecalho-secao";
 
-/**
- * Ecrã de consultas e listagem (UC02/UC04): assiduidade por aluno, por
- * turma ou por ano de formação, com exportação em PDF (RF06/RF07/RF11).
- *
- * Só admin e coordenador. O porteiro não entra: identifica quem passa na
- * portaria, mas não acompanha o histórico de faltas de ninguém.
- */
+/** Consultas (UC02/UC04): assiduidade por aluno, turma ou ano, com PDF. Só admin e coordenador. */
 export default async function PaginaConsultas() {
   const sessao = await exigirPerfil(["coordenador", "gestor", "admin"]);
   await ligarBaseDados();
 
-  // O coordenador só vê as turmas dos cursos que coordena; o admin vê tudo.
   const turmas = await turmasDoUtilizador(sessao.user.id, sessao.user.perfil);
 
   const alunos = await Utilizador.find({

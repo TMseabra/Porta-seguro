@@ -1,10 +1,6 @@
 /**
- * Modelo: registos
- *
- * O coração do sistema: cada entrada ou saída de um aluno na portaria fica
- * aqui, com a decisão que foi tomada. É a partir desta coleção (cruzada com
- * `horarios`) que se calculam presenças, faltas e atrasos — nunca se
- * introduzem esses valores à mão.
+ * Modelo: registos. Cada entrada/saída com a decisão tomada. Presenças, faltas e atrasos calculam-se daqui
+ * (com `horarios`), nunca se introduzem à mão.
  */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
@@ -24,13 +20,9 @@ export interface IRegisto {
   tipo: TipoRegisto;
   metodo: MetodoRegisto;
   estado: EstadoRegisto;
-  /** Explicação da decisão (ex.: "fora do horário letivo", "aluno suspenso"). */
   motivo?: string;
-  /** Bloco de horário em vigor no momento do registo, se existir. */
   horarioId?: Types.ObjectId;
-  /** Utilizador (porteiro) que efetuou ou confirmou o registo. */
   registadoPorId: Types.ObjectId;
-  /** Verdadeiro se o porteiro confirmou a autorização dos pais por telefone. */
   confirmacaoPais: boolean;
 }
 
@@ -59,9 +51,7 @@ const RegistoSchema = new Schema<IRegisto>(
   { timestamps: true },
 );
 
-// Índice principal: o histórico de um aluno é sempre consultado ordenado do
-// mais recente para o mais antigo (`-1` na dataHora), tanto no ecrã de
-// consultas como no cálculo de assiduidade.
+// O histórico de um aluno consulta-se sempre do mais recente para o mais antigo.
 RegistoSchema.index({ alunoId: 1, dataHora: -1 });
 
 export const Registo: Model<IRegisto> =

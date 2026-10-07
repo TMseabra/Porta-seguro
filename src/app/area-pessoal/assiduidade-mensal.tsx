@@ -5,17 +5,10 @@ import { useId, useState } from "react";
 export interface LinhaDiaAssinalar {
   dataFormatada: string;
   situacao: "presenca_atraso" | "falta";
-  /** Hora exata da entrada ("09:15") — ausente numa falta, porque não há
-   * entrada nenhuma para ter hora. */
   horaEntradaFormatada?: string;
 }
 
-/**
- * Assiduidade do mês: os números-resumo (dias letivos, presenças, atrasos,
- * faltas) ficam sempre visíveis; a lista dia-a-dia fica escondida atrás de
- * um botão — só quem quer mesmo ver QUAIS dias tiveram falta/atraso é que
- * clica, em vez de a página abrir sempre com uma lista comprida.
- */
+/** Resumo sempre visível; a lista dia-a-dia fica atrás de um botão. */
 export function AssiduidadeMensal({
   mes,
   ano,

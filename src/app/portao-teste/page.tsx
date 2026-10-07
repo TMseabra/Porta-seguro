@@ -7,13 +7,7 @@ import { Registo, Utilizador } from "@/models";
 import { PainelPortao } from "./painel-portao";
 import type { LinhaRegisto } from "@/lib/movimento";
 
-/**
- * Portão Teste (UC01): leitura de código QR na portaria, com semáforo e
- * tabela dos registos do dia.
- *
- * Só porteiro e admin — é aqui que se cria um registo de entrada/saída
- * verdadeiro, por isso o acesso é o mesmo do ecrã de portaria de sempre.
- */
+/** Portão Teste (UC01): QR, semáforo e registos do dia. Só porteiro e admin: cria registos verdadeiros. */
 export default async function PaginaPortaoTeste() {
   await exigirPerfil(["porteiro", "admin"]);
   await ligarBaseDados();
@@ -23,8 +17,6 @@ export default async function PaginaPortaoTeste() {
     .sort({ dataHora: -1 })
     .lean();
 
-  // Uma só consulta para os nomes de todos os alunos que aparecem na
-  // tabela, em vez de uma consulta por linha.
   const alunoIds = [...new Set(registosHoje.map((registo) => registo.alunoId.toString()))];
   const alunos = await Utilizador.find({ _id: { $in: alunoIds } })
     .select("nomeCompleto")

@@ -1,16 +1,7 @@
 /**
- * Modelo de Excel para os horários (RF10 — decisão do aluno).
- *
- * É uma rota normal (não uma Server Action) pela mesma razão do
- * `/api/relatorios/pdf`: uma Server Action devolve dados para o React, não
- * um ficheiro para descarregar — um link direto é a forma simples de o
- * browser fazer o download.
- *
- * A folha "Professores" não é decoração: o importador (`importarHorario.ts`)
- * exige que o nome na coluna "Professor" seja EXATAMENTE igual ao nome da
- * conta na base de dados, por isso o modelo já traz a lista certa para
- * copiar/colar, gerada na hora — se entrar um professor novo, o próximo
- * download já o mostra.
+ * Modelo de Excel para horários (RF10). Rota normal e não Server Action: um link direto é o que faz o
+ * browser descarregar um ficheiro. A folha "Professores" existe porque o importador exige o nome
+ * EXATAMENTE igual ao da conta.
  */
 import * as XLSX from "xlsx";
 import { ligarBaseDados } from "@/lib/mongoose";
@@ -34,9 +25,7 @@ export async function GET() {
 
   const livro = XLSX.utils.book_new();
 
-  // Folha principal: cabeçalho + duas linhas de exemplo (apagar antes de
-  // preencher a sério) para quem nunca viu o formato perceber logo o que
-  // vai em cada coluna, sem ter de ler instrução nenhuma.
+  // Duas linhas de exemplo (a apagar) para se perceber cada coluna.
   const linhasExemplo = [
     ["Dia", "Início", "Fim", "Disciplina", "Professor", "Sala"],
     ["Segunda-feira", "08:30", "10:00", "Programação", professores[0]?.nomeCompleto ?? "", "1.12"],
@@ -53,9 +42,7 @@ export async function GET() {
   ];
   XLSX.utils.book_append_sheet(livro, folhaHorario, "Horário");
 
-  // Folha de referência: nomes exatos a copiar para a coluna "Professor",
-  // e os nomes das turmas já criadas (só para consulta, o importador não
-  // lê esta folha).
+  // Folha de consulta: nomes exatos dos professores e das turmas; o importador não a lê.
   const linhasInstrucoes = [
     ["Como preencher a folha \"Horário\"", ""],
     ["", ""],

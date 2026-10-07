@@ -1,29 +1,18 @@
-/**
- * Rota de diagnóstico: GET /api/saude
- *
- * Serve para confirmar que a aplicação consegue mesmo falar com o MongoDB
- * Atlas. Não faz parte dos requisitos do projeto — é uma ferramenta de apoio
- * ao desenvolvimento, útil também para verificar o deploy na Vercel.
- */
+/** Diagnóstico (GET /api/saude): confirma a ligação ao Atlas e o deploy. Não faz parte dos requisitos. */
 
 import { ligarBaseDados } from "@/lib/mongoose";
 import { formatarDataHora } from "@/lib/datas";
 import { auth } from "@/auth";
 
-// Esta rota TEM de correr no runtime Node.js. O Mongoose usa sockets TCP,
-// que não existem no runtime "Edge" da Vercel.
+// Tem de ser Node.js: o Mongoose usa TCP, que o Edge não tem.
 export const runtime = "nodejs";
 
-// Nunca guardar o resultado em cache: queremos sempre o estado atual.
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const agora = new Date();
 
-  // Esta rota tem de continuar a responder a quem não tem sessão — é assim
-  // que se confirma que um deploy novo ficou de pé. Mas o nome da base de
-  // dados e o endereço do servidor no Atlas não são coisas para dar a
-  // desconhecidos: os detalhes só vão para um admin autenticado.
+  // Responde a quem não tem sessão (confirma o deploy), mas nome da BD e servidor só vão para admins.
   const sessao = await auth();
   const eAdmin = sessao?.user?.perfil === "admin" || sessao?.user?.perfil === "gestor";
 
@@ -41,10 +30,7 @@ export async function GET() {
       momento: formatarDataHora(agora), // já no fuso de Lisboa
     });
   } catch (erro) {
-    // A mensagem crua do driver do MongoDB ajuda a perceber o que falhou
-    // (URI em falta, password errada, IP não autorizado no Atlas...), mas
-    // também revela demasiado — fica no log do servidor e só é devolvida a
-    // um admin.
+    // A mensagem do driver revela demasiado: fica no log do servidor e só é devolvida a um admin.
     console.error("Falha na ligação à base de dados:", erro);
     const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido.";
 

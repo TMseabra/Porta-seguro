@@ -1,41 +1,19 @@
 /**
- * Script de seed: preenche a base de dados com dados de demonstração
- * coerentes entre si — 2 cursos, 4 turmas, ~20 alunos, horários de uma
- * semana e alguns registos de entrada/saída.
- *
- * Corre-se com `npm run seed`. APAGA primeiro tudo o que já existir nas 7
- * coleções — é para ambiente de desenvolvimento, nunca para uma base de
- * dados com dados reais de alunos.
- *
- * Todos os utilizadores criados ficam com a mesma palavra-passe, indicada
- * no resumo impresso no fim.
+ * Preenche a BD com dados de demonstração (2 cursos, 4 turmas, ~20 alunos, horários de uma semana,
+ * alguns registos). `npm run seed`. APAGA as 7 coleções primeiro: só para desenvolvimento.
  */
 
-// O Next.js carrega o .env.local sozinho; este script corre fora do
-// Next.js (por `tsx`), por isso tem de carregar o ficheiro ele próprio.
-// `process.loadEnvFile` é nativo do Node (>= 20.6) — não precisa de mais
-// nenhuma dependência só para isto.
+// O Next.js carrega o .env.local sozinho; este script corre fora dele (tsx).
 process.loadEnvFile(".env.local");
 
 /**
- * TRAVÃO DE SEGURANÇA.
- *
- * Este script apaga as 7 coleções antes de recriar os dados. Enquanto só
- * existiu a base de dados de desenvolvimento isso era inofensivo; a partir
- * do momento em que houver uma base de dados de produção com alunos a
- * sério, um `npm run seed` distraído — ou um `.env.local` onde alguém
- * colou a URI de produção para experimentar uma coisa — apaga tudo, sem
- * forma de voltar atrás (o plano gratuito do Atlas não faz backups).
- *
- * Por isso o comando recusa-se a correr sozinho: é preciso pedir o
- * apagamento explicitamente. Não protege de quem escreve a flag à mesma,
- * mas protege do engano, que é o que realmente acontece.
+ * Travão de segurança: o script apaga tudo e o Atlas gratuito não faz backups, por isso recusa-se a
+ * correr sem pedido explícito. Protege do engano (ex.: URI de produção colada no .env.local).
  */
 const CONFIRMACAO = "--apagar-tudo";
 
 if (!process.argv.includes(CONFIRMACAO)) {
-  // Mostra QUAL base de dados ia ser apagada — é o que permite dar pelo
-  // engano antes de ele acontecer.
+  // Mostra QUAL base de dados vai ser apagada, para se dar pelo engano a tempo.
   const uri = process.env.MONGODB_URI ?? "";
   const nomeBaseDados = uri.split("/").pop()?.split("?")[0] || "(desconhecida)";
 
@@ -61,13 +39,8 @@ import { hashPassword } from "@/lib/senha";
 import type { Perfil } from "@/lib/constantes";
 
 /**
- * Palavra-passe dada a todas as contas criadas por este script.
- *
- * NÃO fica escrita aqui de propósito: uma palavra-passe no código é uma
- * palavra-passe que qualquer pessoa com acesso ao repositório (ou a um
- * backup dele) conhece — e todas as contas do seed a partilham. Vem da
- * variável de ambiente `SEED_PASSWORD`; se não estiver definida, o script
- * inventa uma diferente em cada execução e imprime-a no fim.
+ * Não fica escrita no código: vem de `SEED_PASSWORD`; se faltar, gera-se uma nova a cada execução
+ * e imprime-se no fim.
  */
 const PALAVRA_PASSE_SEED =
   process.env.SEED_PASSWORD ?? `Seed-${crypto.randomBytes(6).toString("base64url")}`;
@@ -88,9 +61,7 @@ const DISCIPLINAS_MEC = [
   "Inglês Técnico",
 ];
 
-// Cada professor dá sempre a MESMA disciplina, em todas as turmas onde ela
-// exista (ex.: quem dá "Inglês Técnico" dá-o tanto nas turmas de API como
-// nas de MEC) — nunca um professor a dar disciplinas diferentes.
+// Cada professor dá sempre a MESMA disciplina, em todas as turmas onde ela existe.
 const PROFESSOR_POR_DISCIPLINA: Record<string, string> = {
   "Programação": "Ana Ferreira",
   "Base de Dados": "Bruno Costa",
@@ -141,7 +112,6 @@ interface DefinicaoTurma {
   disciplinas: string[];
 }
 
-/** Só os campos do aluno de que o resto do script precisa depois de o criar. */
 interface AlunoResumoSeed {
   _id: mongoose.Types.ObjectId;
   email: string;
@@ -187,11 +157,9 @@ async function main() {
   const porteiro = await Utilizador.create(
     novoUtilizador("Porteiro Principal", "porteiro@portaoseguro.pt", "porteiro"),
   );
-  // "gestor": as mesmas permissões do admin em toda a administração, mas
-  // sem acesso ao Portão Teste — ver a nota em src/lib/constantes.ts.
+  // "gestor": permissões do admin, mas sem acesso ao Portão Teste (ver constantes.ts).
   await Utilizador.create(novoUtilizador("Gestora da Escola", "gestor@portaoseguro.pt", "gestor"));
-  // Um coordenador por curso (não o mesmo para os dois) — mais realista, e
-  // dá para testar que cada coordenador só vê as turmas do SEU curso.
+  // Um coordenador por curso, para testar que cada um só vê as turmas do SEU curso.
   const coordenadorAPI = await Utilizador.create(
     novoUtilizador("Coordenador de Curso (API)", "coordenador@portaoseguro.pt", "coordenador"),
   );
@@ -237,11 +205,8 @@ async function main() {
     { nome: "2MEC", ano: 2, curso: cursoMEC, disciplinas: DISCIPLINAS_MEC },
   ];
 
-  // Um dia "normal" tem só a manhã + o bloco logo a seguir ao almoço
-  // (11:45–13:00 já é um intervalo de almoço real). À terça e à quinta o
-  // dia estende-se até às 16h/18h — dá dois cenários diferentes para testar
-  // saída/entrada à hora de almoço num dia mais comprido, tal como um dia
-  // real de aulas com mais horas.
+  // Dia normal: manhã + bloco a seguir ao almoço; terça e quinta alargam-se até às 16h/18h para testar
+  // saídas à hora de almoço num dia mais comprido.
   const BLOCO_MANHA: Array<[string, string]> = [
     ["08:30", "10:00"],
     ["10:15", "11:45"],
@@ -310,8 +275,7 @@ async function main() {
     for (let i = 0; i < 5; i++) {
       const nome = NOMES_ALUNOS[contadorAluno] ?? `Aluno ${contadorAluno + 1}`;
       const numeroAluno = 20001 + contadorAluno;
-      // Ano 3 (finalistas): todos maiores de idade, para simplificar a
-      // demonstração das saídas fora do horário.
+      // Ano 3: todos maiores de idade, para demonstrar saídas fora do horário.
       const maiorIdade = def.ano >= 3 || Math.random() < 0.25;
       const aluno = await Utilizador.create(
         novoUtilizador(nome, `aluno${numeroAluno}@portaoseguro.pt`, "aluno", {
@@ -320,8 +284,7 @@ async function main() {
           turmaId: turma._id,
           maiorIdade,
           autorizacaoPais: !maiorIdade && Math.random() < 0.5,
-          // Um aluno suspenso por turma, para haver pelo menos um caso a
-          // demonstrar o bloqueio de entrada (RF03).
+          // Um suspenso por turma, para demonstrar o bloqueio de entrada (RF03).
           suspenso: i === 4,
         }),
       );
@@ -333,9 +296,7 @@ async function main() {
 
   const todosAlunos = alunosPorTurma.flat();
 
-  // Alguns registos de exemplo (ontem), para a tabela de consultas não
-  // ficar vazia. As presenças/faltas/atrasos nunca são inseridos à mão —
-  // isto é só histórico de entradas/saídas, tal como o porteiro produziria.
+  // Registos de ontem para a tabela de consultas não ficar vazia. Presenças/faltas nunca se inserem à mão.
   const ontem = new Date();
   ontem.setDate(ontem.getDate() - 1);
 
@@ -367,8 +328,6 @@ async function main() {
     });
   }
 
-  // Um caso de saída negada e um de saída confirmada por telefone, para
-  // haver exemplos dos três estados possíveis.
   const [alunoNegado, alunoConfirmadoPais] = todosAlunos.slice(8, 10);
   registosExemplo.push({
     alunoId: alunoNegado._id,
@@ -392,8 +351,6 @@ async function main() {
 
   await Registo.insertMany(registosExemplo);
 
-  // Ocorrência de exemplo: a tentativa de entrada do aluno suspenso da
-  // primeira turma (RF03).
   const alunoSuspenso = alunosPorTurma[0][4];
   const registoBloqueado = await Registo.create({
     alunoId: alunoSuspenso._id,

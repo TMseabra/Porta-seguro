@@ -1,9 +1,4 @@
-/**
- * Ponto único de acesso a todos os modelos.
- *
- * Em vez de `import { Utilizador } from "@/models/Utilizador"` em cada
- * ficheiro, escreve-se `import { Utilizador } from "@/models"`.
- */
+/** Ponto único de acesso aos modelos: `import { Utilizador } from "@/models"`. */
 
 export { Curso, type ICurso } from "./Curso";
 export { Turma, type ITurma } from "./Turma";

@@ -10,13 +10,8 @@ import {
 } from "./logica";
 
 /**
- * UC02 — Consultar assiduidade.
- *
- * Só admin e coordenador. O porteiro NÃO entra aqui: a função dele é
- * identificar quem passa na portaria, não acompanhar o histórico de faltas
- * de ninguém. O coordenador só vê as turmas dos cursos que coordena, e essa
- * verificação é feita aqui no servidor — não basta filtrar os menus, porque
- * o id da turma vem do browser e podia ser trocado à mão.
+ * UC02. Só admin e coordenador (o porteiro não acompanha faltas). O âmbito verifica-se aqui no servidor:
+ * o id da turma vem do browser e podia ser trocado.
  */
 export async function consultarAssiduidade(
   ambito: Ambito,

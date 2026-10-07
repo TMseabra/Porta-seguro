@@ -4,12 +4,7 @@ import { Utilizador, Turma } from "@/models";
 import { CabecalhoSecao } from "@/components/cabecalho-secao";
 import { FormularioSimulacao, type AlunoParaSeletor } from "./formulario-simulacao";
 
-/**
- * Ferramenta de simulação de data/hora (admin/gestor — RF15/RF16 fora do
- * momento real): permite demonstrar entradas e saídas em dias e horas
- * diferentes do agora, para a defesa oral. Os registos criados aqui ficam
- * sempre marcados como simulação (ver `./acoes.ts`).
- */
+/** Simulação de data/hora (admin/gestor) para a defesa oral; os registos ficam marcados como simulação. */
 export default async function PaginaSimulacao() {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();

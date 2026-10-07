@@ -8,19 +8,9 @@ export interface OpcaoSelect {
 }
 
 /**
- * Substituto do `<select>` nativo: o menu aberto de um `<select>` é
- * desenhado pelo sistema operativo, não pelo browser, por isso não há CSS
- * que o faça combinar com o resto do site (cantos direitos, cores fixas).
- * Este componente é só um botão + uma lista normal em HTML, por isso
- * herda os mesmos `rounded-lg`/cores/dark mode de qualquer outro elemento
- * da página.
- *
- * Segue o padrão de teclado do WAI-ARIA para um "listbox recolhível"
- * (Collapsible Listbox): setas cima/baixo movem uma opção "ativa" sem
- * tirar o foco do botão, Home/Fim saltam para a primeira/última, Enter e
- * espaço confirmam, Escape fecha — tal como um `<select>` nativo. Sem
- * isto, um `<select>` a sério dava para operar todo por teclado e este
- * substituto não dava (só clique, ou um Tab por cada opção).
+ * Substituto do <select> nativo, cujo menu aberto é desenhado pelo sistema operativo e não se pode
+ * estilizar. Segue o padrão WAI-ARIA de listbox recolhível: setas movem a opção ativa sem tirar o
+ * foco do botão, Home/Fim saltam, Enter/espaço confirmam, Escape fecha.
  */
 export function SelectPersonalizado({
   rotulo,
@@ -36,9 +26,7 @@ export function SelectPersonalizado({
   className?: string;
 }) {
   const [aberto, setAberto] = useState(false);
-  // Índice da opção "ativa" (destacada, mas sem o foco do browser sair do
-  // botão) — é o que o `aria-activedescendant` do botão aponta, para o
-  // leitor de ecrã anunciar a opção certa sem mexer no foco real.
+  // Opção "ativa": destacada sem o foco sair do botão; é o que o aria-activedescendant aponta.
   const [indiceAtivo, setIndiceAtivo] = useState(0);
   const raiz = useRef<HTMLDivElement>(null);
   const botaoRef = useRef<HTMLButtonElement>(null);
@@ -68,9 +56,7 @@ export function SelectPersonalizado({
     setAberto(true);
   }
 
-  /** Fecha e devolve o foco ao botão — sem isto, ao escolher uma opção
-   * clicando (ou por teclado) o foco perdia-se: a lista desaparece do
-   * ecrã e o browser não sabe para onde ir a seguir. */
+  /** Fecha e devolve o foco ao botão, senão o foco perdia-se quando a lista desaparece. */
   function fechar() {
     setAberto(false);
     botaoRef.current?.focus();
@@ -91,8 +77,7 @@ export function SelectPersonalizado({
       case "ArrowUp":
       case " ":
       case "Enter":
-        // A primeira seta/Enter/espaço ABRE a lista, já com a opção atual
-        // ativa — só a partir daqui é que as setas passam a MOVER.
+        // A 1.ª seta/Enter/espaço abre a lista; a partir daí as setas movem.
         evento.preventDefault();
         if (!aberto) {
           abrir();
@@ -136,11 +121,7 @@ export function SelectPersonalizado({
       <button
         ref={botaoRef}
         type="button"
-        // `role="combobox"`: um `<button>` simples não é uma role que
-        // suporte `aria-activedescendant` (o ESLint jsx-a11y apanhou isto
-        // — role-supports-aria-props). O padrão WAI-ARIA para um "select"
-        // recolhível destes é mesmo `combobox` no botão + `listbox` na
-        // lista, exatamente para poder apontar qual é a opção ativa.
+        // role="combobox": um <button> simples não suporta aria-activedescendant (jsx-a11y/role-supports-aria-props).
         role="combobox"
         aria-haspopup="listbox"
         aria-expanded={aberto}
@@ -172,9 +153,7 @@ export function SelectPersonalizado({
                   id={`${idLista}-${indice}`}
                   role="option"
                   aria-selected={selecionadaAtual}
-                  // `tabIndex={-1}`: o foco real do teclado nunca sai do
-                  // botão acima — só a opção "ativa" (`aria-activedescendant`)
-                  // é que muda, tal como um `<select>` nativo faz.
+                  // tabIndex -1: o foco do teclado nunca sai do botão; só a opção ativa muda.
                   tabIndex={-1}
                   onMouseEnter={() => setIndiceAtivo(indice)}
                   onClick={() => escolher(indice)}

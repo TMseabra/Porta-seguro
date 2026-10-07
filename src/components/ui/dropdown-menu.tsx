@@ -4,12 +4,7 @@ import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check } from "lucide-react";
 
-/**
- * Menu suspenso no estilo do shadcn/ui, em cima do Radix (que trata do
- * teclado, do foco e dos leitores de ecrã). Só tem as peças que o site usa.
- * As cores são as do próprio site — não as variáveis do shadcn, que não
- * existem neste projeto.
- */
+/** Menu suspenso estilo shadcn/ui sobre o Radix (teclado, foco, leitores de ecrã), com as cores do site. */
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
@@ -24,7 +19,7 @@ export function DropdownMenuContent({
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         sideOffset={sideOffset}
-        className={`z-50 min-w-36 overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-white/10 dark:bg-[#0c1118] dark:text-slate-100 ${className}`}
+        className={`z-50 min-w-36 overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-white/10 dark:bg-[#0a0a0a] dark:text-slate-100 ${className}`}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>

@@ -37,11 +37,7 @@ const ROTULOS_TIPO: Record<string, string> = {
   saida: "Saída",
 };
 
-/**
- * Tempo mínimo do ecrã "A ler...". O pedido ao servidor costuma ser mais
- * rápido do que isto; sem uma espera mínima, o resultado aparecia de
- * repente e não se percebia que tinha havido leitura nenhuma.
- */
+/** Sem espera mínima o resultado aparecia de repente e não se via que tinha havido leitura. */
 const ESPERA_MINIMA_MS = 900;
 
 export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[] }) {
@@ -49,8 +45,6 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
   const [linhas, setLinhas] = useState<LinhaRegisto[]>(linhasIniciais);
   const [aEnviar, iniciarTransicao] = useTransition();
 
-  /** Comum ao caminho direto e à confirmação de identidade — ambos
-   * devolvem o mesmo formato (ok / pendente / resultado final). */
   function aplicarResultadoIdentificacao(resultado: ResultadoMovimento, idToken: string) {
     if (!resultado.ok) {
       setEstado({ passo: "erro", mensagem: resultado.erro });
@@ -134,8 +128,6 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
         return;
       }
       if ("identidadeRejeitada" in resultado) {
-        // Nada foi registado — só a ocorrência (RF16) — por isso a tabela
-        // de registos de hoje não muda.
         setEstado({
           passo: "resultado",
           aluno: resultado.aluno,

@@ -15,18 +15,16 @@ import { TokenQR, Registo, Ocorrencia } from "@/models";
 import { proximoTipoRegisto } from "@/lib/regras";
 import type { TipoRegisto } from "@/lib/constantes";
 
-/** Validade do código, conforme o RF15 (decisão do aluno: 1 minuto). */
+/** Validade do código (RF15): 1 minuto. */
 const VALIDADE_MS = 1 * 60 * 1000;
 
 export interface TokenGerado {
   id: string;
   validoAteISO: string;
   imagemDataUrl: string;
-  /** Direção com que este código foi gerado — mostrada ao aluno para não
-   * haver dúvida de que só serve para entrar OU só para sair. */
+  /** Direção do código, mostrada ao aluno: só serve para entrar OU só para sair. */
   tipo: TipoRegisto;
-  /** Só preenchido para a conta de teste, quando pede uma hora simulada —
-   * mostrado como aviso, para nunca se confundir com um código real. */
+  /** Só na conta de teste, quando simula uma hora: avisa que não é um código real. */
   momentoSimuladoFormatado?: string;
 }
 
@@ -35,34 +33,13 @@ export type ResultadoGeracaoQR =
   | { ok: false; erro: string };
 
 /**
- * Gera um código novo, invalidando qualquer código anterior ainda não
- * usado — só pode existir um código válido por aluno de cada vez.
- *
- * A direção (`tipo`) fica decidida já aqui, com a mesma regra de
- * alternância da portaria — e é EXIGIDA na leitura (`validarTokenQR`): um
- * código gerado para entrar nunca serve para sair, mesmo que o estado do
- * aluno mude entretanto.
- *
- * Restrito ao telemóvel (decisão do aluno): o código destina-se a ser
- * mostrado na portaria a partir do telemóvel de quem o gera, não gerado
- * num PC e fotografado ou reencaminhado. Verificado aqui no servidor (não
- * só escondendo o botão no ecrã) porque a Server Action é chamável
- * diretamente, sem passar pela interface. A conta de teste
- * `5802@eclisboa.net` fica isenta, para permitir demonstrar isto sem
- * telemóvel na defesa oral.
- *
- * Essa mesma conta pode ainda escolher `dataSimulada`/`horaSimulada`: a
- * decisão de entrada/saída (feita mais tarde, quando o porteiro lê o
- * código) passa a usar essa data/hora em vez do momento real da leitura —
- * para dar para demonstrar a entrada por QR em qualquer dia/hora sem
- * esperar pelo momento certo. A validade do próprio código continua real
- * (1 minuto a partir de agora), para se manter mesmo scanável.
- *
- * Numa simulação, a conta de teste pode ainda escolher se o código é de
- * `"entrada"` ou de `"saida"` (`tipoEscolhido`), em vez de a direção
- * alternar com o último registo — para dar para testar uma saída sem ter
- * de simular primeiro uma entrada. Só vale com uma data/hora simulada: um
- * código real nunca tem a direção escolhida à mão.
+ * Gera um código novo e anula os anteriores por usar (só há um válido por aluno).
+ * A direção fica decidida aqui (alternância com o último registo) e a leitura exige-a (validarTokenQR).
+ * Só no telemóvel: o código é para mostrar na portaria, não para gerar num PC e reencaminhar. Verifica-se
+ * no servidor (esconder o botão não chega) e a conta de teste 5802@eclisboa.net fica isenta, para
+ * demonstrar sem telemóvel. Essa conta pode ainda simular a data/hora (a validade continua real) e
+ * escolher a direção (`tipoEscolhido`), mas só numa simulação: um código real nunca tem a direção
+ * escolhida à mão.
  */
 export async function gerarNovoTokenQR(
   dataSimulada?: string,
@@ -87,11 +64,8 @@ export async function gerarNovoTokenQR(
 
   await ligarBaseDados();
 
-  // Ao decidir a direção (entrada/saída), o "último registo" tem de ser o
-  // último ANTES do momento a usar — real, ou simulado quando escolhido.
-  // Sem este filtro, um momento simulado no passado ignorava-o e olhava
-  // sempre para o registo mais recente de sempre (mesmo bug já corrigido
-  // na simulação do admin — ver src/lib/movimento.ts).
+  // A direção usa o último registo ANTES do momento a usar (real ou simulado); sem isto, uma hora
+  // simulada no passado olhava ao registo mais recente de sempre.
   const momentoParaDecisao = momentoSimulado ?? new Date();
   const [, ultimoRegisto] = await Promise.all([
     TokenQR.updateMany(
@@ -102,17 +76,14 @@ export async function gerarNovoTokenQR(
       .sort({ dataHora: -1 })
       .lean(),
   ]);
-  // O valor vem do browser (uma Server Action é um endereço HTTP normal,
-  // e o tipo TypeScript não existe depois de compilado): só se aceitam os
-  // dois valores válidos, e só para a conta de teste numa simulação.
+  // O valor vem do browser: só se aceita "entrada"/"saida", e só na conta de teste numa simulação.
   const tipoForcado: TipoRegisto | undefined =
     momentoSimulado && (tipoEscolhido === "entrada" || tipoEscolhido === "saida")
       ? tipoEscolhido
       : undefined;
   const tipo = tipoForcado ?? proximoTipoRegisto(ultimoRegisto?.tipo);
 
-  // Aleatório e imprevisível — não dá para adivinhar o código de outro
-  // aluno a tentar valores ao acaso.
+  // Aleatório: não dá para adivinhar o código de outro aluno.
   const token = crypto.randomBytes(24).toString("base64url");
   const criadoEm = new Date();
   const validoAte = new Date(criadoEm.getTime() + VALIDADE_MS);
@@ -161,42 +132,23 @@ export type EstadoTokenQR =
     };
 
 /**
- * Diz ao telemóvel do aluno o que aconteceu ao seu próprio código QR desde
- * que foi gerado — chamado em intervalos curtos enquanto o código está no
- * ecrã (ver `GeradorQR`).
- *
- * Sem isto, depois de o porteiro ler o código, o aluno continuava a ver a
- * imagem do QR (já inútil, porque é de uso único) sem saber que tinha sido
- * lido nem o que foi decidido — e nada impedia mostrar essa imagem, ainda
- * visível, a outra pessoa.
+ * Diz ao telemóvel do aluno o que aconteceu ao seu código, para o QR já usado deixar de aparecer
+ * no ecrã. Consultado em intervalos curtos pelo GeradorQR.
  */
 export async function consultarEstadoTokenQR(idToken: string): Promise<EstadoTokenQR> {
   const sessao = await exigirPerfil(["aluno"]);
   await ligarBaseDados();
 
-  // Filtrar por alunoId, não só pelo id do token: garante que ninguém
-  // consegue espreitar o estado do código de outro aluno a adivinhar o id.
+  // Filtra também por alunoId: ninguém espreita o estado do código de outro aluno a adivinhar o id.
   const tokenQR = await TokenQR.findOne({ _id: idToken, alunoId: sessao.user.id }).lean();
   if (!tokenQR || !tokenQR.usado) {
     return { usado: false };
   }
 
-  // O token fica marcado como usado em duas situações: foi lido na portaria
-  // (RF15), ou ficou obsoleto porque a pessoa já teve outro movimento
-  // registado enquanto o código ainda estava por usar (ver
-  // `invalidarTokenQRPendente` em src/app/portao-teste/acoes.ts).
-  //
-  // Nota: uma rejeição por "direção errada" (código gerado para entrar
-  // apresentado para sair, ou vice-versa) NÃO passa por aqui — não marca o
-  // token como usado, de propósito, tal como já acontecia com "aluno
-  // diferente" e "expirado": um código só é considerado gasto quando é
-  // mesmo aceite, não em qualquer tentativa falhada. O porteiro vê o erro
-  // no próprio ecrã; o código continua válido para a pessoa tentar outra
-  // vez na direção certa.
-  //
-  // Também não assume que já terminou logo que fica marcado como usado: o
-  // porteiro ainda pode ter de confirmar a identidade (RF16) ou telefonar
-  // aos pais, e isso demora mais um pouco.
+  // O código fica "usado" quando é lido ou fica obsoleto por outro movimento. Uma rejeição por direção
+  // errada não o gasta (tal como "aluno diferente" e "expirado"): só se gasta quando é aceite.
+  // Também não se dá logo por terminado: o porteiro ainda pode ter de confirmar a identidade (RF16)
+  // ou ligar aos pais.
   const desde = tokenQR.usadoEm ?? tokenQR.validoAte;
   const [ocorrenciaRejeitada, registo] = await Promise.all([
     Ocorrencia.findOne({
@@ -223,7 +175,6 @@ export async function consultarEstadoTokenQR(idToken: string): Promise<EstadoTok
     };
   }
 
-  // Usado, mas ainda sem registo nem rejeição: o porteiro está a meio do
-  // fluxo (ex.: a ligar aos pais numa saída fora do horário).
+  // Usado mas sem registo nem rejeição: o porteiro está a meio do fluxo (ex.: a ligar aos pais).
   return { usado: true, resultado: "pendente" };
 }

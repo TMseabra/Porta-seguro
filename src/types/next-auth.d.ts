@@ -1,15 +1,9 @@
-/**
- * "Aumenta" os tipos do Auth.js com os campos próprios do PortãoSeguro
- * (`id` e `perfil`), que por omissão não existem no `User` nem na `Session`.
- * Sem isto, o TypeScript não deixaria escrever `sessao.user.perfil` em lado
- * nenhum do código.
- */
+/** Acrescenta `id` e `perfil` aos tipos do Auth.js, para o TypeScript aceitar `sessao.user.perfil`. */
 import type { DefaultSession } from "next-auth";
 import type { Perfil } from "@/lib/constantes";
 
 declare module "next-auth" {
   interface User {
-    /** Só vem preenchido quando o login é feito por email + palavra-passe. */
     perfil?: Perfil;
   }
 
@@ -21,17 +15,13 @@ declare module "next-auth" {
   }
 }
 
-// Aumenta a interface JWT no seu módulo de origem real (@auth/core/jwt).
-// O "next-auth/jwt" é só um re-export desse módulo, e uma augmentation feita
-// aí não chega aos tipos que o Auth.js usa internamente nos callbacks
-// jwt()/session() — tem de ser feita diretamente no módulo de origem.
+// Tem de ser no módulo de origem (@auth/core/jwt): o "next-auth/jwt" só o re-exporta e a augmentation aí
+// não chega aos callbacks.
 declare module "@auth/core/jwt" {
   interface JWT {
     idUtilizador?: string;
     perfil?: Perfil;
-    /** Instante (em milissegundos) a partir do qual esta sessão deixa de
-     * valer, além do limite geral de 8 horas. Só as contas admin e gestor
-     * o têm preenchido: são expulsas à meia-noite (ver src/auth.ts). */
+    /** Instante (ms) em que a sessão deixa de valer, além das 8 horas. Só admin e gestor (expulsos à meia-noite). */
     expiraEm?: number;
   }
 }

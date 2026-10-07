@@ -11,12 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 /**
- * Botão do tema, como no shadcn/ui (https://ui.shadcn.com/docs/dark-mode/next):
- * um botão com sol/lua que abre um menu "Claro / Escuro / Sistema".
- *
- * O sol e a lua trocam só com CSS (`dark:`), sem ler o tema em JavaScript —
- * por isso o servidor e o browser desenham exatamente o mesmo HTML e não há
- * o "piscar" do tema errado ao carregar a página.
+ * Botão do tema como no shadcn/ui. Sol e lua trocam só com CSS (`dark:`): o servidor e o browser desenham
+ * o mesmo HTML e não há piscar.
  */
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();

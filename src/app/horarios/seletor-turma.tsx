@@ -10,15 +10,7 @@ export interface TurmaComHorario {
   blocos: BlocoHorario[];
 }
 
-/**
- * Escolhe primeiro a turma, só depois mostra o horário dela — em vez de
- * empilhar o horário de todas as turmas de uma vez, o que ficava
- * impraticável para quem tem muitas turmas atribuídas.
- *
- * Os horários de todas as turmas já vêm prontos do servidor (uma única
- * consulta em horarios/page.tsx); trocar de turma aqui é só trocar que
- * pedaço desses dados se mostra, sem pedir nada de novo à rede.
- */
+/** Escolhe a turma e só então mostra o horário. Os dados já vêm do servidor: trocar de turma não vai à rede. */
 export function SeletorTurma({ turmas }: { turmas: TurmaComHorario[] }) {
   const [idSelecionado, setIdSelecionado] = useState(turmas[0]?.id ?? "");
   const selecionada = turmas.find((t) => t.id === idSelecionado) ?? turmas[0];

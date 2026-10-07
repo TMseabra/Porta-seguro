@@ -68,12 +68,8 @@ export async function atualizarAluno(
   const novaPalavraPasse = String(formData.get("palavraPasse") ?? "");
 
   try {
-    // `perfil: "aluno"` no filtro é uma verificação de segurança, não uma
-    // otimização: sem ele, este formulário aceitava o id de QUALQUER
-    // utilizador — incluindo o do admin — e o campo "palavra-passe" abaixo
-    // deixava um gestor mudar a password do admin e entrar como ele,
-    // contornando a única coisa que o gestor não pode fazer (o Portão
-    // Teste). O id vem do browser e nunca é de confiança sozinho.
+    // `perfil: "aluno"` é segurança, não otimização: sem ele aceitava-se o id de qualquer utilizador e um
+    // gestor mudava a password do admin e entrava como ele. O id vem do browser.
     const aluno = await Utilizador.findOne({ _id: id, perfil: "aluno" });
     if (!aluno) return "Aluno não encontrado.";
 
@@ -90,11 +86,7 @@ export async function atualizarAluno(
   redirect("/admin/alunos");
 }
 
-/**
- * Remover um aluno leva consigo o seu histórico (registos, ocorrências e
- * códigos QR) — não há forma de "manter o histórico de alguém que já não
- * existe no sistema" sem confundir os relatórios de assiduidade.
- */
+/** Leva o histórico (registos, ocorrências, códigos QR): sem o aluno, falsearia os relatórios. */
 export async function removerAluno(formData: FormData): Promise<void> {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();
@@ -105,10 +97,7 @@ export async function removerAluno(formData: FormData): Promise<void> {
     redirect(`/admin/alunos?erro=${encodeURIComponent(ERRO_PASSKEY)}`);
   }
 
-  // Apaga primeiro o utilizador, com `perfil: "aluno"` no filtro (mesma
-  // razão de segurança que em `atualizarAluno`: sem isto, o id vindo do
-  // browser dava para apagar o admin). Só se apagou mesmo um aluno é que
-  // faz sentido apagar o histórico dele.
+  // Mesma razão de segurança que em `atualizarAluno`. Só se apagou um aluno é que se apaga o histórico.
   const aluno = await Utilizador.findOneAndDelete({ _id: id, perfil: "aluno" });
   if (!aluno) {
     redirect(`/admin/alunos?erro=${encodeURIComponent("Aluno não encontrado.")}`);

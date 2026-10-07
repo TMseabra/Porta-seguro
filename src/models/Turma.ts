@@ -1,10 +1,4 @@
-/**
- * Modelo: turmas
- *
- * Uma turma pertence a um curso e tem um diretor de turma (um utilizador
- * com perfil "dt"). Os alunos apontam para a turma através do campo
- * `turmaId` no modelo Utilizador.
- */
+/** Modelo: turmas. Pertence a um curso e tem um diretor de turma (perfil "dt"); os alunos apontam-lhe por `turmaId`. */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 
@@ -18,10 +12,8 @@ export interface ITurma {
 
 const TurmaSchema = new Schema<ITurma>(
   {
-    // Ex.: "3API" — o nome completo da turma tal como é conhecido na escola.
     nome: { type: String, required: true, trim: true },
 
-    // Ano de formação (1, 2 ou 3, no caso de um curso profissional de 3 anos).
     ano: { type: Number, required: true, min: 1 },
 
     cursoId: { type: Schema.Types.ObjectId, ref: "Curso", required: true },
@@ -31,8 +23,7 @@ const TurmaSchema = new Schema<ITurma>(
   { timestamps: true },
 );
 
-// Cada curso tem várias turmas; esta consulta ("todas as turmas de um curso")
-// vai ser usada nos relatórios por curso, por isso vale a pena um índice.
+// Para listar as turmas de um curso (relatórios).
 TurmaSchema.index({ cursoId: 1 });
 
 export const Turma: Model<ITurma> =

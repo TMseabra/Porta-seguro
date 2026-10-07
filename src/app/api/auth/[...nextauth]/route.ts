@@ -1,7 +1,6 @@
 import { handlers } from "@/auth";
 
-// Obrigatório: o fornecedor Credentials usa o Argon2id (módulo nativo) e o
-// Mongoose (ligação TCP) — nenhum dos dois funciona no runtime Edge.
+// Obrigatório: o Credentials usa Argon2id (nativo) e Mongoose (TCP), que não funcionam no Edge.
 export const runtime = "nodejs";
 
 export const { GET, POST } = handlers;

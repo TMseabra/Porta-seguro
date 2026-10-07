@@ -1,10 +1,6 @@
 /**
- * Modelo: ocorrencias
- *
- * Registo de tentativas irregulares, para auditoria (RF16): códigos QR
- * expirados, já usados ou de outro aluno, e entradas bloqueadas por
- * suspensão (RF03). Não substitui os `registos` — é um registo à parte,
- * pensado para a administração poder investigar comportamentos suspeitos.
+ * Modelo: ocorrencias. Tentativas irregulares para auditoria (RF16): QR expirado, usado ou de outro aluno,
+ * e entradas bloqueadas por suspensão (RF03). À parte dos `registos`.
  */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
@@ -16,7 +12,6 @@ export interface IOcorrencia {
   tipo: TipoOcorrencia;
   descricao: string;
   dataHora: Date;
-  /** Registo de entrada/saída associado, quando existir. */
   registoId?: Types.ObjectId;
 }
 

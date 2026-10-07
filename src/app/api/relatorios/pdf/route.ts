@@ -1,15 +1,7 @@
 /**
- * Exportação do relatório de assiduidade em PDF (RF11 / UC04).
- *
- * É uma rota normal (não uma Server Action) de propósito: uma Server
- * Action devolve dados para o React tratar, não um ficheiro para
- * descarregar — um `<a href="/api/relatorios/pdf?...">` é a forma direta
- * de o browser fazer o download, sem código extra nenhum no cliente.
- *
- * Só quem consulta assiduidade gera relatórios: admin e coordenador (UC04).
- * O ficheiro é gerado a partir dos mesmos dados que a pessoa já vê no ecrã
- * de consultas, e passa pela mesma verificação de âmbito — senão bastava
- * trocar o `alvo` no endereço para descarregar dados de outra turma.
+ * Relatório em PDF (RF11/UC04). Rota normal e não Server Action: um link direto é o que faz o browser
+ * descarregar. Só admin e coordenador, com a mesma verificação de âmbito (senão bastava trocar o `alvo`
+ * no endereço).
  */
 import { exigirPerfil } from "@/lib/permissoes";
 import { calcularResultadoConsulta, podeConsultar, ambitoValido } from "@/app/consultas/logica";

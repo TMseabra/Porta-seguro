@@ -4,14 +4,8 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 /**
- * Tema claro/escuro com o `next-themes` (o que o shadcn/ui recomenda). Ele
- * acrescenta ou tira a classe "dark" no <html> — que é o que as regras
- * `dark:` do Tailwind leem (ver o @custom-variant em globals.css) — e mete
- * no <head> um pequeno script que a aplica ANTES de a página aparecer, por
- * isso não há o piscar de claro para escuro ao carregar.
- *
- * `storageKey` novo de propósito: o tema antigo do site guardava "claro" /
- * "escuro" na chave "portao-tema", valores que o next-themes não entende.
+ * next-themes: põe/tira a classe "dark" no <html> (lida pelo `@custom-variant` do globals.css) e aplica-a
+ * antes de a página aparecer. `storageKey` novo: a chave antiga "portao-tema" tem valores que ele não entende.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (

@@ -1,8 +1,3 @@
-/**
- * Mostrado de imediato ao clicar num item do menu, enquanto a página nova
- * vai buscar os dados à base de dados. Sem isto, o clique parecia não fazer
- * nada até a página inteira estar pronta.
- */
 export default function CarregarPainel() {
   return (
     <div role="status" aria-label="A carregar" className="flex animate-pulse flex-col gap-6">
@@ -12,7 +7,7 @@ export default function CarregarPainel() {
       </div>
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-64 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0c1118]" />
+          <div key={i} className="h-64 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0a0a0a]" />
         ))}
       </div>
       <span className="sr-only">A carregar…</span>

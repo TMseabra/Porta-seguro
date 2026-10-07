@@ -7,11 +7,6 @@ import { Registo } from "@/models";
 import { tokenInicialDoAluno, permissoesQR, horarioDoAluno } from "./dados-aluno";
 import { Cartao } from "./shell";
 
-/**
- * Página inicial do aluno: um RESUMO de cada secção. Cada cartão tem um
- * "Ver tudo" que abre a página própria dessa secção (/painel/qr,
- * /painel/horario, ...), onde está a versão completa.
- */
 export async function DashboardAluno({ alunoId, email, nome }: { alunoId: string; email?: string | null; nome: string }) {
   await ligarBaseDados();
   const agora = new Date();
@@ -57,7 +52,7 @@ export async function DashboardAluno({ alunoId, email, nome }: { alunoId: string
               className="relative flex h-36 w-36 items-center justify-center rounded-full shadow-[0_0_28px_rgba(16,185,129,0.14)]"
               style={{ background: `conic-gradient(#10b981 ${percentagem}%, var(--attendance-empty) 0)` }}
             >
-              <div className="absolute inset-[10px] flex flex-col items-center justify-center rounded-full bg-white dark:bg-[#0c1118]">
+              <div className="absolute inset-[10px] flex flex-col items-center justify-center rounded-full bg-white dark:bg-[#0a0a0a]">
                 <span className="text-3xl font-bold">{percentagem}%</span>
                 <span className="text-[10px] text-slate-500">presença</span>
               </div>

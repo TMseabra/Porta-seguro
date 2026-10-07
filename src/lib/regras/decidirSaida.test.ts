@@ -3,9 +3,7 @@ import { Types } from "mongoose";
 import type { IHorario } from "@/models/Horario";
 import { decidirSaida } from "./decidirSaida";
 
-// Segunda-feira, 5 de janeiro de 2026. Em janeiro Lisboa está em UTC+0
-// (sem hora de verão), por isso a hora UTC usada aqui coincide com a hora
-// de Lisboa — evita ambiguidade nos testes.
+// Janeiro em Lisboa é UTC+0: a hora UTC coincide com a de Lisboa.
 function segundaFeira(hora: string): Date {
   const [h, m] = hora.split(":").map(Number);
   return new Date(Date.UTC(2026, 0, 5, h, m));

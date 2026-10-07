@@ -1,12 +1,7 @@
-/**
- * Decisão de saída (RF02): pode um aluno sair da escola agora?
- */
-
 import type { Types } from "mongoose";
 import type { IHorario } from "@/models/Horario";
 import { encontrarBlocoADecorrer } from "./horarios";
 
-/** Só os campos do aluno de que esta decisão precisa. */
 export interface AlunoParaDecisaoSaida {
   maiorIdade: boolean;
   autorizacaoPais: boolean;
@@ -15,15 +10,10 @@ export interface AlunoParaDecisaoSaida {
 export interface DecisaoSaida {
   autorizado: boolean;
   motivo: string;
-  /** Bloco de horário em vigor no momento da saída, se existir. */
   horarioId?: Types.ObjectId;
 }
 
-/**
- * A saída é autorizada se não houver nenhuma aula a decorrer nesse
- * momento, ou se o aluno for maior de idade, ou se tiver autorização dos
- * pais para sair fora do horário letivo. Caso contrário, é recusada.
- */
+/** Autorizada se não há aula a decorrer, ou é maior de idade, ou tem autorização dos pais. */
 export function decidirSaida(
   aluno: AlunoParaDecisaoSaida,
   horariosDaTurma: IHorario[],

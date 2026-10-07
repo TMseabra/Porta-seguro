@@ -3,8 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { NOMES_DIAS_SEMANA } from "@/lib/datas";
 
-/** Mesmo ponto de corte do `lg:` do Tailwind — é a partir daqui que
- * `tamanhoGrande` também começa a mostrar todos os dias já abertos. */
+/** Mesmo ponto de corte do `lg:` do Tailwind. */
 const MEDIA_QUERY_PC = "(min-width: 1024px)";
 
 export interface BlocoHorario {
@@ -14,21 +13,13 @@ export interface BlocoHorario {
   disciplina: string;
   sala?: string;
   professor?: string;
-  /** Nome da turma — só usado na vista "por professor" (RF10), onde os
-   * blocos vêm de turmas diferentes e é preciso dizer qual é qual. */
+  /** Só na vista "por professor" (RF10), onde os blocos vêm de turmas diferentes. */
   turma?: string;
 }
 
 /**
- * Horário semanal, agrupado por dia, em formato de acordeão: cada dia
- * começa fechado (só o nome e a contagem de aulas) e abre ao clicar,
- * mostrando os blocos desse dia — dá para abrir vários dias ao mesmo
- * tempo, não é preciso escolher só um. Mostrar logo todos os dias
- * expandidos de uma vez ficava com demasiada informação junta,
- * principalmente em turmas com muitas aulas por semana.
- *
- * Partilhado por três ecrãs (horários das turmas, área pessoal do aluno e
- * portaria), por isso recebe os blocos já prontos — não vai à base de dados.
+ * Horário semanal em acordeão por dia (vários podem estar abertos). Partilhado por três ecrãs, por
+ * isso recebe os blocos já prontos.
  */
 export function HorarioSemanal({
   blocos,
@@ -39,17 +30,12 @@ export function HorarioSemanal({
 }: {
   blocos: BlocoHorario[];
   mostrarProfessor?: boolean;
-  /** Mostra a turma de cada bloco — usado na vista "por professor". */
   mostrarTurma?: boolean;
-  /** Dia da semana a destacar (0 = domingo). Usado para marcar "hoje" e
-   * para começar já aberto, por ser o dia mais provável de interessar. */
+  /** Dia a destacar (0 = domingo); começa aberto. */
   diaEmDestaque?: number;
-  /** Letras maiores e uma 3.ª coluna em ecrãs largos — usado na área
-   * pessoal do aluno, agora que tem uma aba só para o horário e sobra
-   * espaço no PC para o mostrar mais confortável. */
+  /** Letras maiores e 3.ª coluna em ecrãs largos (área pessoal do aluno). */
   tamanhoGrande?: boolean;
 }) {
-  // Só os dias que têm mesmo aulas, pela ordem da semana.
   const diasComAulas = [...new Set(blocos.map((b) => b.diaSemana))].sort((a, b) => a - b);
 
   const idBase = useId();
@@ -57,11 +43,7 @@ export function HorarioSemanal({
     () => new Set(diaEmDestaque !== undefined ? [diaEmDestaque] : []),
   );
 
-  // No PC (só quando `tamanhoGrande`), mostra logo todos os dias abertos —
-  // há espaço de sobra e poupa o clique. No telemóvel mantém-se fechado
-  // por omissão, como sempre foi: aí a informação toda de uma vez não cabe.
-  // Corre no cliente (media query real, não CSS) porque a decisão de
-  // ABRIR ou não é lógica de estado, não só de aparência.
+  // No PC (com `tamanhoGrande`) abre todos os dias logo. É estado, por isso usa media query em JS e não CSS.
   useEffect(() => {
     if (!tamanhoGrande) return;
 

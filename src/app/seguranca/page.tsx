@@ -3,11 +3,7 @@ import { LayoutPublico, TopoPagina, CartaoPublico } from "@/components/layout-pu
 
 export const metadata: Metadata = { title: "Segurança · PortãoSeguro" };
 
-/**
- * Só descreve medidas que estão mesmo implementadas no código, e em termos
- * gerais — o objetivo é explicar o cuidado que houve, não dar a um atacante
- * pormenores de configuração.
- */
+/** Só medidas realmente implementadas, em termos gerais, sem dar pormenores a um atacante. */
 const MEDIDAS: { titulo: string; icone: string; texto: string }[] = [
   {
     titulo: "Palavras-passe protegidas",

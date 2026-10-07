@@ -1,8 +1,6 @@
 /**
- * Consulta de assiduidade (RF05-RF07, RF12): agrega `calcularAssiduidade`
- * (Fase 3/7, pura) com os dados da base de dados. Fica num ficheiro à
- * parte de `acoes.ts` (que só faz "use server") para poder ser importado
- * também pela rota do PDF (`/api/relatorios/pdf`), sem duplicar a consulta.
+ * Consulta de assiduidade (RF05-RF07, RF12): junta `calcularAssiduidade` com a BD. Fica à parte de
+ * `acoes.ts` para a rota do PDF a poder reutilizar.
  */
 
 import { ligarBaseDados } from "@/lib/mongoose";
@@ -20,22 +18,14 @@ export type Ambito = "aluno" | "turma" | "ano";
 
 const AMBITOS: Ambito[] = ["aluno", "turma", "ano"];
 
-/**
- * Confirma que o âmbito é mesmo um dos três — o tipo TypeScript não
- * sobrevive à compilação, e este valor vem do browser (numa Server Action
- * ou no endereço do PDF). Sem isto, um âmbito inventado passava adiante e
- * ia parar, por exemplo, ao nome do ficheiro PDF devolvido.
- */
+/** O tipo TypeScript não existe em runtime e o valor vem do browser. */
 export function ambitoValido(valor: unknown): valor is Ambito {
   return typeof valor === "string" && (AMBITOS as string[]).includes(valor);
 }
 
 /**
- * Confirma que o alvo pedido está dentro do âmbito de quem pergunta.
- *
- * Vive aqui (e não em `acoes.ts`) porque um ficheiro "use server" transforma
- * cada função exportada numa Server Action chamável a partir do browser — e
- * uma verificação de permissões não tem nada que estar exposta assim.
+ * Confirma que o alvo está no âmbito de quem pergunta. Fica aqui porque cada função exportada de um
+ * ficheiro "use server" fica chamável a partir do browser.
  */
 export async function podeConsultar(
   idUtilizador: string,
@@ -55,7 +45,7 @@ export async function podeConsultar(
     return turmas.some((turma) => String(turma.ano) === alvo);
   }
 
-  // Âmbito "aluno": só se o aluno estiver numa das turmas do coordenador.
+  // Âmbito "aluno": só se estiver numa turma do coordenador.
   await ligarBaseDados();
   const aluno = await Utilizador.findOne({ _id: alvo, perfil: "aluno" })
     .select("turmaId")
@@ -77,7 +67,6 @@ export interface ResumoAssiduidade {
 export interface LinhaDiaAssiduidade {
   dataFormatada: string;
   situacao: SituacaoDia;
-  /** Hora exata da entrada ("09:15") — ausente numa falta. */
   horaEntradaFormatada?: string;
 }
 
@@ -115,7 +104,6 @@ function paraResumo(resultado: ReturnType<typeof calcularAssiduidade>): ResumoAs
   };
 }
 
-/** `mes` no formato "AAAA-MM" (o que um `<input type="month">` devolve). */
 export async function calcularResultadoConsulta(
   ambito: Ambito,
   alvo: string,
@@ -134,9 +122,7 @@ export async function calcularResultadoConsulta(
     const horarios = aluno.turmaId
       ? await Horario.find({ turmaId: aluno.turmaId }).select("diaSemana").lean()
       : [];
-    // `metodo: "simulacao"` fica de fora: são registos de demonstração
-    // criados pelo admin em `/admin/simulacao`, não movimentos reais — não
-    // podem contar para a assiduidade de ninguém.
+    // Fora os registos de simulação: não são movimentos reais.
     const registos = await Registo.find({
       alunoId: aluno._id,
       dataHora: { $gte: periodo.inicio, $lt: periodo.fim },
@@ -164,7 +150,6 @@ export async function calcularResultadoConsulta(
     };
   }
 
-  // "turma" ou "ano": junta uma ou várias turmas e agrega por aluno.
   let turmasRelevantes;
   let alvoNome: string;
 

@@ -1,18 +1,8 @@
 "use server";
 
 /**
- * Server Actions da ferramenta de simulação (só admin): aplica as MESMAS
- * regras da Fase 3 e a mesma lógica de movimento do Portão Teste real
- * (`src/lib/movimento.ts`), mas a uma data/hora escolhida à mão em vez da
- * hora verdadeira — para o aluno conseguir demonstrar na defesa oral
- * comportamentos que dependem da hora ou do dia da semana (atraso, saída à
- * hora de almoço, bloqueio de suspenso...) sem ter de esperar pelo momento
- * certo.
- *
- * Os registos criados aqui ficam com `metodo: "simulacao"` — nunca se
- * confundem com uma entrada/saída real, e são excluídos do cálculo de
- * assiduidade (RF07) em `src/app/consultas/logica.ts` e
- * `src/app/area-pessoal/page.tsx`.
+ * Simulação (só admin): as MESMAS regras e o mesmo `movimento.ts` do Portão Teste, a uma data/hora
+ * escolhida. Os registos ficam com `metodo: "simulacao"` e são excluídos da assiduidade (RF07).
  */
 
 import { ligarBaseDados } from "@/lib/mongoose";
@@ -26,18 +16,11 @@ import {
   type ResultadoConfirmacao,
 } from "@/lib/movimento";
 
-/**
- * Simula uma passagem pela portaria: `dataISO`/`horaISO` vêm de um
- * `<input type="date">` + `<input type="time">` (mais fácil de preencher do
- * que um único `datetime-local` em todos os navegadores), interpretados
- * como hora de Lisboa.
- */
+/** `dataISO`/`horaISO` vêm de inputs date + time, interpretados como hora de Lisboa. */
 export async function simularPassagem(
   alunoId: string,
   data: string,
   hora: string,
-  /** "entrada" / "saida" para forçar a direção; qualquer outra coisa (ou
-   * nada) mantém a alternância automática com o último registo. */
   tipo?: string,
 ): Promise<ResultadoMovimento> {
   const sessao = await exigirPerfil(["gestor", "admin"]);
@@ -53,15 +36,12 @@ export async function simularPassagem(
     return { ok: false, erro: "Data ou hora inválida." };
   }
 
-  // O valor vem do browser: só passam os dois valores válidos. Uma Server
-  // Action é um endereço HTTP normal e o tipo TypeScript não existe depois
-  // de compilado — sem esta verificação aceitava-se qualquer texto.
+  // Vem do browser: uma Server Action é um endereço HTTP e o tipo TypeScript não existe em runtime.
   const tipoForcado = tipo === "entrada" || tipo === "saida" ? tipo : undefined;
 
   return processarMovimento(aluno, sessao.user.id, "simulacao", momento, tipoForcado);
 }
 
-/** Grava, na simulação, o resultado de "os pais autorizaram a saída?". */
 export async function confirmarSaidaSimulada(
   alunoId: string,
   horarioId: string | undefined,

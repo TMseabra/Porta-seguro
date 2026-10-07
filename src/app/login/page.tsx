@@ -8,16 +8,8 @@ import { entrarComGoogle } from "./acoes";
 import { ModeToggle } from "@/components/mode-toggle";
 
 /**
- * Mensagens para os códigos de erro que o Auth.js acrescenta ao URL
- * (`/login?error=...`) quando o login falha antes de haver sessão — o
- * caso mais comum é o `signIn` callback (src/auth.ts) recusar uma conta
- * Google sem `Utilizador` correspondente na escola.
- *
- * Sem isto, uma tentativa falhada com o Google não mostrava nada: a
- * pessoa ficava a olhar para o formulário vazio, sem perceber que a
- * entrada tinha sido recusada — e se por acaso já tivesse uma sessão
- * antiga válida noutra aba, parecia que "o Google a tinha deixado entrar"
- * quando na verdade só continuava a ver essa sessão antiga.
+ * Mensagens para os `?error=` do Auth.js (ex.: conta Google sem `Utilizador` na escola); sem elas a
+ * recusa não mostrava nada.
  */
 const MENSAGENS_ERRO_LOGIN: Record<string, string> = {
   AccessDenied:
@@ -30,10 +22,7 @@ export default async function PaginaLogin({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  // Quem já tem sessão iniciada não precisa de ver o login outra vez.
-  // (O middleware já faz este mesmo redirecionamento antes de chegar aqui;
-  // repetimos por segurança, caso esta página seja alguma vez usada de
-  // outra forma.)
+  // O proxy já redireciona; repete-se por segurança.
   const sessao = await auth();
   if (sessao?.user) {
     redirect("/painel");
@@ -99,7 +88,6 @@ export default async function PaginaLogin({
   );
 }
 
-/** Logótipo oficial da Google ("G" de quatro cores), usado no botão de login. */
 function LogoGoogle() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>

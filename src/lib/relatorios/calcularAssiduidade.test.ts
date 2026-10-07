@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calcularAssiduidade, type RegistoParaAssiduidade } from "./calcularAssiduidade";
 
-// Semana de 5 a 11 de janeiro de 2026 (segunda a domingo). Janeiro em
-// Lisboa está em UTC+0, tal como nos outros testes deste projeto.
+// Semana de 5 a 11 de janeiro de 2026; janeiro em Lisboa é UTC+0.
 const HORARIOS_SEG_QUA_SEX = [{ diaSemana: 1 }, { diaSemana: 3 }, { diaSemana: 5 }];
 const PERIODO_SEMANA = {
   inicio: new Date("2026-01-05T00:00:00.000Z"),
@@ -60,7 +59,6 @@ describe("calcularAssiduidade", () => {
   it("fronteira: um registo exatamente à meia-noite do dia seguinte não conta para o dia anterior", () => {
     const registos = [entradaAutorizada("2026-01-06T00:00:00.000Z")]; // terça à meia-noite, não é dia letivo
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
-    // A entrada cai fora dos três dias letivos (seg/qua/sex) — continuam todos em falta.
     expect(resultado.faltas).toBe(3);
   });
 

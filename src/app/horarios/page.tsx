@@ -9,14 +9,8 @@ import { VistaHorario, type ProfessorComHorario } from "./vista-horario";
 import type { BlocoHorario } from "@/components/horario-semanal";
 
 /**
- * Horários das turmas, para quem dá ou coordena aulas:
- *
- *  - professor / diretor de turma -> as turmas onde tem blocos atribuídos;
- *  - coordenador -> as turmas dos cursos que coordena;
- *  - admin -> a escola toda.
- *
- * Não mostra assiduidade nenhuma — isso é o ecrã /consultas, e só o
- * coordenador e o admin lá chegam. Aqui é mesmo só o horário.
+ * Horários das turmas: professor/diretor de turma vê as suas; coordenador as dos seus cursos; admin a
+ * escola toda. Sem assiduidade (isso é /consultas).
  */
 export default async function PaginaHorarios({
   searchParams,
@@ -34,9 +28,7 @@ export default async function PaginaHorarios({
     .sort({ diaSemana: 1, horaInicio: 1 })
     .lean();
 
-  // Uma só consulta para os nomes de todos os professores que aparecem.
-  // O type guard explícito é preciso porque `.filter(Boolean)` não estreita
-  // `string | undefined` para `string` aos olhos do TypeScript.
+  // O type guard é preciso porque `.filter(Boolean)` não estreita o tipo para o TypeScript.
   const idsProfessores = [
     ...new Set(
       blocos
@@ -50,9 +42,7 @@ export default async function PaginaHorarios({
   const nomePorId = new Map(professores.map((p) => [p._id.toString(), p.nomeCompleto]));
   const nomeTurmaPorId = new Map(turmas.map((t) => [t.id, t.nome]));
 
-  // Duas formas de agrupar os MESMOS blocos: por turma (o dia inteiro de
-  // uma turma, várias disciplinas e professores) e por professor (só as
-  // aulas de uma pessoa, em turmas diferentes) — ver VistaHorario.
+  // Os mesmos blocos agrupados por turma e por professor (ver VistaHorario).
   const blocosPorTurma = new Map<string, BlocoHorario[]>();
   const blocosPorProfessor = new Map<string, BlocoHorario[]>();
   for (const bloco of blocos) {
@@ -79,9 +69,7 @@ export default async function PaginaHorarios({
     }
   }
 
-  // Junta o horário de cada turma aos dados que o seletor precisa — feito
-  // aqui, no servidor, para o componente de cliente não ter de ir buscar
-  // nada à rede quando se troca de turma.
+  // Feito no servidor para o cliente não ir à rede ao trocar de turma.
   const turmasComHorario: TurmaComHorario[] = turmas.map((turma) => ({
     id: turma.id,
     nome: turma.nome,
@@ -89,8 +77,6 @@ export default async function PaginaHorarios({
     blocos: blocosPorTurma.get(turma.id) ?? [],
   }));
 
-  // "O meu horário": só para quem tem perfil professor, e só as próprias
-  // aulas. "Por professor": só para o admin, que pode escolher qualquer um.
   const meuHorario =
     sessao.user.perfil === "professor" ? (blocosPorProfessor.get(sessao.user.id) ?? []) : undefined;
   const professoresComHorario: ProfessorComHorario[] | undefined =

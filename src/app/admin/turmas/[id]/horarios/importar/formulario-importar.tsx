@@ -130,7 +130,6 @@ export function FormularioImportar({ turmaId, turmaNome }: { turmaId: string; tu
     );
   }
 
-  // passo === "previsualizar"
   const { linhas } = estado;
   const linhasValidas = linhas.filter((l) => l.erros.length === 0);
   const linhasComErro = linhas.filter((l) => l.erros.length > 0);

@@ -3,8 +3,6 @@ import { Types } from "mongoose";
 import type { IHorario } from "@/models/Horario";
 import { calcularEstadoPorta } from "./estadoPorta";
 
-// Janeiro em Lisboa está em UTC+0, por isso a hora UTC coincide com a de
-// Lisboa (mesma convenção dos outros testes das regras).
 function segundaFeira(hora: string): Date {
   const [h, m] = hora.split(":").map(Number);
   return new Date(Date.UTC(2026, 0, 5, h, m));
@@ -21,14 +19,12 @@ function bloco(diaSemana: number, horaInicio: string, horaFim: string, disciplin
   };
 }
 
-// Segunda-feira: 08:30-10:00 e 10:15-11:45 (com um intervalo de 15 min).
 const manha = bloco(1, "08:30", "10:00", "Programação");
 const meio = bloco(1, "10:15", "11:45", "Base de Dados");
 const horarioSegunda = [manha, meio];
 
 describe("calcularEstadoPorta", () => {
   it("fecha a porta quando a turma não tem aulas nesse dia da semana", () => {
-    // Domingo (dia 4 de janeiro de 2026) — o horário só tem blocos à segunda.
     const domingo = new Date(Date.UTC(2026, 0, 4, 9, 0));
     const resultado = calcularEstadoPorta(horarioSegunda, domingo);
 
@@ -71,7 +67,6 @@ describe("calcularEstadoPorta", () => {
     expect(resultado.atrasado).toBe(false);
   });
 
-  // Casos-fronteira: os minutos exatos de início e fim.
   it("no minuto exato de início da aula já conta como atraso", () => {
     const resultado = calcularEstadoPorta(horarioSegunda, segundaFeira("08:30"));
     expect(resultado.atrasado).toBe(true);
@@ -89,8 +84,6 @@ describe("calcularEstadoPorta", () => {
   });
 
   it("respeita a hora de Lisboa no verão (UTC+1), não a hora UTC", () => {
-    // 6 de julho de 2026 é uma segunda-feira. 08:00 UTC = 09:00 em Lisboa,
-    // ou seja, já com a aula das 08:30 a decorrer.
     const julho = new Date(Date.UTC(2026, 6, 6, 8, 0));
     const resultado = calcularEstadoPorta(horarioSegunda, julho);
 

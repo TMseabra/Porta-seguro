@@ -2,19 +2,8 @@ import type { MetodoRegisto, TipoRegisto } from "@/lib/constantes";
 import { proximoTipoRegisto } from "./proximoTipo";
 
 /**
- * Direção de um código QR na leitura, quando o aluno de teste escolheu à
- * mão se o código é de entrada ou de saída (`tipoEscolhido`).
- *
- * Só conta quando o movimento é uma SIMULAÇÃO. É o `metodo` — que o
- * servidor deduz do código guardado na base de dados, nunca do browser —
- * que decide: um código real (`"qr"`) ignora a escolha e segue sempre a
- * alternância normal, mesmo que alguma vez ficasse marcado por engano.
- *
- * Duas funções, uma por pergunta que a leitura faz:
- *  - `tipoEsperadoNaLeitura` — "que direção devia este código ter?", para
- *    o `validarTokenQR` recusar um código fora da direção.
- *  - `tipoForcadoNoMovimento` — "força a direção ao registar?", para o
- *    `processarMovimento` não a recalcular pela alternância.
+ * Direção de um QR quando a conta de teste a escolheu à mão. Só conta numa SIMULAÇÃO: o `metodo` deduz-se
+ * do código na BD, nunca do browser, e um código real segue sempre a alternância.
  */
 export interface CodigoParaTipo {
   tipo: TipoRegisto;

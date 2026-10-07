@@ -41,7 +41,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
                   <Link
                     key={atalho.href + atalho.titulo}
                     href={atalho.href}
-                    className="group flex min-h-36 items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg dark:border-white/[.09] dark:bg-[#10151c] dark:hover:border-blue-500/50"
+                    className="group flex min-h-36 items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg dark:border-white/[.09] dark:bg-[#0a0a0a] dark:hover:border-blue-500/50"
                   >
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-700 group-hover:text-white dark:bg-blue-500/10 dark:text-blue-300">
                       {atalho.icone}

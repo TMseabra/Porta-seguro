@@ -1,9 +1,4 @@
-/**
- * Itens do menu do aluno. Fica num ficheiro "normal" (sem "use client")
- * para poder ser importado tanto pelo layout do servidor como pelos
- * componentes de navegação do browser — um valor exportado de um ficheiro
- * "use client" não chega ao servidor como o array em si.
- */
+/** Sem "use client": o servidor não recebe o array de um ficheiro de cliente. */
 export const NAV_ALUNO = [
   { href: "/painel", label: "Painel", icon: "▦" },
   { href: "/painel/qr", label: "Código QR", icon: "▧" },

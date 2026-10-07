@@ -1,22 +1,8 @@
 /**
- * Estado da porta para uma pessoa, num dado momento, a partir do horário
- * da turma dela. Função pura — sem BD, sem rede — como as restantes regras
- * da Fase 3.
- *
- * Serve o ecrã da portaria: depois de identificar o aluno (cartão ou QR), o
- * porteiro precisa de perceber num relance se aquela pessoa devia mesmo
- * estar ali àquela hora. Não tem nada a ver com assiduidade — isso é
- * histórico, e o porteiro não tem acesso a esses dados.
- *
- * De propósito NÃO sabe se o movimento em curso é uma entrada ou uma
- * saída — só descreve o horário ("há uma aula a decorrer agora"). Quem
- * usa o resultado é que decide o que isso significa: para uma entrada,
- * `atrasado` quer dizer "chegou tarde"; para uma saída, quer só dizer "está
- * a sair a meio de uma aula" — coisas diferentes com o mesmo facto de
- * horário por trás. Foi por o `motivo` de aqui dizer sempre "chegou depois
- * da hora de entrada", mesmo em saídas, que a portaria chegou a mostrar
- * "atraso" a alguém que estava só a sair — a frase ficou aqui neutra, e a
- * palavra "atraso" só aparece no ecrã quando é mesmo uma entrada.
+ * Estado da porta para uma pessoa num momento, a partir do horário da turma. Função pura, como as outras
+ * regras. Serve o porteiro: perceber de relance se a pessoa devia estar ali.
+ * Não sabe se o movimento é entrada ou saída: só descreve o horário. Quem o usa decide o que `atrasado`
+ * quer dizer (numa entrada, chegou tarde; numa saída, está a sair a meio de uma aula).
  */
 
 import type { IHorario } from "@/models/Horario";
@@ -27,24 +13,14 @@ export type EstadoPorta = "aberta" | "fechada";
 
 export interface ResultadoEstadoPorta {
   estado: EstadoPorta;
-  /** Frase curta para o porteiro ler de imediato. */
   motivo: string;
-  /**
-   * Verdadeiro quando a leitura acontece com uma aula já a decorrer — ou
-   * seja, a pessoa devia já cá estar e só chegou agora.
-   */
+  /** Há uma aula já a decorrer na hora da leitura. */
   atrasado: boolean;
 }
 
 /**
- * Regra, por ordem:
- *
- *  1. Sem blocos hoje  -> porta fechada (a pessoa não tem aulas hoje).
- *  2. Aula a decorrer  -> porta aberta, mas marcada como ATRASO: se a aula
- *     já começou e a pessoa só está a entrar agora, chegou tarde.
- *  3. Antes da 1.ª aula do dia -> porta aberta, ainda a horas.
- *  4. Entre blocos (intervalo) -> porta aberta.
- *  5. Depois do último bloco -> porta fechada, as aulas já acabaram.
+ * Por ordem: sem blocos hoje -> fechada; aula a decorrer -> aberta e `atrasado`; antes da 1.ª aula ->
+ * aberta, a horas; entre blocos -> aberta; depois do último bloco -> fechada.
  */
 export function calcularEstadoPorta(
   horariosDaTurma: IHorario[],

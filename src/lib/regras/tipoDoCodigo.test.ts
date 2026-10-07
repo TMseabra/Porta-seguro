@@ -9,9 +9,7 @@ describe("tipoEsperadoNaLeitura", () => {
   });
 
   it("numa simulação com escolha, a direção escolhida manda — mesmo contra a alternância", () => {
-    // Sem registos antes a alternância diria "entrada"; o aluno escolheu "saida".
     expect(tipoEsperadoNaLeitura({ tipo: "saida", tipoEscolhido: true }, "simulacao", undefined)).toBe("saida");
-    // Último registo foi uma entrada (alternância: "saida"); escolheu outra entrada.
     expect(tipoEsperadoNaLeitura({ tipo: "entrada", tipoEscolhido: true }, "simulacao", "entrada")).toBe("entrada");
   });
 

@@ -13,36 +13,28 @@ import { limitesDoDiaEmLisboa } from "@/lib/datas";
 import type { Perfil } from "@/lib/constantes";
 
 /**
- * A que horas é que esta sessão morre, além do limite geral de 8 horas.
- *
- * As contas admin e gestor são expulsas à meia-noite de Lisboa, aconteça o
- * que acontecer: são as contas com poder sobre os dados de toda a gente, e
- * uma sessão esquecida aberta num computador da escola deixa de servir a
- * partir do fim do dia em que foi aberta. Para os restantes perfis fica
- * `undefined` — vale só o `maxAge` de 8 horas do auth.config.ts.
+ * Admin e gestor são expulsos à meia-noite de Lisboa, além do limite geral de 8h: têm poder sobre
+ * os dados de todos e uma sessão esquecida num computador da escola não deve durar mais que o dia.
+ * Nos outros perfis devolve undefined (vale só o maxAge).
  */
 function fimDaSessao(perfil: Perfil): number | undefined {
   if (perfil !== "admin" && perfil !== "gestor") return undefined;
   return limitesDoDiaEmLisboa(new Date()).fim.getTime();
 }
 
-/** Endereço de onde veio o pedido, quando o servidor o consegue ver. */
 async function ipDoPedido(): Promise<string | undefined> {
   try {
     const cabecalhos = await headers();
     return cabecalhos.get("x-forwarded-for")?.split(",")[0]?.trim();
   } catch {
-    // Fora do contexto de um pedido HTTP não há cabeçalhos — o aviso sai
-    // na mesma, só sem o endereço.
+    // Fora de um pedido HTTP não há cabeçalhos: o aviso sai sem o endereço.
     return undefined;
   }
 }
 
 /**
- * Configuração completa do Auth.js, com os dois fornecedores de login
- * (RF13): email + palavra-passe, e conta Google. Só é importado por código
- * que corre no runtime Node.js (rotas de API, Server Components, Server
- * Actions) — nunca pelo middleware.ts (ver a explicação em auth.config.ts).
+ * Configuração completa do Auth.js (RF13): email + palavra-passe e Google.
+ * Só corre em Node, nunca no proxy (ver auth.config.ts).
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -59,9 +51,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           credenciais?.email,
           credenciais?.password,
           credenciais?.codigo,
-          // Só para ficar registado de onde veio uma tentativa falhada. O
-          // bloqueio é sempre por conta, nunca por este endereço: além de
-          // ser falsificável, bastava trocar de rede para o contornar.
+          // Só para registar de onde veio uma falha. O bloqueio é por conta, nunca por IP:
+          // é falsificável e bastava trocar de rede.
           pedido.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
         ),
     }),
@@ -69,10 +60,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
-      // Sem isto, o Google entra logo com a conta já sessão aberta no
-      // telemóvel/browser, sem perguntar qual usar — más notícias quando é
-      // um telemóvel partilhado ou com várias contas Google. `select_account`
-      // obriga a mostrar sempre o ecrã de escolha de conta.
+      // select_account: obriga a escolher a conta, em vez de entrar logo com a que já está aberta.
       authorization: { params: { prompt: "select_account" } },
     }),
   ],
@@ -80,9 +68,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
 
-    // Só entra por conta Google quem já tem uma conta criada na escola. O
-    // Google só confirma "esta pessoa é dona deste email" — não decide se
-    // essa pessoa pode usar o PortãoSeguro. Essa decisão é sempre nossa.
+    // Só entra por Google quem já tem conta na escola: o Google só confirma o email, quem pode usar
+    // o sistema decidimos nós.
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         await ligarBaseDados();
@@ -91,11 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
         if (!existente) return false;
 
-        // Contas com segundo fator não entram pelo Google. Não vale a pena
-        // pôr um cadeado na porta se a janela ao lado fica aberta: o código
-        // por email só protege alguma coisa se NÃO houver outra maneira de
-        // entrar sem ele. Estas contas usam sempre email + palavra-passe +
-        // código.
+        // Contas com 2FA não entram pelo Google: seria uma porta lateral que contornava o código por email.
         if (precisaDoisFatores(existente.perfil)) return false;
 
         return true;
@@ -103,13 +86,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
 
-    // Só corre quando alguém acaba de fazer login (`user` só vem preenchido
-    // nesse momento). Nos pedidos seguintes, o Auth.js reaproveita o token
-    // já guardado, sem voltar a consultar a base de dados.
+    // Só corre no login (`user` só vem aí); nos pedidos seguintes o Auth.js reutiliza o token.
     async jwt({ token, user }) {
       if (user?.perfil) {
-        // Veio do fornecedor Credentials — autorizarCredenciais() já foi à
-        // base de dados e confirmou tudo.
+        // Credentials: autorizarCredenciais() já confirmou tudo.
         token.idUtilizador = user.id;
         token.perfil = user.perfil;
         token.expiraEm = fimDaSessao(user.perfil);
@@ -120,9 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await ipDoPedido(),
         );
       } else if (user?.email) {
-        // Veio do fornecedor Google — o perfil de acesso vem sempre da
-        // NOSSA base de dados (o Google não sabe se a pessoa é porteiro,
-        // professor ou admin).
+        // Google: o perfil vem sempre da nossa BD (o Google não sabe se a pessoa é porteiro ou admin).
         await ligarBaseDados();
         const utilizador = await Utilizador.findOne({
           email: user.email.toLowerCase(),
@@ -141,11 +119,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // Devolver `null` faz o Auth.js apagar o cookie de sessão (confirmado
-      // em @auth/core/lib/actions/session.js) — é assim que a sessão do
-      // admin/gestor morre à meia-noite, mesmo que o browser fique aberto.
-      // Este `if` corre em TODOS os pedidos, não só no login: é o que faz o
-      // prazo ser verificado a sério e não só decidido uma vez.
+      // Devolver null faz o Auth.js apagar o cookie de sessão (confirmado em
+      // @auth/core/lib/actions/session.js): é assim que a sessão de admin/gestor morre à meia-noite.
+      // Corre em todos os pedidos, não só no login.
       if (token.expiraEm && Date.now() > token.expiraEm) {
         return null;
       }
@@ -153,14 +129,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
 
-    // A sessão é o que o resto da aplicação lê com `auth()` — aqui
-    // copiamos do token só o que interessa mostrar/usar no código.
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.idUtilizador ?? "";
-        // Se por algum motivo o perfil não ficou no token, assumimos o
-        // perfil de menos permissões ("aluno") em vez de deixar undefined
-        // — mais vale falhar a fechado (acesso a menos) do que a aberto.
+        // Sem perfil no token assume-se o de menos permissões: mais vale falhar a fechar do que a abrir.
         session.user.perfil = token.perfil ?? "aluno";
       }
       return session;

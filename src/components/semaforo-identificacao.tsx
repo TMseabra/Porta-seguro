@@ -1,23 +1,10 @@
-/**
- * Peças visuais partilhadas por quem faz uma identificação e vê o
- * resultado das regras da Fase 3 — o ecrã real da portaria
- * (`/portao-teste`) e a ferramenta de simulação do admin
- * (`/admin/simulacao`). Extraídas daqui para não duplicar ~80 linhas
- * entre os dois sítios.
- */
+/** Peças visuais partilhadas pelo ecrã da portaria (/portao-teste) e pela simulação do admin. */
 import type { AlunoResumo } from "@/lib/movimento";
 import type { TipoRegisto } from "@/lib/constantes";
 
 /**
- * Foto do aluno ao lado do nome.
- *
- * É aqui que assenta o RF16: o sistema não tem forma automática de saber se
- * quem apresenta o telemóvel é o dono do código QR, por isso quem confirma é
- * o porteiro, comparando a pessoa à frente com esta fotografia.
- *
- * Quando não há foto guardada, mostram-se as iniciais: deixa claro ao
- * porteiro que não existe fotografia para comparar, em vez de um espaço
- * vazio que se confunde com uma imagem que não carregou.
+ * Foto do aluno ao lado do nome (RF16): o porteiro compara-a com a pessoa à frente. Sem foto, mostram-se
+ * as iniciais e "Sem fotografia", para não parecer uma imagem que não carregou.
  */
 export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
   return (
@@ -47,27 +34,16 @@ export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
 }
 
 /**
- * Estado da porta e horário do dia, para quem identifica decidir se aquela
- * pessoa devia estar ali àquela hora.
- *
- * Não mostra assiduidade nem histórico de faltas de propósito: isso não é
- * da conta do porteiro (nem do admin, aqui). O aluno consulta o seu na área
- * pessoal.
- *
- * `tipo` (entrada/saída) é obrigatório e vem de quem chama, nunca de
- * `estadoPorta` — este é só um facto de horário ("há uma aula a decorrer"),
- * não sabe se o movimento em curso é uma entrada ou uma saída. É o `tipo`
- * que decide se esse facto quer dizer "chegou atrasado" (só faz sentido
- * numa entrada) ou nada de especial (numa saída, estar a sair a meio de
- * uma aula não é chegar atrasado a lado nenhum).
+ * Estado da porta e horário do dia, para quem identifica ver se a pessoa devia estar ali (sem histórico
+ * de faltas). `tipo` vem de quem chama: estadoPorta é só um facto de horário; é o tipo que decide se
+ * "há aula a decorrer" quer dizer "chegou atrasado" (só numa entrada) ou nada de especial (numa saída).
  */
 export function EstadoPortaEHorario({ aluno, tipo }: { aluno: AlunoResumo; tipo: TipoRegisto }) {
   const estadoPorta = aluno.estadoPorta;
   if (!estadoPorta) return null;
 
   const aberta = estadoPorta.estado === "aberta";
-  // Já vêm filtrados e ordenados pelo servidor (dia da semana em Lisboa —
-  // ou, na simulação, o dia da semana do momento escolhido).
+  // Já filtrados e ordenados pelo servidor, para o dia do momento (real ou simulado).
   const blocosDeHoje = aluno.blocosHoje ?? [];
 
   return (
@@ -105,7 +81,6 @@ export function EstadoPortaEHorario({ aluno, tipo }: { aluno: AlunoResumo; tipo:
   );
 }
 
-/** "Beatriz Almeida" -> "BA". Nomes de uma só palavra dão uma inicial só. */
 function iniciais(nome: string): string {
   const partes = nome.trim().split(/\s+/);
   const primeira = partes[0]?.[0] ?? "";

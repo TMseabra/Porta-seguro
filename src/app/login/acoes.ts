@@ -5,22 +5,14 @@ import { signIn } from "@/auth";
 import { verificarCredenciais } from "@/lib/autenticacao";
 import { precisaDoisFatores, enviarNovoCodigo } from "@/lib/dois-fatores";
 
-/**
- * O ecrã de login tem dois passos possíveis. As contas normais entram logo
- * no primeiro; as contas admin e gestor passam ao segundo, onde escrevem o
- * código de 6 dígitos que lhes foi enviado por email.
- */
+/** Dois passos: contas normais entram logo; admin e gestor escrevem ainda o código de 6 dígitos do email. */
 export type EstadoLogin = {
   passo: "credenciais" | "codigo";
   erro?: string;
   aviso?: string;
 };
 
-/**
- * Server Action ligada ao formulário de email + palavra-passe.
- * Usa `useActionState` no lado do cliente (ver formulario-credenciais.tsx),
- * por isso recebe o estado anterior como primeiro argumento.
- */
+/** Usada com `useActionState`, por isso recebe o estado anterior. */
 export async function entrarComCredenciais(
   _estadoAnterior: EstadoLogin,
   formData: FormData,
@@ -29,10 +21,7 @@ export async function entrarComCredenciais(
   const password = formData.get("password");
   const codigo = String(formData.get("codigo") ?? "").trim();
 
-  // Primeiro passo: ainda não há código escrito. Confirma-se a
-  // palavra-passe para saber se esta conta precisa de segundo fator — e,
-  // já agora, para não deixar qualquer pessoa fazer o sistema enviar
-  // emails para contas que não são suas.
+  // 1.º passo: confirma a palavra-passe antes de enviar email, para ninguém fazer o sistema enviar emails a contas alheias.
   if (!codigo) {
     const utilizador = await verificarCredenciais(email, password);
     if (!utilizador) {
@@ -42,9 +31,7 @@ export async function entrarComCredenciais(
     if (precisaDoisFatores(utilizador.perfil)) {
       const enviado = await enviarNovoCodigo(utilizador.name, utilizador.email);
       if (!enviado) {
-        // Falha fechada de propósito: se o código não sai, ninguém entra.
-        // Deixar passar sem ele anulava o segundo fator exatamente no
-        // momento em que ele mais faz falta.
+        // Falha fechada: se o código não sai, ninguém entra (senão o 2.º fator anulava-se quando mais falta faz).
         return {
           passo: "credenciais",
           erro: "Não foi possível enviar o código de acesso. Tenta novamente daqui a pouco.",
@@ -60,9 +47,7 @@ export async function entrarComCredenciais(
   try {
     await signIn("credentials", { email, password, codigo, redirectTo: "/painel" });
   } catch (erro) {
-    // Quando o signIn() tem sucesso, ele próprio lança um erro especial do
-    // Next.js só para desencadear o redirecionamento — esse erro TEM de
-    // continuar a subir, senão a navegação para /painel nunca acontece.
+    // Um signIn() com sucesso lança um erro especial só para redirecionar: tem de continuar a subir.
     if (erro instanceof AuthError) {
       const passo = codigo ? "codigo" : "credenciais";
       switch (erro.type) {
@@ -83,7 +68,6 @@ export async function entrarComCredenciais(
   return { passo: "credenciais" };
 }
 
-/** Server Action ligada ao botão "Entrar com conta Google". */
 export async function entrarComGoogle() {
   await signIn("google", { redirectTo: "/painel" });
 }

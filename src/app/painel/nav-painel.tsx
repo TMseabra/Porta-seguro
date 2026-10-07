@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/**
- * Partes do menu que precisam de saber a página atual. São do lado do
- * browser porque o menu vive no layout (src/app/painel/layout.tsx), que NÃO
- * volta a ser desenhado quando se muda de página — é isso que torna a
- * navegação imediata. Como o layout não sabe qual é a página aberta, quem
- * destaca o item certo é o usePathname(), lido aqui no browser.
- */
+/** Do lado do browser porque o layout não é redesenhado ao mudar de página: quem destaca o item é o usePathname(). */
 
 export interface ItemNav {
   href: string;
@@ -52,7 +46,7 @@ export function NavRapida({ itens }: { itens: ItemNav[] }) {
   return (
     <nav
       aria-label="Navegação rápida"
-      className="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2.5 lg:hidden dark:border-white/[.08] dark:bg-[#0b0f14]"
+      className="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2.5 lg:hidden dark:border-white/[.08] dark:bg-[#0a0a0a]"
     >
       {itens.map((item) => {
         const selecionado = ativo(caminho, item.href);
@@ -76,7 +70,6 @@ export function NavRapida({ itens }: { itens: ItemNav[] }) {
   );
 }
 
-/** Nome da página aberta, para a barra de topo ("Área reservada / ..."). */
 export function TituloAtual({ itens }: { itens: ItemNav[] }) {
   const caminho = usePathname();
   return <>{itens.find((item) => ativo(caminho, item.href))?.label ?? "Painel"}</>;

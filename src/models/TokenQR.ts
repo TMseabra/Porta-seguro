@@ -1,13 +1,6 @@
 /**
- * Modelo: tokensQR
- *
- * Códigos QR dinâmicos gerados na área pessoal do aluno (RF15). Regras:
- *   - válido durante 2 minutos (`validoAte`);
- *   - utilização única (`usado`);
- *   - só pode existir UM código válido por aluno de cada vez — gerar um novo
- *     invalida o anterior. Essa regra é aplicada no código da Fase 5 (ao
- *     gerar um token novo, marcamos os anteriores desse aluno como usados),
- *     não pode ser garantida só pelo esquema da base de dados.
+ * Modelo: tokensQR. Códigos QR dinâmicos (RF15): válidos 1 minuto, uso único, e só um válido por aluno
+ * de cada vez (garantido no código ao gerar um novo, não pelo esquema).
  */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
@@ -16,40 +9,23 @@ import { TIPOS_REGISTO, type TipoRegisto } from "@/lib/constantes";
 export interface ITokenQR {
   _id: Types.ObjectId;
   alunoId: Types.ObjectId;
-  /** Código aleatório, imprevisível, gerado com `crypto.randomBytes`. */
   token: string;
   criadoEm: Date;
   validoAte: Date;
   usado: boolean;
   usadoEm?: Date;
-  /**
-   * Direção com que o código foi gerado — decidida no momento da geração
-   * pela mesma regra de alternância usada na portaria (`proximoTipoRegisto`)
-   * e depois EXIGIDA na leitura: um código gerado para entrar nunca serve
-   * para sair, e vice-versa (decisão do aluno).
-   */
+  /** Direção com que o código foi gerado. A leitura exige-a: um código de entrada nunca serve para sair. */
   tipo: TipoRegisto;
   /**
-   * Só preenchido para a conta de teste (`EMAIL_CONTA_DE_TESTE_QR`): a
-   * decisão de entrada/saída passa a usar esta data/hora em vez do
-   * momento real da leitura — para dar para demonstrar, na defesa oral,
-   * a entrada por QR em qualquer dia/hora sem esperar pelo momento certo.
-   * A validade do próprio código (`validoAte`) continua a ser real, para
-   * o código se manter mesmo scanável.
+   * Só na conta de teste: a decisão entrada/saída usa esta data/hora em vez da real, para demonstrar a
+   * qualquer hora. A validade do código (validoAte) continua real.
    */
   momentoSimulado?: Date;
-  /**
-   * Só nos códigos de simulação da conta de teste: verdadeiro quando o
-   * aluno escolheu à mão se o código é de entrada ou de saída (em vez de a
-   * direção alternar com o último registo). Ver `tipoDoCodigo.ts` — na
-   * leitura, a escolha só é respeitada se o movimento for uma simulação.
-   */
+  /** Só em simulações da conta de teste: a direção foi escolhida à mão (ver tipoDoCodigo.ts). */
   tipoEscolhido?: boolean;
   /**
-   * Quando é que este código já deu origem a um registo de entrada/saída.
-   * `usado` marca a LEITURA (o porteiro apontou a câmara); este marca a
-   * conclusão. Serve para o mesmo código não poder gerar dois movimentos
-   * se alguém repetir o pedido de confirmação de identidade.
+   * Quando o código deu origem a um registo. `usado` marca a leitura; este marca a conclusão, para o
+   * mesmo código não gerar dois movimentos.
    */
   movimentoRegistadoEm?: Date;
 }
@@ -77,8 +53,7 @@ const TokenQRSchema = new Schema<ITokenQR>(
   { timestamps: true },
 );
 
-// Ao ler um QR na portaria, procuramos sempre "o token válido deste aluno"
-// — este índice composto torna essa procura imediata.
+// Índice para a procura "o token válido deste aluno" na portaria.
 TokenQRSchema.index({ alunoId: 1, usado: 1 });
 
 export const TokenQR: Model<ITokenQR> =

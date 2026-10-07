@@ -9,13 +9,7 @@ import { NAV_ALUNO } from "./nav-itens";
 import { atalhosDoPerfil } from "./atalhos";
 import { NavLateral, NavRapida, TituloAtual, type ItemNav } from "./nav-painel";
 
-/**
- * Moldura comum a todas as páginas da área reservada: menu lateral, barra
- * de topo e navegação rápida no telemóvel. É usada UMA vez, no layout
- * (src/app/painel/layout.tsx) — por isso não é redesenhada ao mudar de
- * página, só o conteúdo do meio troca. Qual item está ativo é decidido no
- * browser (nav-painel.tsx), a partir do endereço atual.
- */
+/** Moldura comum (menu, topo, navegação móvel), usada uma vez no layout. */
 
 export const ROTULO_PERFIL: Record<Perfil, string> = {
   aluno: "Aluno",
@@ -48,8 +42,8 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
       ];
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-950 dark:bg-[#080b10] dark:text-slate-100">
-      <aside className="sticky top-0 hidden h-screen w-52 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 dark:border-white/[.08] dark:bg-[#0b0f14] lg:flex xl:w-60 xl:px-4">
+    <div className="flex min-h-screen bg-slate-50 text-slate-950 dark:bg-[#000000] dark:text-slate-100">
+      <aside className="sticky top-0 hidden h-screen w-52 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 dark:border-white/[.08] dark:bg-[#0a0a0a] lg:flex xl:w-60 xl:px-4">
         <Link href="/" className="mb-10 flex items-center gap-2 px-2">
           <Logo className="h-10 w-10" decorativa />
           <span className="flex flex-col gap-1">
@@ -76,7 +70,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-[68px] items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#080c12]/90 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex h-[68px] items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur-xl dark:border-white/[.08] dark:bg-[#000000]/90 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2 lg:hidden">
             <Logo className="h-8 w-8 shrink-0" decorativa />
             {/* No telemóvel fica só o escudo e o nome da página: o nome do
@@ -93,7 +87,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
               <span className="block text-sm font-semibold">{sessao.user.name}</span>
               <span className="block text-xs text-slate-500">{ROTULO_PERFIL[sessao.user.perfil]}</span>
             </span>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-bold text-blue-800 dark:border-white/10 dark:bg-[#172235] dark:text-blue-200">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-bold text-blue-800 dark:border-white/10 dark:bg-[#1f1f1f] dark:text-blue-200">
               {iniciais}
             </span>
             <form
@@ -123,7 +117,6 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
   );
 }
 
-/** Cabeçalho de cada sub-página do aluno. */
 export function TituloPagina({ titulo, descricao }: { titulo: string; descricao?: string }) {
   return (
     <div>
@@ -133,11 +126,10 @@ export function TituloPagina({ titulo, descricao }: { titulo: string; descricao?
   );
 }
 
-/** Cartão com o mesmo aspeto em todas as páginas do painel. */
 export function Cartao({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <section
-      className={`hover-highlight rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-[#0c1118] sm:p-6 ${className}`}
+      className={`hover-highlight rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-[#0a0a0a] sm:p-6 ${className}`}
     >
       {children}
     </section>

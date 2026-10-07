@@ -1,10 +1,6 @@
 /**
- * Que turmas é que cada perfil pode consultar.
- *
- * Existe num sítio só porque é usado em dois lados (horários e
- * assiduidade) e porque a verificação TEM de acontecer no servidor: filtrar
- * apenas as opções de um menu não impede ninguém de enviar diretamente o id
- * de outra turma para a Server Action.
+ * Que turmas cada perfil pode consultar. Verifica-se no servidor (horários e assiduidade): filtrar só
+ * o menu não impede ninguém de enviar à mão o id de outra turma.
  */
 
 import type { Types } from "mongoose";
@@ -19,22 +15,10 @@ export interface TurmaDoAmbito {
 }
 
 /**
- * Devolve as turmas que este utilizador pode ver:
- *
- *  - admin/gestor -> a escola toda;
- *  - coordenador  -> as turmas dos cursos que coordena;
- *  - professor/dt -> as turmas onde tem blocos de horário atribuídos, mais
- *                    as turmas de que é diretor;
- *  - qualquer outro perfil (aluno, porteiro) -> nenhuma. O aluno vê o seu
- *    próprio horário pela área pessoal, e o porteiro não consulta turmas.
- *
- * IMPORTANTE: a relação "é coordenador deste curso" / "é diretor desta
- * turma" está guardada em `Curso.coordenadorId` e `Turma.diretorTurmaId` —
- * são esses os campos que o admin edita. O `Utilizador` tem campos-espelho
- * (`cursosQueCoordena`, `turmasQueCoordena`) que o `seed.ts` preenche, mas
- * NENHUMA ação do admin os atualiza; usá-los aqui deixava invisível
- * qualquer coordenador ou DT atribuído depois do seed. Por isso consulta-se
- * sempre a fonte (`Curso`/`Turma`), nunca o espelho.
+ * Turmas visíveis: admin/gestor -> todas; coordenador -> as dos cursos que coordena; professor/dt ->
+ * onde têm aulas e as que dirigem; outros perfis -> nenhuma. Consulta-se sempre a fonte
+ * (Curso.coordenadorId, Turma.diretorTurmaId) e não os campos-espelho de Utilizador, que só o seed
+ * preenche: usá-los escondia os coordenadores/DTs atribuídos depois do seed.
  */
 export async function turmasDoUtilizador(
   idUtilizador: string,
@@ -64,8 +48,7 @@ export async function turmasDoUtilizador(
       Turma.find({ diretorTurmaId: idUtilizador }).select("_id").lean(),
     ]);
 
-    // Um Set evita repetidos: um professor tem normalmente vários blocos na
-    // mesma turma, e um diretor de turma também lá dá aulas.
+    // Set: um professor tem vários blocos na mesma turma.
     const ids = new Set<string>(blocos.map((bloco) => bloco.turmaId.toString()));
     for (const turma of turmasDirigidas) {
       ids.add(turma._id.toString());

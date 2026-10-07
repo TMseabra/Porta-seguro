@@ -1,10 +1,4 @@
-/**
- * Modelo: cursos
- *
- * Um curso agrupa várias turmas (ex.: "Técnico de Programação", turmas
- * 1API, 2API, 3API). Tem um coordenador, que é um utilizador com perfil
- * "coordenador".
- */
+/** Modelo: cursos. Agrupa turmas e tem um coordenador. */
 
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 
@@ -20,8 +14,7 @@ const CursoSchema = new Schema<ICurso>(
   {
     nome: { type: String, required: true, trim: true },
 
-    // "API", "MEC", etc. — guardamos sempre em maiúsculas para não haver
-    // duas siglas iguais escritas de forma diferente ("api" vs "API").
+    // Sempre em maiúsculas, para não haver "api" e "API".
     sigla: {
       type: String,
       required: true,
@@ -37,12 +30,8 @@ const CursoSchema = new Schema<ICurso>(
   { timestamps: true },
 );
 
-// `mongoose.models.Curso` só existe se o modelo já tiver sido criado antes.
-// Isto evita o erro "Cannot overwrite model once compiled", que acontece em
-// desenvolvimento porque o Next.js recarrega os módulos a cada gravação.
+// Evita "Cannot overwrite model once compiled" quando o Next.js recarrega módulos em desenvolvimento.
 export const Curso: Model<ICurso> =
   (mongoose.models.Curso as Model<ICurso>) ||
-  // Terceiro argumento = nome exato da coleção. Sem isto, o Mongoose tentaria
-  // adivinhar o plural em inglês ("cursos" -> "cursoss"), o que está errado
-  // para nomes em português.
+  // Nome da coleção explícito: o plural automático do Mongoose é inglês ("cursoss").
   mongoose.model<ICurso>("Curso", CursoSchema, "cursos");

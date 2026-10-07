@@ -1,9 +1,6 @@
 /**
- * Cálculo de presenças, faltas e atrasos (RF05). Função pura — sem BD, sem
- * rede — tal como as regras de decisão da Fase 3: recebe os horários da
- * turma e os registos já lidos da base de dados, e devolve os números.
- * Presenças/faltas/atrasos NUNCA são guardados à parte — são sempre
- * recalculados a partir de `horarios` + `registos`.
+ * Presenças, faltas e atrasos (RF05). Função pura: nunca se guardam, recalculam-se sempre a partir de
+ * `horarios` + `registos`.
  */
 
 import type { Types } from "mongoose";
@@ -14,17 +11,14 @@ export interface RegistoParaAssiduidade {
   tipo: TipoRegisto;
   estado: EstadoRegisto;
   dataHora: Date;
-  /** Presente só quando a entrada foi registada com uma aula já a decorrer. */
   horarioId?: Types.ObjectId | string;
 }
 
 export type SituacaoDia = "presenca" | "presenca_atraso" | "falta";
 
 export interface DiaAssiduidade {
-  /** Meia-noite (Lisboa) desse dia, em UTC. */
   data: Date;
   situacao: SituacaoDia;
-  /** Hora exata da entrada autorizada desse dia — ausente numa falta. */
   horaEntrada?: Date;
 }
 
@@ -33,21 +27,14 @@ export interface ResultadoAssiduidade {
   presencas: number;
   atrasos: number;
   faltas: number;
-  /** Entre 0 e 1 — 0 quando não há nenhum dia letivo no período. */
   taxaPresenca: number;
   dias: DiaAssiduidade[];
 }
 
 /**
- * Um dia conta como "letivo" para a turma se houver pelo menos um bloco de
- * horário nesse dia da semana — não interessa se é feriado ou não, porque
- * o sistema não tem calendário escolar (fora do âmbito do projeto).
- *
- * Um dia conta como "presença" se houver uma entrada autorizada nesse dia;
- * "com atraso" se essa entrada tiver `horarioId` (só fica preenchido pela
- * Fase 3 quando já decorria uma aula no momento da entrada — ver
- * `decidirEntrada`). Sem entrada autorizada nesse dia, é falta — inclui o
- * caso de a entrada ter sido bloqueada por suspensão.
+ * Dia letivo = há pelo menos um bloco nesse dia da semana (não há calendário escolar). Presença = há
+ * entrada autorizada; atraso = essa entrada tem `horarioId`. Sem entrada autorizada (incluindo bloqueio
+ * por suspensão) é falta.
  */
 export function calcularAssiduidade(
   horariosDaTurma: Array<{ diaSemana: number }>,
@@ -57,8 +44,7 @@ export function calcularAssiduidade(
   const diasComAula = new Set(horariosDaTurma.map((h) => h.diaSemana));
   const dias: DiaAssiduidade[] = [];
 
-  // Avança dia a dia recalculando sempre os limites em Lisboa (em vez de
-  // somar 24h fixas), para não desacertar nos dias de mudança de hora.
+  // Recalcula os limites de cada dia em Lisboa em vez de somar 24h, por causa das mudanças de hora.
   let cursor = limitesDoDiaEmLisboa(periodo.inicio).inicio;
 
   while (cursor < periodo.fim) {

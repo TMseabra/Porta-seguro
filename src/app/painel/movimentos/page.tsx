@@ -5,8 +5,6 @@ import { chaveDoDiaEmLisboa, formatarData, formatarHora, NOMES_DIAS_SEMANA, diaD
 import type { EstadoRegisto } from "@/lib/constantes";
 import { TituloPagina, Cartao } from "../shell";
 
-/** Quantos movimentos mostrar — chega para ver as últimas semanas sem
- * carregar o histórico inteiro de um ano letivo de uma vez. */
 const LIMITE = 100;
 
 const ESTADOS: Record<EstadoRegisto, { rotulo: string; classe: string }> = {
@@ -19,8 +17,6 @@ export default async function PaginaMovimentos() {
   const sessao = await exigirPerfil(["aluno"]);
   await ligarBaseDados();
 
-  // Só os movimentos reais — os da ferramenta de simulação do admin são
-  // demonstrações, não passagens verdadeiras pela portaria.
   const registos = await Registo.find({ alunoId: sessao.user.id, metodo: { $ne: "simulacao" } })
     .select("tipo estado dataHora motivo")
     .sort({ dataHora: -1 })

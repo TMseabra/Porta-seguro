@@ -39,7 +39,7 @@ export default async function PaginaLogin({
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-3">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-400"
+            className="flex items-center gap-2 py-2 text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-400"
           >
             ← Página principal
           </Link>

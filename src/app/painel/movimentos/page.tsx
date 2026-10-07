@@ -39,7 +39,7 @@ export default async function PaginaMovimentos() {
         descricao="Todas as tuas entradas e saídas registadas na portaria."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <Resumo titulo="Registos" valor={registos.length} />
         <Resumo titulo="Entradas" valor={entradas} />
         <Resumo titulo="Saídas" valor={saidas} />

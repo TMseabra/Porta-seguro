@@ -234,13 +234,13 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
       <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
         <h2 className="mb-3 font-semibold">Registos de hoje</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <th className="py-2 pr-4 font-medium">Hora</th>
-                <th className="py-2 pr-4 font-medium">Aluno</th>
-                <th className="py-2 pr-4 font-medium">Movimento</th>
-                <th className="py-2 pr-4 font-medium">Estado</th>
+                <th className="py-2 pr-2 sm:pr-4 font-medium">Hora</th>
+                <th className="py-2 pr-2 sm:pr-4 font-medium">Aluno</th>
+                <th className="py-2 pr-2 sm:pr-4 font-medium">Movimento</th>
+                <th className="py-2 pr-2 sm:pr-4 font-medium">Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -256,8 +256,8 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
                   key={linha.id}
                   className="border-b border-slate-100 last:border-0 dark:border-slate-800"
                 >
-                  <td className="py-2 pr-4 font-mono tabular-nums">{linha.horaFormatada}</td>
-                  <td className="py-2 pr-4">
+                  <td className="py-2 pr-2 sm:pr-4 font-mono tabular-nums">{linha.horaFormatada}</td>
+                  <td className="py-2 pr-2 sm:pr-4">
                     {linha.alunoNome}
                     {linha.metodo === "simulacao" && (
                       <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-purple-800 dark:bg-purple-950 dark:text-purple-300">
@@ -265,8 +265,8 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
                       </span>
                     )}
                   </td>
-                  <td className="py-2 pr-4">{ROTULOS_TIPO[linha.tipo]}</td>
-                  <td className="py-2 pr-4">{ROTULOS_ESTADO[linha.estado]}</td>
+                  <td className="py-2 pr-2 sm:pr-4">{ROTULOS_TIPO[linha.tipo]}</td>
+                  <td className="py-2 pr-2 sm:pr-4">{ROTULOS_ESTADO[linha.estado]}</td>
                 </tr>
               ))}
             </tbody>

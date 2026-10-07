@@ -99,7 +99,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
             >
               <button
                 type="submit"
-                className="rounded-md border border-slate-300 px-3 py-2 text-xs text-slate-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white dark:border-white/10 dark:text-slate-300"
+                className="rounded-md border border-slate-300 px-3 py-2.5 text-xs text-slate-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white dark:border-white/10 dark:text-slate-300"
               >
                 Sair
               </button>

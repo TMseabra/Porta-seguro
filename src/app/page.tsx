@@ -65,7 +65,7 @@ export default async function PaginaInicial() {
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <h2 className="text-3xl font-black tracking-tight">O essencial</h2>
-          <Link href="/funcionalidades" className="text-sm font-semibold text-blue-700 hover:underline dark:text-blue-400">
+          <Link href="/funcionalidades" className="py-2 text-sm font-semibold text-blue-700 hover:underline dark:text-blue-400">
             Ver todas as funcionalidades →
           </Link>
         </div>

@@ -95,7 +95,7 @@ export default async function PaginaHorarios({
             <div className="leading-tight">
               <h1 className="font-semibold">Horário de turmas</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {turmas.length} {turmas.length === 1 ? "turma" : "turmas"} atribuídas
+                {turmas.length} {turmas.length === 1 ? "turma atribuída" : "turmas atribuídas"}
               </p>
             </div>
           </div>

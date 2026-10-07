@@ -124,7 +124,7 @@ export function HorarioSemanal({
                 className={`flex flex-col px-3.5 pb-3.5 ${tamanhoGrande ? "gap-3 lg:px-5 lg:pb-5 lg:text-base" : "gap-1.5 text-sm"}`}
               >
                 {doDia.map((bloco, indice) => (
-                  <li key={indice} className="hover-highlight rounded-lg border border-transparent px-2 py-1.5 hover:bg-white/70 dark:hover:bg-slate-900/60">
+                  <li key={indice} className="hover-highlight flex flex-wrap items-baseline gap-x-3 gap-y-0.5 rounded-lg border border-transparent px-2 py-1.5 hover:bg-white/70 dark:hover:bg-slate-900/60">
                     <span
                       className={`font-mono tabular-nums text-blue-700 dark:text-blue-400 ${tamanhoGrande ? "text-sm" : "text-xs"}`}
                     >

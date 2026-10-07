@@ -38,7 +38,7 @@ export async function DashboardAluno({ alunoId, email, nome }: { alunoId: string
         </p>
       </div>
 
-      <div className="grid items-stretch gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <Cartao>
           <CabecalhoCartao titulo="Código QR temporário" href="/painel/qr" />
           <GeradorQR tokenInicial={tokenInicial} podeGerar={podeGerar} podeEscolherHora={podeEscolherHora} compacto />
@@ -91,12 +91,12 @@ export async function DashboardAluno({ alunoId, email, nome }: { alunoId: string
           <CabecalhoCartao titulo={`Horário de hoje · ${horariosHoje.length} ${horariosHoje.length === 1 ? "aula" : "aulas"}`} href="/painel/horario" />
           {horariosHoje.length ? (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px] text-left text-xs">
+              <table className="w-full text-left text-xs">
                 <thead className="text-slate-500">
                   <tr>
                     <th className="pb-3 font-medium">Hora</th>
                     <th className="pb-3 font-medium">Disciplina</th>
-                    <th className="pb-3 font-medium">Sala</th>
+                    <th className="hidden pb-3 font-medium sm:table-cell">Sala</th>
                     <th className="pb-3 font-medium">Estado</th>
                   </tr>
                 </thead>
@@ -106,8 +106,8 @@ export async function DashboardAluno({ alunoId, email, nome }: { alunoId: string
                     return (
                       <tr key={`${h.horaInicio}-${h.disciplina}`} className="schedule-row border-t border-slate-200 dark:border-slate-800">
                         <td className="py-3 font-mono tabular-nums">{h.horaInicio}–{h.horaFim}</td>
-                        <td className="py-3 font-medium">{h.disciplina}</td>
-                        <td className="py-3 text-slate-500">{h.sala ?? "—"}</td>
+                        <td className="py-3 font-medium">{h.disciplina}<span className="block font-normal text-slate-500 sm:hidden">{h.sala ?? "—"}</span></td>
+                        <td className="hidden py-3 text-slate-500 sm:table-cell">{h.sala ?? "—"}</td>
                         <td className="py-3">
                           <span className={estado === "Concluída" ? "text-emerald-600 dark:text-emerald-400" : estado === "A decorrer" ? "text-blue-600 dark:text-blue-400" : "text-slate-500"}>
                             ● {estado}
@@ -132,7 +132,7 @@ function CabecalhoCartao({ titulo, href }: { titulo: string; href: string }) {
   return (
     <div className="mb-4 flex items-center justify-between gap-2">
       <h2 className="text-sm font-semibold">{titulo}</h2>
-      <Link href={href} className="hover-highlight rounded-md px-1 py-0.5 text-xs font-medium text-blue-700 hover:underline dark:text-blue-400">
+      <Link href={href} className="hover-highlight -my-2 rounded-md px-1 py-2 text-xs font-medium text-blue-700 hover:underline dark:text-blue-400">
         Ver tudo →
       </Link>
     </div>

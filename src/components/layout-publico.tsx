@@ -67,7 +67,7 @@ export async function LayoutPublico({ ativa, children }: { ativa: PaginaPublica;
               key={link.href}
               href={link.href}
               aria-current={link.chave === ativa ? "page" : undefined}
-              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+              className={`shrink-0 rounded-full border px-3 py-2.5 text-xs font-semibold ${
                 link.chave === ativa
                   ? "border-blue-700 bg-blue-700 text-white"
                   : "border-slate-200 text-slate-600 dark:border-white/10 dark:text-slate-300"
@@ -84,9 +84,9 @@ export async function LayoutPublico({ ativa, children }: { ativa: PaginaPublica;
       <footer className="border-t border-slate-200 dark:border-white/[.08]">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <span>PortãoSeguro · Projeto UFCD 10790</span>
-          <span className="flex gap-4">
+          <span className="flex gap-5">
             {LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-blue-700 dark:hover:text-blue-400">
+              <Link key={link.href} href={link.href} className="-my-2 py-2 hover:text-blue-700 dark:hover:text-blue-400">
                 {link.label}
               </Link>
             ))}

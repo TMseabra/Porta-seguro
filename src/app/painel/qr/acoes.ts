@@ -12,7 +12,7 @@ import { exigirPerfil } from "@/lib/permissoes";
 import { formatarHora, formatarDataHora, horaLisboaParaUtc } from "@/lib/datas";
 import { ehUserAgentDeTelemovel, EMAIL_CONTA_DE_TESTE_QR } from "@/lib/dispositivo";
 import { TokenQR, Registo, Ocorrencia } from "@/models";
-import { proximoTipoRegisto } from "@/lib/regras";
+import { proximoTipoRegisto, limiteDeCodigosQR, MAX_CODIGOS_POR_MINUTO } from "@/lib/regras";
 import type { TipoRegisto } from "@/lib/constantes";
 
 /** Validade do código (RF15): 1 minuto. */
@@ -63,6 +63,24 @@ export async function gerarNovoTokenQR(
       : null;
 
   await ligarBaseDados();
+
+  const agora = new Date();
+  const recentes = await TokenQR.find({
+    alunoId: sessao.user.id,
+    criadoEm: { $gte: new Date(agora.getTime() - 60 * 1000) },
+  })
+    .select("criadoEm")
+    .lean();
+  const limite = limiteDeCodigosQR(
+    recentes.map((codigo) => codigo.criadoEm),
+    agora,
+  );
+  if (!limite.permitido) {
+    return {
+      ok: false,
+      erro: `Já geraste ${MAX_CODIGOS_POR_MINUTO} códigos no último minuto. Tenta outra vez daqui a ${limite.esperarSegundos} s.`,
+    };
+  }
 
   // A direção usa o último registo ANTES do momento a usar (real ou simulado); sem isto, uma hora
   // simulada no passado olhava ao registo mais recente de sempre.

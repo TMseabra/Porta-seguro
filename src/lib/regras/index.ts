@@ -12,6 +12,7 @@ export {
 } from "./validarTokenQR";
 export { encontrarBlocoADecorrer } from "./horarios";
 export { proximoTipoRegisto } from "./proximoTipo";
+export { limiteDeCodigosQR, MAX_CODIGOS_POR_MINUTO, type ResultadoLimiteQR } from "./limiteQR";
 export {
   tipoEsperadoNaLeitura,
   tipoForcadoNoMovimento,

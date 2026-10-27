@@ -11,6 +11,15 @@
   --background: #ffffff;
   --foreground: #171717;
   --attendance-empty: #e2e8f0;
+
+  --cor-barra: #1f3864;
+  --cor-borda: #c7ccd4;
+  --cor-cartao: #f5f6f8;
+  --cor-suave: #5b6472;
+  --cor-campo: #9aa3b0;
+  --cor-botao: #2b6cb0;
+  --cor-botao-hover: #245a94;
+  --cor-cabecalho-tabela: #e4e8f0;
 }
 
 /* Cores do tema escuro: só substituímos os valores das mesmas variáveis. */
@@ -18,6 +27,15 @@
   --background: #000000;
   --foreground: #ededed;
   --attendance-empty: #262626;
+
+  --cor-barra: #1b2d52;
+  --cor-borda: #2e2e2e;
+  --cor-cartao: #0a0a0a;
+  --cor-suave: #a3a3a3;
+  --cor-campo: #525252;
+  --cor-botao: #3b82c4;
+  --cor-botao-hover: #5a9bd6;
+  --cor-cabecalho-tabela: #1f1f1f;
 
   /* O site inteiro usa as cores "slate" do Tailwind, que têm um tom azulado:
      no modo escuro o fundo ficava azul-escuro e, onde a página não chegava ao
@@ -42,14 +60,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Feedback discreto para cartões, botões e links que recebem foco ou hover. */
@@ -108,4 +126,241 @@ body {
   .hover-highlight:active {
     transform: scale(0.99);
   }
+}
+
+/* ---------- Estilo simples (barra, cartões, botões, tabelas) ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--cor-barra);
+  color: #fff;
+}
+.barra-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: auto;
+  font-weight: 700;
+}
+.barra a,
+.barra button {
+  padding: 0.5rem 0.4rem;
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.barra-titulo {
+  min-width: 0;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.barra a:hover,
+.barra button:hover {
+  text-decoration: underline;
+}
+
+.pagina {
+  width: 100%;
+  max-width: 64rem;
+  flex: 1;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+.pagina-login {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+.pagina h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.subtitulo {
+  margin-top: 0.15rem;
+  color: var(--cor-suave);
+  font-size: 0.85rem;
+}
+
+.cartao {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.6rem;
+  background: var(--cor-cartao);
+}
+.cartao h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cartao-login {
+  width: 100%;
+  max-width: 22rem;
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .colunas {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.empilhado {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.filtros .campo {
+  flex: 1 1 9rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--cor-suave);
+  font-size: 0.8rem;
+}
+.campo input,
+.campo select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 2px solid var(--cor-campo);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 0.9rem;
+}
+.campo input:focus,
+.campo select:focus {
+  border-color: var(--cor-botao);
+  outline: none;
+}
+.campo option {
+  background: var(--background);
+}
+
+.botao,
+.botao-claro {
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--cor-botao);
+  border-radius: 0.4rem;
+  background: var(--cor-botao);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+.botao:hover {
+  background: var(--cor-botao-hover);
+  border-color: var(--cor-botao-hover);
+}
+.botao-claro {
+  background: transparent;
+  color: var(--cor-botao);
+}
+.botao-claro:hover {
+  background: var(--cor-cabecalho-tabela);
+}
+.botao:disabled,
+.botao-claro:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tabela-rolavel {
+  overflow-x: auto;
+}
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.tabela th {
+  padding: 0.55rem 0.7rem;
+  background: var(--cor-cabecalho-tabela);
+  font-weight: 700;
+}
+.tabela td {
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.estatisticas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+@media (min-width: 640px) {
+  .estatisticas {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.estatistica {
+  padding: 0.7rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.5rem;
+  background: var(--background);
+  text-align: center;
+}
+.estatistica strong {
+  display: block;
+  font-size: 1.5rem;
+}
+.estatistica span {
+  color: var(--cor-suave);
+  font-size: 0.75rem;
+}
+
+.aviso {
+  padding: 0.7rem 0.9rem;
+  border: 2px solid;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+}
+.aviso-verde {
+  border-color: #3a9a4d;
+  background: #e3f4e6;
+  color: #17301c;
+}
+.aviso-amarelo {
+  border-color: #e0a526;
+  background: #fdf1d6;
+  color: #3d2e08;
+}
+.aviso-vermelho {
+  border-color: #d14b4b;
+  background: #fbe4e4;
+  color: #3d1111;
+}
+.dark .aviso-verde {
+  background: #0f2415;
+  color: #c8ebd0;
+}
+.dark .aviso-amarelo {
+  background: #2b2008;
+  color: #f3e0ab;
+}
+.dark .aviso-vermelho {
+  background: #2c1010;
+  color: #f4c6c6;
 }

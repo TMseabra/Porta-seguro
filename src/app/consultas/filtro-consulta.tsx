@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { consultarAssiduidade } from "./acoes";
 import type { Ambito, ResultadoConsulta } from "./logica";
-import { SelectPersonalizado } from "@/components/select-personalizado";
 
 interface Opcao {
   id: string;
@@ -15,9 +14,6 @@ const ROTULOS_SITUACAO: Record<string, string> = {
   presenca_atraso: "Presença (atraso)",
   falta: "Falta",
 };
-
-const CLASSE_CAMPO =
-  "rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent";
 
 export function FiltroConsulta({
   alunos,
@@ -61,107 +57,84 @@ export function FiltroConsulta({
   const opcoesAtuais = opcoesParaAmbito(ambito);
 
   return (
-    <div className="flex flex-col gap-6">
-      <form
-        onSubmit={consultar}
-        className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:flex-wrap sm:items-end dark:border-slate-800 dark:bg-slate-900"
-      >
-        <SelectPersonalizado
-          rotulo="Âmbito"
-          valor={ambito}
-          onAlterar={(v) => mudarAmbito(v as Ambito)}
-          opcoes={[
-            { valor: "aluno", rotulo: "Por aluno" },
-            { valor: "turma", rotulo: "Por turma" },
-            { valor: "ano", rotulo: "Por ano de formação" },
-          ]}
-          className="w-full sm:w-auto"
-        />
-
-        <SelectPersonalizado
-          rotulo={ambito === "aluno" ? "Aluno" : ambito === "turma" ? "Turma" : "Ano"}
-          valor={alvo}
-          onAlterar={setAlvo}
-          opcoes={opcoesAtuais.map((o) => ({ valor: o.valor, rotulo: o.rotulo }))}
-          className="w-full sm:w-auto sm:min-w-48"
-        />
-
-        <label className="flex w-full flex-col gap-1 text-sm sm:w-auto">
-          Mês
-          <input
-            type="month"
-            value={mes}
-            onChange={(e) => setMes(e.target.value)}
-            className={`w-full ${CLASSE_CAMPO}`}
-          />
+    <div className="empilhado">
+      <form onSubmit={consultar} className="cartao filtros">
+        <label className="campo">
+          Âmbito
+          <select value={ambito} onChange={(e) => mudarAmbito(e.target.value as Ambito)}>
+            <option value="aluno">Por aluno</option>
+            <option value="turma">Por turma</option>
+            <option value="ano">Por ano de formação</option>
+          </select>
         </label>
 
-        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-          <button
-            type="submit"
-            disabled={aEnviar || !alvo}
-            className="flex-1 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50 sm:flex-none"
-          >
-            {aEnviar ? "A consultar..." : "Consultar"}
-          </button>
+        <label className="campo">
+          {ambito === "aluno" ? "Aluno" : ambito === "turma" ? "Turma" : "Ano"}
+          <select value={alvo} onChange={(e) => setAlvo(e.target.value)}>
+            {opcoesAtuais.map((o) => (
+              <option key={o.valor} value={o.valor}>
+                {o.rotulo}
+              </option>
+            ))}
+          </select>
+        </label>
 
-          {podeExportar && resultado?.ok && (
-            <a
-              href={`/api/relatorios/pdf?ambito=${ambito}&alvo=${alvo}&mes=${mes}`}
-              className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-center text-sm transition hover:bg-slate-100 sm:flex-none dark:border-slate-700 dark:hover:bg-slate-800"
-            >
-              Exportar PDF
-            </a>
-          )}
-        </div>
+        <label className="campo">
+          Mês
+          <input type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
+        </label>
+
+        <button type="submit" disabled={aEnviar || !alvo} className="botao">
+          {aEnviar ? "A consultar..." : "Consultar"}
+        </button>
+
+        {podeExportar && resultado?.ok && (
+          <a
+            href={`/api/relatorios/pdf?ambito=${ambito}&alvo=${alvo}&mes=${mes}`}
+            className="botao-claro"
+          >
+            Exportar PDF
+          </a>
+        )}
       </form>
 
-      {resultado && !resultado.ok && (
-        <p className="rounded-lg border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-          {resultado.erro}
-        </p>
-      )}
+      {resultado && !resultado.ok && <p className="aviso aviso-vermelho">{resultado.erro}</p>}
 
       {resultado?.ok && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="mb-4 font-semibold">{resultado.alvoNome}</h2>
+        <section className="cartao">
+          <h2>{resultado.alvoNome}</h2>
 
-          <div className="mb-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Tile rotulo="Dias letivos" valor={resultado.resumo.diasLetivos} />
-            <Tile rotulo="Presenças" valor={resultado.resumo.presencas} destaque="ok" />
-            <Tile rotulo="Atrasos" valor={resultado.resumo.atrasos} destaque="aviso" />
-            <Tile rotulo="Faltas" valor={resultado.resumo.faltas} destaque="critico" />
+          <div className="estatisticas">
+            <Estatistica rotulo="Dias letivos" valor={resultado.resumo.diasLetivos} />
+            <Estatistica rotulo="Presenças" valor={resultado.resumo.presencas} />
+            <Estatistica rotulo="Atrasos" valor={resultado.resumo.atrasos} />
+            <Estatistica rotulo="Faltas" valor={resultado.resumo.faltas} />
           </div>
-          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+          <p className="subtitulo mb-3">
             Taxa de presença: {(resultado.resumo.taxaPresenca * 100).toFixed(1)}%
           </p>
 
-          <div className="overflow-x-auto">
+          <div className="tabela-rolavel">
             {resultado.ambito === "aluno" ? (
-              <table className="w-full text-left text-sm">
+              <table className="tabela">
                 <thead>
-                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                    <th className="py-2 pr-4 font-medium">Dia</th>
-                    <th className="py-2 pr-4 font-medium">Situação</th>
-                    <th className="py-2 pr-4 font-medium">Entrada</th>
+                  <tr>
+                    <th>Dia</th>
+                    <th>Situação</th>
+                    <th>Entrada</th>
                   </tr>
                 </thead>
                 <tbody>
                   {resultado.dias.map((dia, indice) => (
-                    <tr
-                      key={indice}
-                      className="border-b border-slate-100 last:border-0 dark:border-slate-800"
-                    >
-                      <td className="py-2 pr-4 font-mono tabular-nums">{dia.dataFormatada}</td>
-                      <td className="py-2 pr-4">{ROTULOS_SITUACAO[dia.situacao]}</td>
-                      <td className="py-2 pr-4 font-mono tabular-nums">
-                        {dia.horaEntradaFormatada ?? "—"}
-                      </td>
+                    <tr key={indice}>
+                      <td>{dia.dataFormatada}</td>
+                      <td>{ROTULOS_SITUACAO[dia.situacao]}</td>
+                      <td>{dia.horaEntradaFormatada ?? "—"}</td>
                     </tr>
                   ))}
                   {resultado.dias.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="py-6 text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan={3} className="text-center">
                         Sem dias letivos neste mês.
                       </td>
                     </tr>
@@ -169,36 +142,31 @@ export function FiltroConsulta({
                 </tbody>
               </table>
             ) : (
-              <table className="w-full text-left text-sm">
+              <table className="tabela">
                 <thead>
-                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                    <th className="py-2 pr-4 font-medium">Aluno</th>
-                    <th className="py-2 pr-4 font-medium">Turma</th>
-                    <th className="py-2 pr-4 font-medium">Presenças</th>
-                    <th className="py-2 pr-4 font-medium">Atrasos</th>
-                    <th className="py-2 pr-4 font-medium">Faltas</th>
-                    <th className="py-2 pr-4 font-medium">Taxa</th>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Turma</th>
+                    <th>Presenças</th>
+                    <th>Atrasos</th>
+                    <th>Faltas</th>
+                    <th>Taxa</th>
                   </tr>
                 </thead>
                 <tbody>
                   {resultado.alunos.map((linha) => (
-                    <tr
-                      key={linha.alunoId}
-                      className="border-b border-slate-100 last:border-0 dark:border-slate-800"
-                    >
-                      <td className="py-2 pr-4 font-medium">{linha.nome}</td>
-                      <td className="py-2 pr-4">{linha.turma ?? "—"}</td>
-                      <td className="py-2 pr-4 tabular-nums">{linha.resumo.presencas}</td>
-                      <td className="py-2 pr-4 tabular-nums">{linha.resumo.atrasos}</td>
-                      <td className="py-2 pr-4 tabular-nums">{linha.resumo.faltas}</td>
-                      <td className="py-2 pr-4 tabular-nums">
-                        {(linha.resumo.taxaPresenca * 100).toFixed(0)}%
-                      </td>
+                    <tr key={linha.alunoId}>
+                      <td>{linha.nome}</td>
+                      <td>{linha.turma ?? "—"}</td>
+                      <td>{linha.resumo.presencas}</td>
+                      <td>{linha.resumo.atrasos}</td>
+                      <td>{linha.resumo.faltas}</td>
+                      <td>{(linha.resumo.taxaPresenca * 100).toFixed(0)}%</td>
                     </tr>
                   ))}
                   {resultado.alunos.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan={6} className="text-center">
                         Sem alunos neste âmbito.
                       </td>
                     </tr>
@@ -213,25 +181,11 @@ export function FiltroConsulta({
   );
 }
 
-function Tile({
-  rotulo,
-  valor,
-  destaque,
-}: {
-  rotulo: string;
-  valor: number;
-  destaque?: "ok" | "aviso" | "critico";
-}) {
-  const cores = {
-    ok: "text-emerald-700 dark:text-emerald-400",
-    aviso: "text-amber-700 dark:text-amber-400",
-    critico: "text-red-700 dark:text-red-400",
-  };
-
+function Estatistica({ rotulo, valor }: { rotulo: string; valor: number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 dark:border-slate-800 dark:bg-slate-800/40">
-      <p className={`text-2xl font-bold tabular-nums ${destaque ? cores[destaque] : ""}`}>{valor}</p>
-      <p className="text-xs text-slate-500 dark:text-slate-400">{rotulo}</p>
+    <div className="estatistica">
+      <strong>{valor}</strong>
+      <span>{rotulo}</span>
     </div>
   );
 }

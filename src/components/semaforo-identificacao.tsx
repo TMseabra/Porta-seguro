@@ -95,22 +95,18 @@ export function Semaforo({
   cor: "verde" | "vermelho" | "amarelo";
   children: React.ReactNode;
 }) {
-  const cores = {
-    verde: "border-emerald-500 bg-emerald-50 dark:bg-emerald-950",
-    vermelho: "border-red-500 bg-red-50 dark:bg-red-950",
-    amarelo: "border-amber-500 bg-amber-50 dark:bg-amber-950",
-  };
-
-  return <div className={`rounded-2xl border-l-4 p-5 ${cores[cor]}`}>{children}</div>;
+  return <div className={`aviso aviso-${cor}`}>{children}</div>;
 }
 
 export function BotaoResposta({
   onClick,
   disabled,
+  principal = false,
   children,
 }: {
   onClick: () => void;
   disabled?: boolean;
+  principal?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -118,7 +114,7 @@ export function BotaoResposta({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-transparent dark:hover:bg-white/10"
+      className={principal ? "botao" : "botao-claro"}
     >
       {children}
     </button>

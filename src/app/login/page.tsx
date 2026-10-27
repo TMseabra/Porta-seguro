@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { auth } from "@/auth";
 import { Logo } from "@/components/logo";
-import { LogoTexto } from "@/components/logo-texto";
 import { redirect } from "next/navigation";
 import { FormularioCredenciais } from "./formulario-credenciais";
 import { entrarComGoogle } from "./acoes";
-import { ModeToggle } from "@/components/mode-toggle";
+import { BarraTopo } from "@/components/barra-topo";
 
 /**
  * Mensagens para os `?error=` do Auth.js (ex.: conta Google sem `Utilizador` na escola); sem elas a
@@ -34,50 +32,25 @@ export default async function PaginaLogin({
     : null;
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="border-b border-slate-200 bg-blue-50 dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-3">
-          <Link
-            href="/"
-            className="flex items-center gap-2 py-2 text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-400"
-          >
-            ← Página principal
-          </Link>
-          <ModeToggle />
-        </div>
-      </header>
+    <div className="flex min-h-full flex-col">
+      <BarraTopo titulo="PortãoSeguro" voltar={{ href: "/", texto: "← Página principal" }} />
 
-      <main className="flex flex-1 flex-col items-center justify-center p-8">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="mb-6 flex flex-col items-center gap-2 text-center">
+      <main className="pagina-login">
+        <div className="cartao cartao-login">
+          <div className="mb-4 flex flex-col items-center gap-1 text-center">
             <Logo className="h-11 w-11" decorativa />
-            <h1>
-              <LogoTexto className="h-7" />
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Inicia sessão para continuar
-            </p>
+            <h1 className="text-xl font-bold">PortãoSeguro</h1>
+            <p className="subtitulo">Inicia sessão para continuar</p>
           </div>
 
-          {mensagemErro && (
-            <p className="mb-4 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-              {mensagemErro}
-            </p>
-          )}
+          {mensagemErro && <p className="aviso aviso-vermelho mb-3">{mensagemErro}</p>}
 
           <FormularioCredenciais />
 
-          <div className="my-6 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-            ou
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-          </div>
+          <p className="subtitulo my-3 text-center">ou</p>
 
           <form action={entrarComGoogle}>
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-            >
+            <button type="submit" className="botao-claro flex w-full items-center justify-center gap-2">
               <LogoGoogle />
               Entrar com conta Google
             </button>

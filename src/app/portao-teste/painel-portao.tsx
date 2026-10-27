@@ -141,57 +141,66 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
     });
   }
 
+  const aLerOuVazio = estado.passo === "vazio" || estado.passo === "a-ler";
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* --- Leitura do código QR ---------------------------------------- */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="mb-4 font-semibold">Leitura de código QR</h2>
+    <div className="empilhado">
+      <div className="colunas">
+        <section className="cartao">
+          <h2>Leitura de código QR</h2>
 
-        {estado.passo === "vazio" && (
-          <div className="flex flex-col items-center gap-3">
-            <LeitorQR onLido={aoLerTokenQR} />
-            <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-              Aponta a câmara ao código do telemóvel do aluno.
-            </p>
-          </div>
-        )}
+          {estado.passo === "vazio" && (
+            <div className="flex flex-col items-center gap-3">
+              <LeitorQR onLido={aoLerTokenQR} />
+              <p className="subtitulo text-center">Aponta a câmara ao código do telemóvel do aluno.</p>
+            </div>
+          )}
 
-        {estado.passo === "a-ler" && (
-          <div role="status" className="flex items-center justify-center gap-3 py-8">
-            <span
-              aria-hidden
-              className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600"
-            />
-            <p className="text-sm font-medium">A ler...</p>
-          </div>
-        )}
+          {estado.passo === "a-ler" && (
+            <div role="status" className="flex items-center justify-center gap-3 py-8">
+              <span
+                aria-hidden
+                className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600"
+              />
+              <p className="text-sm font-bold">A ler...</p>
+            </div>
+          )}
 
-        {(estado.passo === "erro" ||
-          estado.passo === "resultado" ||
-          estado.passo === "confirmar-identidade" ||
-          estado.passo === "pendente") && (
-          <div className="flex flex-col gap-4">
-            {estado.passo === "erro" && (
-              <p className="rounded-xl border-l-4 border-red-600 bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-                {estado.mensagem}
-              </p>
-            )}
+          {(estado.passo === "erro" || estado.passo === "resultado") && (
+            <button type="button" onClick={() => setEstado({ passo: "vazio" })} className="botao">
+              Ler o próximo código
+            </button>
+          )}
+          {(estado.passo === "confirmar-identidade" || estado.passo === "pendente") && (
+            <p className="subtitulo">Responde à pergunta ao lado para continuar.</p>
+          )}
+        </section>
 
-            {estado.passo === "resultado" && (
+        <section className="cartao">
+          <h2>Confirmar identidade</h2>
+
+          {aLerOuVazio && <p className="subtitulo">Ainda não há nenhum código lido.</p>}
+
+          {estado.passo === "erro" && <p className="aviso aviso-vermelho">{estado.mensagem}</p>}
+
+          {estado.passo === "resultado" && (
+            <div className="empilhado">
+              <CartaoAluno aluno={estado.aluno} />
+              <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
               <Semaforo cor={estado.autorizado ? "verde" : "vermelho"}>
-                <CartaoAluno aluno={estado.aluno} />
-                <p className="mt-2 text-sm">{estado.motivo}</p>
-                <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
+                <b>{estado.autorizado ? "Autorizado" : "Não autorizado"}</b> — {estado.motivo}
               </Semaforo>
-            )}
+            </div>
+          )}
 
-            {estado.passo === "confirmar-identidade" && (
+          {estado.passo === "confirmar-identidade" && (
+            <div className="empilhado">
+              <CartaoAluno aluno={estado.aluno} />
+              <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
               <Semaforo cor="amarelo">
-                <CartaoAluno aluno={estado.aluno} />
-                <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
-                <p className="mt-3 text-sm font-medium">É esta a pessoa à tua frente?</p>
-                <div className="mt-2 flex gap-2">
-                  <BotaoResposta onClick={() => responderIdentidade(true)} disabled={aEnviar}>
+                <p className="mb-2 font-bold">É esta a pessoa à tua frente?</p>
+                <div className="flex gap-2">
+                  <BotaoResposta onClick={() => responderIdentidade(true)} disabled={aEnviar} principal>
                     Sim
                   </BotaoResposta>
                   <BotaoResposta onClick={() => responderIdentidade(false)} disabled={aEnviar}>
@@ -199,15 +208,17 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
                   </BotaoResposta>
                 </div>
               </Semaforo>
-            )}
+            </div>
+          )}
 
-            {estado.passo === "pendente" && (
+          {estado.passo === "pendente" && (
+            <div className="empilhado">
+              <CartaoAluno aluno={estado.aluno} />
               <Semaforo cor="amarelo">
-                <CartaoAluno aluno={estado.aluno} />
-                <p className="mt-2 text-sm">{estado.motivo}</p>
-                <p className="mt-3 text-sm font-medium">Os pais autorizam a saída?</p>
-                <div className="mt-2 flex gap-2">
-                  <BotaoResposta onClick={() => responderContactoPais(true)} disabled={aEnviar}>
+                <p className="mb-2">{estado.motivo}</p>
+                <p className="mb-2 font-bold">Os pais autorizam a saída?</p>
+                <div className="flex gap-2">
+                  <BotaoResposta onClick={() => responderContactoPais(true)} disabled={aEnviar} principal>
                     Sim
                   </BotaoResposta>
                   <BotaoResposta onClick={() => responderContactoPais(false)} disabled={aEnviar}>
@@ -215,58 +226,40 @@ export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[
                   </BotaoResposta>
                 </div>
               </Semaforo>
-            )}
+            </div>
+          )}
+        </section>
+      </div>
 
-            {(estado.passo === "erro" || estado.passo === "resultado") && (
-              <button
-                type="button"
-                onClick={() => setEstado({ passo: "vazio" })}
-                className="self-start rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800"
-              >
-                Ler o próximo código
-              </button>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* --- Registos de hoje ------------------------------------------- */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="mb-3 font-semibold">Registos de hoje</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm">
+      <section>
+        <h2 className="mb-2 font-bold">Registos de hoje</h2>
+        <div className="tabela-rolavel">
+          <table className="tabela">
             <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <th className="py-2 pr-2 sm:pr-4 font-medium">Hora</th>
-                <th className="py-2 pr-2 sm:pr-4 font-medium">Aluno</th>
-                <th className="py-2 pr-2 sm:pr-4 font-medium">Movimento</th>
-                <th className="py-2 pr-2 sm:pr-4 font-medium">Estado</th>
+              <tr>
+                <th>Hora</th>
+                <th>Aluno</th>
+                <th>Movimento</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               {linhas.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-4 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={4} className="text-center">
                     Ainda sem registos hoje.
                   </td>
                 </tr>
               )}
               {linhas.map((linha) => (
-                <tr
-                  key={linha.id}
-                  className="border-b border-slate-100 last:border-0 dark:border-slate-800"
-                >
-                  <td className="py-2 pr-2 sm:pr-4 font-mono tabular-nums">{linha.horaFormatada}</td>
-                  <td className="py-2 pr-2 sm:pr-4">
+                <tr key={linha.id}>
+                  <td>{linha.horaFormatada}</td>
+                  <td>
                     {linha.alunoNome}
-                    {linha.metodo === "simulacao" && (
-                      <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-purple-800 dark:bg-purple-950 dark:text-purple-300">
-                        Simulação
-                      </span>
-                    )}
+                    {linha.metodo === "simulacao" && <b> (simulação)</b>}
                   </td>
-                  <td className="py-2 pr-2 sm:pr-4">{ROTULOS_TIPO[linha.tipo]}</td>
-                  <td className="py-2 pr-2 sm:pr-4">{ROTULOS_ESTADO[linha.estado]}</td>
+                  <td>{ROTULOS_TIPO[linha.tipo]}</td>
+                  <td>{ROTULOS_ESTADO[linha.estado]}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Logo } from "@/components/logo";
+import { BarraTopo } from "@/components/barra-topo";
 import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { limitesDoDiaEmLisboa, formatarHora } from "@/lib/datas";
@@ -33,29 +32,14 @@ export default async function PaginaPortaoTeste() {
   }));
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="border-b border-slate-200 bg-blue-50 dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-3">
-          <div className="flex items-center gap-3">
-            <Logo />
-            <div className="leading-tight">
-              <h1 className="font-semibold">Portão Teste</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Leitura de código QR na portaria
-              </p>
-            </div>
-          </div>
+    <div className="flex min-h-full flex-col">
+      <BarraTopo titulo="PortãoSeguro — Portão" voltar={{ href: "/painel", texto: "← Painel" }} comSair />
 
-          <Link
-            href="/painel"
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-          >
-            ← Painel
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
+      <main className="pagina">
+        <h1>Portaria</h1>
+        <p className="subtitulo mb-4">
+          Leitura do código QR, confirmação da identidade e registo do movimento.
+        </p>
         <PainelPortao linhasIniciais={linhasIniciais} />
       </main>
     </div>

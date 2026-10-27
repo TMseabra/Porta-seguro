@@ -17,7 +17,7 @@ export function FormularioCredenciais() {
 
   return (
     <form action={acao} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Email institucional
         <input
           type="email"
@@ -26,11 +26,10 @@ export function FormularioCredenciais() {
           autoComplete="email"
           value={email}
           onChange={(evento) => setEmail(evento.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Palavra-passe
         <div className="relative">
           <input
@@ -40,7 +39,7 @@ export function FormularioCredenciais() {
             autoComplete="current-password"
             value={password}
             onChange={(evento) => setPassword(evento.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
+            style={{ paddingRight: "2.25rem" }}
           />
           <button
             type="button"
@@ -55,7 +54,7 @@ export function FormularioCredenciais() {
       </label>
 
       {pedeCodigo && (
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="campo">
           Código de acesso
           <input
             // `inputMode="numeric"` abre o teclado de números; `one-time-code` deixa o iOS/Android sugerir o código.
@@ -69,21 +68,17 @@ export function FormularioCredenciais() {
             placeholder="000000"
             value={codigo}
             onChange={(evento) => setCodigo(evento.target.value.replace(/\D/g, ""))}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-center text-lg tracking-[0.4em] focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
+            style={{ textAlign: "center", letterSpacing: "0.4em" }}
           />
         </label>
       )}
 
       {estado.aviso && !estado.erro && (
-        <p className="text-sm text-blue-700 dark:text-blue-400">{estado.aviso}</p>
+        <p className="aviso aviso-amarelo">{estado.aviso}</p>
       )}
-      {estado.erro && <p className="text-sm text-red-600 dark:text-red-400">{estado.erro}</p>}
+      {estado.erro && <p className="aviso aviso-vermelho">{estado.erro}</p>}
 
-      <button
-        type="submit"
-        disabled={aEnviar}
-        className="mt-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
-      >
+      <button type="submit" disabled={aEnviar} className="botao">
         {aEnviar ? "A entrar..." : pedeCodigo ? "Confirmar código" : "Entrar"}
       </button>
     </form>

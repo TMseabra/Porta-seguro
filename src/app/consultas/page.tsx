@@ -4,7 +4,7 @@ import { partesEmLisboa } from "@/lib/datas";
 import { Utilizador } from "@/models";
 import { turmasDoUtilizador } from "@/lib/ambito";
 import { FiltroConsulta } from "./filtro-consulta";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { BarraTopo } from "@/components/barra-topo";
 
 /** Consultas (UC02/UC04): assiduidade por aluno, turma ou ano, com PDF. Só admin e coordenador. */
 export default async function PaginaConsultas() {
@@ -26,14 +26,15 @@ export default async function PaginaConsultas() {
   const mesAtual = `${ano}-${String(mes).padStart(2, "0")}`;
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao titulo="Consultas de assiduidade" voltarHref="/painel" voltarLabel="Painel" />
+    <div className="flex min-h-full flex-col">
+      <BarraTopo titulo="PortãoSeguro — Consultas" voltar={{ href: "/painel", texto: "← Painel" }} comSair />
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
+      <main className="pagina">
+        <h1>Consultas de assiduidade</h1>
+        <p className="subtitulo mb-4">Presenças, atrasos e faltas por aluno, turma ou ano de formação.</p>
+
         {turmas.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Ainda não tens turmas atribuídas para consultar.
-          </p>
+          <p className="subtitulo">Ainda não tens turmas atribuídas para consultar.</p>
         ) : (
           <FiltroConsulta
             alunos={alunos.map((a) => ({ id: a._id.toString(), nome: a.nomeCompleto }))}

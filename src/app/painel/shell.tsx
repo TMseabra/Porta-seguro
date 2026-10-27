@@ -2,7 +2,7 @@ import type { Session } from "next-auth";
 import { Logo } from "@/components/logo";
 import { signOut } from "@/auth";
 import type { Perfil } from "@/lib/constantes";
-import { BotaoTema } from "@/components/botao-tema";
+import { ModeToggle } from "@/components/mode-toggle";
 import { atalhosDoPerfil } from "./atalhos";
 import { MenuPainel, TituloAtual, type ItemNav } from "./nav-painel";
 
@@ -40,7 +40,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
         <span className="hidden text-sm sm:inline">
           {sessao.user.name} · {ROTULO_PERFIL[sessao.user.perfil]}
         </span>
-        <BotaoTema />
+        <ModeToggle />
         <form
           action={async () => {
             "use server";

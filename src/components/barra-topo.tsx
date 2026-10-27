@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { Logo } from "@/components/logo";
-import { BotaoTema } from "@/components/botao-tema";
+import { ModeToggle } from "@/components/mode-toggle";
 
 /** Barra azul de topo das páginas internas: título à esquerda, ligações à direita. */
 export function BarraTopo({
@@ -21,7 +21,7 @@ export function BarraTopo({
       </div>
 
       <Link href={voltar.href}>{voltar.texto}</Link>
-      <BotaoTema />
+      <ModeToggle />
       {comSair && (
         <form
           action={async () => {

@@ -28,30 +28,28 @@ export function FormularioCurso({
   const [erro, executarAcao, aEnviar] = useActionState(acao, undefined);
 
   return (
-    <form action={executarAcao} className="flex max-w-md flex-col gap-3">
+    <form action={executarAcao} className="empilhado">
       {cursoInicial && <input type="hidden" name="id" value={cursoInicial.id} />}
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Nome
         <input
           name="nome"
           required
           defaultValue={cursoInicial?.nome}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Sigla
         <input
           name="sigla"
           required
           defaultValue={cursoInicial?.sigla}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Anos de duração
         <input
           name="anosDuracao"
@@ -59,16 +57,14 @@ export function FormularioCurso({
           min={1}
           required
           defaultValue={cursoInicial?.anosDuracao}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Coordenador
         <select
           name="coordenadorId"
           defaultValue={cursoInicial?.coordenadorId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           <option value="">— Sem coordenador —</option>
           {coordenadores.map((coordenador) => (
@@ -81,12 +77,12 @@ export function FormularioCurso({
 
       {cursoInicial && <CampoPasskey />}
 
-      {erro && <p className="text-sm text-red-600 dark:text-red-400">{erro}</p>}
+      {erro && <p className="aviso aviso-vermelho">{erro}</p>}
 
       <button
         type="submit"
         disabled={aEnviar}
-        className="mt-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
+        className="botao"
       >
         {aEnviar ? "A guardar..." : "Guardar"}
       </button>

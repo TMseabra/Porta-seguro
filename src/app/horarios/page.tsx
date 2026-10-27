@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Logo } from "@/components/logo";
+import { PaginaInterna } from "@/components/pagina-interna";
 import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { turmasDoUtilizador } from "@/lib/ambito";
@@ -87,43 +86,25 @@ export default async function PaginaHorarios({
       : undefined;
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="border-b border-slate-200 bg-blue-50 dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-6 py-3">
-          <div className="flex items-center gap-3">
-            <Logo />
-            <div className="leading-tight">
-              <h1 className="font-semibold">Horário de turmas</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {turmas.length} {turmas.length === 1 ? "turma atribuída" : "turmas atribuídas"}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/painel"
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-          >
-            ← Painel
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-        {turmas.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Ainda não tens turmas atribuídas. Fala com a administração para te
-            associarem blocos de horário ou um curso a coordenar.
-          </p>
-        ) : (
-          <VistaHorario
-            turmas={turmasComHorario}
-            meuHorario={meuHorario}
-            professores={professoresComHorario}
-            vistaInicial={vistaInicial}
-          />
-        )}
-      </main>
-    </div>
+    <PaginaInterna
+      titulo="Horário de turmas"
+      subtitulo={`${turmas.length} ${turmas.length === 1 ? "turma atribuída" : "turmas atribuídas"}`}
+      voltarHref="/painel"
+      voltarLabel="Painel"
+    >
+      {turmas.length === 0 ? (
+        <p className="subtitulo">
+          Ainda não tens turmas atribuídas. Fala com a administração para te associarem blocos de horário ou um
+          curso a coordenar.
+        </p>
+      ) : (
+        <VistaHorario
+          turmas={turmasComHorario}
+          meuHorario={meuHorario}
+          professores={professoresComHorario}
+          vistaInicial={vistaInicial}
+        />
+      )}
+    </PaginaInterna>
   );
 }

@@ -10,10 +10,7 @@ const OPCOES: { valor: TipoEscolhido; rotulo: string }[] = [
   { valor: "saida", rotulo: "Saída" },
 ];
 
-/**
- * Direção numa simulação: "Automático" alterna com o último registo; as outras forçam. Usa <input type="radio">
- * escondidos: setas e leitores de ecrã funcionam sem código extra.
- */
+/** Direção numa simulação: "Automático" alterna com o último registo; as outras forçam. */
 export function EscolhaTipoPassagem({
   valor,
   onAlterar,
@@ -23,25 +20,18 @@ export function EscolhaTipoPassagem({
 }) {
   const nome = useId();
   return (
-    <fieldset className="flex flex-col gap-1.5 text-sm">
-      <legend className="mb-1.5">Tipo de passagem</legend>
-      <div className="inline-flex w-fit rounded-lg border border-slate-300 p-0.5 dark:border-slate-700">
+    <fieldset className="campo">
+      <legend>Tipo de passagem</legend>
+      <div className="flex flex-wrap gap-4 text-sm" style={{ color: "var(--foreground)" }}>
         {OPCOES.map((opcao) => (
-          <label
-            key={opcao.valor}
-            className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 ${
-              valor === opcao.valor
-                ? "bg-blue-700 text-white"
-                : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
-            }`}
-          >
+          <label key={opcao.valor} className="flex items-center gap-1.5">
             <input
               type="radio"
               name={nome}
               value={opcao.valor}
               checked={valor === opcao.valor}
               onChange={() => onAlterar(opcao.valor)}
-              className="sr-only"
+              style={{ width: "auto" }}
             />
             {opcao.rotulo}
           </label>

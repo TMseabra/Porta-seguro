@@ -31,14 +31,12 @@ export function GeradorQR({
   tokenInicial,
   podeGerar,
   podeEscolherHora,
-  compacto = false,
 }: {
   tokenInicial: TokenGerado | null;
   /** Falso em PC (RF15: o código é para o telemóvel), exceto na conta de teste. */
   podeGerar: boolean;
   /** Só na conta de teste: data/hora que a portaria usa em vez da real. */
   podeEscolherHora: boolean;
-  compacto?: boolean;
 }) {
   const [token, setToken] = useState<TokenGerado | null>(tokenInicial);
   const [segundos, setSegundos] = useState(() =>
@@ -90,32 +88,28 @@ export function GeradorQR({
   const mostrarImagem = token && !expirado && !estado.usado;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3">
       {mostrarImagem && (
         <>
-          <RotuloDirecao tipo={token.tipo} />
-          {token.momentoSimuladoFormatado && (
-            <p className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-purple-800 dark:bg-purple-950 dark:text-purple-300">
-              Simulado para {token.momentoSimuladoFormatado}
-            </p>
-          )}
+          <b>Só serve para {token.tipo === "entrada" ? "entrar" : "sair"}</b>
+          {token.momentoSimuladoFormatado && <b>(Simulado para {token.momentoSimuladoFormatado})</b>}
           {/* eslint-disable-next-line @next/next/no-img-element -- imagem gerada localmente (data URL), não faz sentido otimizar com next/image */}
           <img
             src={token.imagemDataUrl}
             alt="Código QR para a portaria"
-            width={compacto ? 160 : 240}
-            height={compacto ? 160 : 240}
-            className={`hover-highlight rounded-xl border border-slate-200 p-2 dark:border-slate-700 ${compacto ? "h-36 w-36" : ""}`}
+            width={240}
+            height={240}
+            className="rounded-lg bg-white p-2"
           />
-          <p className="rounded-full bg-blue-50 px-3 py-1 font-mono text-sm tabular-nums text-blue-800 dark:bg-blue-950/50 dark:text-blue-300">
+          <p>
             Válido por mais {Math.floor(segundos / 60)}:{String(segundos % 60).padStart(2, "0")}
           </p>
         </>
       )}
 
       {podeEscolherHora && !mostrarImagem && (
-        <div className="flex w-full max-w-xs flex-col gap-2 rounded-xl border border-purple-200 bg-purple-50 p-3 text-sm dark:border-purple-900 dark:bg-purple-950/40">
-          <label className="flex items-center gap-2 font-medium text-purple-900 dark:text-purple-200">
+        <div className="aviso aviso-amarelo empilhado w-full max-w-xs">
+          <label className="flex items-center gap-2 font-bold">
             <input
               type="checkbox"
               checked={simularHora}
@@ -124,73 +118,50 @@ export function GeradorQR({
             Simular outra data/hora
           </label>
           {simularHora && (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap gap-2">
-                <input
-                  type="date"
-                  value={dataSimulada}
-                  onChange={(evento) =>
-                    setDataHoraSimulada((atual) => ({ ...atual, data: evento.target.value }))
-                  }
-                  className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
-                />
-                <input
-                  type="time"
-                  value={horaSimulada}
-                  onChange={(evento) =>
-                    setDataHoraSimulada((atual) => ({ ...atual, hora: evento.target.value }))
-                  }
-                  className="rounded-lg border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
-                />
+            <>
+              <div className="filtros">
+                <label className="campo">
+                  Dia
+                  <input
+                    type="date"
+                    value={dataSimulada}
+                    onChange={(evento) => setDataHoraSimulada((atual) => ({ ...atual, data: evento.target.value }))}
+                  />
+                </label>
+                <label className="campo">
+                  Hora
+                  <input
+                    type="time"
+                    value={horaSimulada}
+                    onChange={(evento) => setDataHoraSimulada((atual) => ({ ...atual, hora: evento.target.value }))}
+                  />
+                </label>
               </div>
               <EscolhaTipoPassagem valor={tipoSimulado} onAlterar={setTipoSimulado} />
-            </div>
+            </>
           )}
         </div>
       )}
 
       {estado.usado && <ResultadoLeitura estado={estado} tipo={token?.tipo} />}
 
-      {expirado && (
-        <p className="text-sm text-red-600 dark:text-red-400">Este código expirou.</p>
-      )}
+      {expirado && <p className="aviso aviso-vermelho">Este código expirou.</p>}
 
-      {erro && (
-        <p className="max-w-xs text-center text-sm text-red-600 dark:text-red-400">{erro}</p>
-      )}
+      {erro && <p className="aviso aviso-vermelho max-w-xs">{erro}</p>}
 
       {podeGerar ? (
-        <button
-          type="button"
-          onClick={gerar}
-          disabled={aGerar}
-          className="hover-highlight rounded-lg border border-transparent bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
-        >
+        <button type="button" onClick={gerar} disabled={aGerar} className="botao">
           {aGerar ? "A gerar..." : token ? "Gerar novo código" : "Gerar código QR"}
         </button>
       ) : (
         !mostrarImagem && (
-          <p className="max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
-            Este código só pode ser gerado a partir do telemóvel. Abre a tua
-            área pessoal no telemóvel para gerares o código QR.
+          <p className="subtitulo max-w-xs text-center">
+            Este código só pode ser gerado a partir do telemóvel. Abre o PortãoSeguro no telemóvel para gerares o
+            código QR.
           </p>
         )
       )}
     </div>
-  );
-}
-
-function RotuloDirecao({ tipo }: { tipo: TipoRegisto }) {
-  return (
-    <span
-      className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
-        tipo === "entrada"
-          ? "bg-blue-700 text-white"
-          : "bg-slate-700 text-white dark:bg-slate-600"
-      }`}
-    >
-      Só serve para {tipo === "entrada" ? "entrar" : "sair"}
-    </span>
   );
 }
 
@@ -201,13 +172,11 @@ function ResultadoLeitura({
   estado: Extract<EstadoTokenQR, { usado: true }>;
   tipo?: TipoRegisto;
 }) {
-  const estilos = {
-    aceite:
-      "border-emerald-500 bg-emerald-50 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100",
-    recusado: "border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100",
-    pendente: "border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-100",
-    identidade_rejeitada:
-      "border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100",
+  const cores = {
+    aceite: "verde",
+    recusado: "vermelho",
+    pendente: "amarelo",
+    identidade_rejeitada: "vermelho",
   } as const;
 
   const nomeMovimento = tipo === "saida" ? "Saída" : "Entrada";
@@ -219,15 +188,10 @@ function ResultadoLeitura({
   } as const;
 
   return (
-    <div
-      role="status"
-      className={`w-full max-w-xs rounded-xl border-l-4 p-4 text-center text-sm ${estilos[estado.resultado]}`}
-    >
-      <p className="font-semibold">
-        Código utilizado{estado.horaFormatada ? ` às ${estado.horaFormatada}` : ""}
-      </p>
-      <p className="mt-1">{titulos[estado.resultado]}</p>
-      {estado.motivo && <p className="mt-1 text-xs opacity-80">{estado.motivo}</p>}
+    <div role="status" className={`aviso aviso-${cores[estado.resultado]} w-full max-w-xs text-center`}>
+      <p className="font-bold">Código utilizado{estado.horaFormatada ? ` às ${estado.horaFormatada}` : ""}</p>
+      <p>{titulos[estado.resultado]}</p>
+      {estado.motivo && <p className="text-xs">{estado.motivo}</p>}
     </div>
   );
 }

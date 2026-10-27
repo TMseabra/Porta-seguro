@@ -2,7 +2,7 @@ import Link from "next/link";
 import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Curso, Turma, Utilizador } from "@/models";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 
 export default async function PaginaAdmin() {
   await exigirPerfil(["gestor", "admin"]);
@@ -15,143 +15,29 @@ export default async function PaginaAdmin() {
   ]);
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao titulo="Administração" voltarHref="/painel" voltarLabel="Painel" />
-
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <CartaoSeccao href="/admin/cursos" titulo="Cursos" total={totalCursos} icone={<IconeCursos />} />
-          <CartaoSeccao href="/admin/turmas" titulo="Turmas" total={totalTurmas} icone={<IconeTurmas />} />
-          <CartaoSeccao href="/admin/alunos" titulo="Alunos" total={totalAlunos} icone={<IconeAlunos />} />
-        </div>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <CartaoAtalho
-            href="/horarios?vista=turma"
-            titulo="Horário"
-            descricao="Ver o horário de qualquer turma ou professor"
-            icone={<IconeCalendario />}
-          />
-          <CartaoAtalho
-            href="/admin/simulacao"
-            titulo="Simulação de data/hora"
-            descricao="Demonstrar entradas e saídas noutro dia ou hora, para a defesa oral"
-            icone={<IconeSimulacao />}
-          />
-        </div>
-      </main>
+    <PaginaInterna titulo="Administração" voltarHref="/painel" voltarLabel="Painel">
+    <div className="grelha">
+      <Link href="/admin/cursos" className="cartao cartao-ligacao">
+        <h2>Cursos ({totalCursos})</h2>
+        <p>Criar, editar e remover cursos.</p>
+      </Link>
+      <Link href="/admin/turmas" className="cartao cartao-ligacao">
+        <h2>Turmas ({totalTurmas})</h2>
+        <p>Turmas e os seus horários, incluindo a importação por Excel.</p>
+      </Link>
+      <Link href="/admin/alunos" className="cartao cartao-ligacao">
+        <h2>Alunos ({totalAlunos})</h2>
+        <p>Criar, editar e remover alunos.</p>
+      </Link>
+      <Link href="/horarios?vista=turma" className="cartao cartao-ligacao">
+        <h2>Horários</h2>
+        <p>Ver o horário de qualquer turma ou professor.</p>
+      </Link>
+      <Link href="/admin/simulacao" className="cartao cartao-ligacao">
+        <h2>Simulação</h2>
+        <p>Demonstrar entradas e saídas noutro dia ou hora.</p>
+      </Link>
     </div>
-  );
-}
-
-function CartaoSeccao({
-  href,
-  titulo,
-  total,
-  icone,
-}: {
-  href: string;
-  titulo: string;
-  total: number;
-  icone: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-900/5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-700"
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition-colors group-hover:bg-blue-700 group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
-        {icone}
-      </span>
-      <div>
-        <p className="text-2xl font-bold tabular-nums">{total}</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{titulo}</p>
-      </div>
-    </Link>
-  );
-}
-
-function CartaoAtalho({
-  href,
-  titulo,
-  descricao,
-  icone,
-}: {
-  href: string;
-  titulo: string;
-  descricao: string;
-  icone: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-900/5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-700"
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition-colors group-hover:bg-blue-700 group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
-        {icone}
-      </span>
-      <div>
-        <p className="font-semibold">{titulo}</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{descricao}</p>
-      </div>
-    </Link>
-  );
-}
-
-function IconeCursos() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden>
-      <path
-        d="M3 6.5 12 3l9 3.5-9 3.5-9-3.5Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path d="M6.5 9v5c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5V9" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M21 8.5v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function IconeTurmas() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden>
-      <rect x="3.5" y="5" width="17" height="15" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function IconeCalendario() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden>
-      <rect x="3.5" y="5" width="17" height="15" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function IconeSimulacao() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden>
-      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function IconeAlunos() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden>
-      <circle cx="9" cy="8" r="2.8" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M3 19c.9-3 3-4.6 6-4.6s5.1 1.6 6 4.6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="17" cy="7.5" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M14.8 13.2c2.4.3 3.9 1.6 4.6 3.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
+  </PaginaInterna>
   );
 }

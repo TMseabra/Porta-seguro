@@ -3,7 +3,6 @@ import { Logo } from "@/components/logo";
 import { signOut } from "@/auth";
 import type { Perfil } from "@/lib/constantes";
 import { BotaoTema } from "@/components/botao-tema";
-import { NAV_ALUNO } from "./nav-itens";
 import { atalhosDoPerfil } from "./atalhos";
 import { MenuPainel, TituloAtual, type ItemNav } from "./nav-painel";
 
@@ -22,7 +21,7 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
 export function ShellPainel({ sessao, children }: { sessao: Session; children: React.ReactNode }) {
   const itens: ItemNav[] =
     sessao.user.perfil === "aluno"
-      ? NAV_ALUNO.map((item) => ({ href: item.href, label: item.label }))
+      ? [{ href: "/painel", label: "Código QR" }]
       : [
           { href: "/painel", label: "Painel" },
           ...atalhosDoPerfil(sessao.user.perfil).map((atalho) => ({ href: atalho.href, label: atalho.titulo })),
@@ -52,7 +51,7 @@ export function ShellPainel({ sessao, children }: { sessao: Session; children: R
         </form>
       </header>
 
-      <MenuPainel itens={itens} />
+      {itens.length > 1 && <MenuPainel itens={itens} />}
 
       <main className="pagina">
         <div className="empilhado">{children}</div>

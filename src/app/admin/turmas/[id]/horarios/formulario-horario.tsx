@@ -33,16 +33,15 @@ export function FormularioHorario({
   const [erro, executarAcao, aEnviar] = useActionState(acao, undefined);
 
   return (
-    <form action={executarAcao} className="flex max-w-md flex-col gap-3">
+    <form action={executarAcao} className="empilhado">
       <input type="hidden" name="turmaId" value={turmaId} />
       {horarioInicial && <input type="hidden" name="id" value={horarioInicial.id} />}
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Dia da semana
         <select
           name="diaSemana"
           defaultValue={horarioInicial?.diaSemana ?? 1}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           {NOMES_DIAS_SEMANA.map((nome, indice) => (
             <option key={nome} value={indice}>
@@ -53,44 +52,40 @@ export function FormularioHorario({
       </label>
 
       <div className="flex gap-3">
-        <label className="flex flex-1 flex-col gap-1 text-sm">
+        <label className="campo">
           Hora de início
           <input
             name="horaInicio"
             type="time"
             required
             defaultValue={horarioInicial?.horaInicio}
-            className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
           />
         </label>
-        <label className="flex flex-1 flex-col gap-1 text-sm">
+        <label className="campo">
           Hora de fim
           <input
             name="horaFim"
             type="time"
             required
             defaultValue={horarioInicial?.horaFim}
-            className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
           />
         </label>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Disciplina
         <input
           name="disciplina"
           required
           defaultValue={horarioInicial?.disciplina}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Professor(a)
         <select
           name="professorId"
           defaultValue={horarioInicial?.professorId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           <option value="">— Sem professor(a) atribuído(a) —</option>
           {professores.map((professor) => (
@@ -101,23 +96,22 @@ export function FormularioHorario({
         </select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Sala
         <input
           name="sala"
           defaultValue={horarioInicial?.sala}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
       {horarioInicial && <CampoPasskey />}
 
-      {erro && <p className="text-sm text-red-600 dark:text-red-400">{erro}</p>}
+      {erro && <p className="aviso aviso-vermelho">{erro}</p>}
 
       <button
         type="submit"
         disabled={aEnviar}
-        className="mt-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
+        className="botao"
       >
         {aEnviar ? "A guardar..." : "Guardar"}
       </button>

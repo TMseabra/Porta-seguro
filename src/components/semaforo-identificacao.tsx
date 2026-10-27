@@ -3,76 +3,52 @@ import type { AlunoResumo } from "@/lib/movimento";
 import type { TipoRegisto } from "@/lib/constantes";
 
 /**
- * Foto do aluno ao lado do nome (RF16): o porteiro compara-a com a pessoa à frente. Sem foto, mostram-se
- * as iniciais e "Sem fotografia", para não parecer uma imagem que não carregou.
+ * Foto do aluno ao lado do nome (RF17): o porteiro compara-a com a pessoa à frente. Sem foto, mostram-se
+ * as iniciais, para não parecer uma imagem que não carregou.
  */
 export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
   return (
     <div className="flex items-center gap-3">
       {aluno.fotoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={aluno.fotoUrl}
-          alt={`Fotografia de ${aluno.nome}`}
-          className="h-16 w-16 shrink-0 rounded-full border object-cover"
-        />
+        <img src={aluno.fotoUrl} alt={`Fotografia de ${aluno.nome}`} className="avatar" />
       ) : (
-        <div
-          aria-hidden
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-black/10 text-lg font-semibold dark:bg-white/15"
-        >
+        <div aria-hidden className="avatar">
           {iniciais(aluno.nome)}
         </div>
       )}
       <div>
-        <p className="text-lg font-semibold">{aluno.nome}</p>
-        {aluno.turma && <p className="text-sm opacity-70">{aluno.turma}</p>}
-        {!aluno.fotoUrl && <p className="text-xs opacity-60">Sem fotografia no sistema</p>}
+        <p className="font-bold">{aluno.nome}</p>
+        {aluno.turma && <p className="subtitulo">{aluno.turma}</p>}
+        {!aluno.fotoUrl && <p className="subtitulo">Sem fotografia no sistema</p>}
       </div>
     </div>
   );
 }
 
 /**
- * Estado da porta e horário do dia, para quem identifica ver se a pessoa devia estar ali (sem histórico
- * de faltas). `tipo` vem de quem chama: estadoPorta é só um facto de horário; é o tipo que decide se
- * "há aula a decorrer" quer dizer "chegou atrasado" (só numa entrada) ou nada de especial (numa saída).
+ * Estado da porta e horário do dia, para quem identifica ver se a pessoa devia estar ali. `tipo` vem de quem
+ * chama: "há aula a decorrer" só quer dizer "chegou atrasado" numa entrada.
  */
 export function EstadoPortaEHorario({ aluno, tipo }: { aluno: AlunoResumo; tipo: TipoRegisto }) {
   const estadoPorta = aluno.estadoPorta;
   if (!estadoPorta) return null;
 
-  const aberta = estadoPorta.estado === "aberta";
-  // Já filtrados e ordenados pelo servidor, para o dia do momento (real ou simulado).
   const blocosDeHoje = aluno.blocosHoje ?? [];
 
   return (
-    <div className="mt-4 flex flex-col gap-1.5 border-t border-black/10 pt-3 dark:border-white/10">
-      <p className="flex flex-wrap items-center gap-2 font-semibold">
-        <span
-          aria-hidden
-          className={`inline-block h-3.5 w-3.5 rounded-full ${
-            aberta ? "bg-emerald-500" : "bg-red-500"
-          }`}
-        />
-        Porta {aberta ? "aberta" : "fechada"}
-        {estadoPorta.atrasado && tipo === "entrada" && (
-          <span className="rounded bg-amber-200 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-900 dark:text-amber-100">
-            Chegou atrasado
-          </span>
-        )}
+    <div>
+      <p>
+        <b>Porta {estadoPorta.estado === "aberta" ? "aberta" : "fechada"}</b>
+        {estadoPorta.atrasado && tipo === "entrada" && " · Chegou atrasado"}
       </p>
-      <p className="text-sm opacity-80">{estadoPorta.motivo}</p>
-
+      <p className="subtitulo">{estadoPorta.motivo}</p>
       {blocosDeHoje.length > 0 && (
-        <ul className="mt-1 flex flex-col gap-0.5 text-xs opacity-70">
+        <ul className="lista subtitulo">
           {blocosDeHoje.map((bloco, indice) => (
-            <li key={indice} className="flex gap-2">
-              <span className="font-mono tabular-nums">
-                {bloco.horaInicio}–{bloco.horaFim}
-              </span>
-              <span>{bloco.disciplina}</span>
-              {bloco.sala && <span>{bloco.sala}</span>}
+            <li key={indice}>
+              {bloco.horaInicio}–{bloco.horaFim} {bloco.disciplina}
+              {bloco.sala ? ` (${bloco.sala})` : ""}
             </li>
           ))}
         </ul>

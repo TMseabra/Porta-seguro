@@ -30,20 +30,19 @@ export function FormularioTurma({
   const [erro, executarAcao, aEnviar] = useActionState(acao, undefined);
 
   return (
-    <form action={executarAcao} className="flex max-w-md flex-col gap-3">
+    <form action={executarAcao} className="empilhado">
       {turmaInicial && <input type="hidden" name="id" value={turmaInicial.id} />}
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Nome (ex.: 3API)
         <input
           name="nome"
           required
           defaultValue={turmaInicial?.nome}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Ano
         <input
           name="ano"
@@ -51,17 +50,15 @@ export function FormularioTurma({
           min={1}
           required
           defaultValue={turmaInicial?.ano}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Curso
         <select
           name="cursoId"
           required
           defaultValue={turmaInicial?.cursoId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           <option value="" disabled>
             — Escolhe um curso —
@@ -74,12 +71,11 @@ export function FormularioTurma({
         </select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Diretor(a) de turma
         <select
           name="diretorTurmaId"
           defaultValue={turmaInicial?.diretorTurmaId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           <option value="">— Sem diretor(a) atribuído(a) —</option>
           {diretores.map((diretor) => (
@@ -92,12 +88,12 @@ export function FormularioTurma({
 
       {turmaInicial && <CampoPasskey />}
 
-      {erro && <p className="text-sm text-red-600 dark:text-red-400">{erro}</p>}
+      {erro && <p className="aviso aviso-vermelho">{erro}</p>}
 
       <button
         type="submit"
         disabled={aEnviar}
-        className="mt-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
+        className="botao"
       >
         {aEnviar ? "A guardar..." : "Guardar"}
       </button>

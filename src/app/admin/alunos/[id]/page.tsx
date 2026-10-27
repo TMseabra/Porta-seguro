@@ -4,7 +4,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Utilizador, Turma } from "@/models";
 import { FormularioAluno } from "../formulario-aluno";
 import { atualizarAluno } from "../acoes";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 
 export default async function PaginaEditarAluno({
   params,
@@ -23,32 +23,28 @@ export default async function PaginaEditarAluno({
   if (!aluno) notFound();
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao
-        titulo={`Editar aluno — ${aluno.nomeCompleto}`}
-        voltarHref="/admin/alunos"
-        voltarLabel="Alunos"
-      />
-
-      <main className="mx-auto w-full max-w-md flex-1 px-6 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-          <FormularioAluno
-            acao={atualizarAluno}
-            turmas={turmas.map((t) => ({ id: t._id.toString(), nome: t.nome }))}
-            alunoInicial={{
-              id: aluno._id.toString(),
-              nomeCompleto: aluno.nomeCompleto,
-              email: aluno.email,
-              numeroAluno: aluno.numeroAluno,
-              numeroCartao: aluno.numeroCartao,
-              turmaId: aluno.turmaId?.toString(),
-              maiorIdade: aluno.maiorIdade,
-              autorizacaoPais: aluno.autorizacaoPais,
-              suspenso: aluno.suspenso,
-            }}
-          />
-        </div>
-      </main>
-    </div>
+    <PaginaInterna
+      titulo={`Editar aluno — ${aluno.nomeCompleto}`}
+      voltarHref="/admin/alunos"
+      voltarLabel="Alunos"
+      estreita>
+      <div className="cartao">
+        <FormularioAluno
+          acao={atualizarAluno}
+          turmas={turmas.map((t) => ({ id: t._id.toString(), nome: t.nome }))}
+          alunoInicial={{
+            id: aluno._id.toString(),
+            nomeCompleto: aluno.nomeCompleto,
+            email: aluno.email,
+            numeroAluno: aluno.numeroAluno,
+            numeroCartao: aluno.numeroCartao,
+            turmaId: aluno.turmaId?.toString(),
+            maiorIdade: aluno.maiorIdade,
+            autorizacaoPais: aluno.autorizacaoPais,
+            suspenso: aluno.suspenso,
+          }}
+        />
+      </div>
+    </PaginaInterna>
   );
 }

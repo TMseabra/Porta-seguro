@@ -4,7 +4,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Curso, Utilizador } from "@/models";
 import { FormularioCurso } from "../formulario-curso";
 import { atualizarCurso } from "../acoes";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 
 export default async function PaginaEditarCurso({
   params,
@@ -23,24 +23,21 @@ export default async function PaginaEditarCurso({
   if (!curso) notFound();
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao titulo="Editar curso" voltarHref="/admin/cursos" voltarLabel="Cursos" />
-
-      <main className="mx-auto w-full max-w-md flex-1 px-6 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-          <FormularioCurso
-            acao={atualizarCurso}
-            coordenadores={coordenadores.map((c) => ({ id: c._id.toString(), nome: c.nomeCompleto }))}
-            cursoInicial={{
-              id: curso._id.toString(),
-              nome: curso.nome,
-              sigla: curso.sigla,
-              anosDuracao: curso.anosDuracao,
-              coordenadorId: curso.coordenadorId?.toString(),
-            }}
-          />
-        </div>
-      </main>
-    </div>
+    <PaginaInterna titulo="Editar curso" voltarHref="/admin/cursos" voltarLabel="Cursos"
+      estreita>
+      <div className="cartao">
+        <FormularioCurso
+          acao={atualizarCurso}
+          coordenadores={coordenadores.map((c) => ({ id: c._id.toString(), nome: c.nomeCompleto }))}
+          cursoInicial={{
+            id: curso._id.toString(),
+            nome: curso.nome,
+            sigla: curso.sigla,
+            anosDuracao: curso.anosDuracao,
+            coordenadorId: curso.coordenadorId?.toString(),
+          }}
+        />
+      </div>
+    </PaginaInterna>
   );
 }

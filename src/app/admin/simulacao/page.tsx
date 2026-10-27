@@ -1,7 +1,7 @@
 import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Utilizador, Turma } from "@/models";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 import { FormularioSimulacao, type AlunoParaSeletor } from "./formulario-simulacao";
 
 /** Simulação de data/hora (admin/gestor) para a defesa oral; os registos ficam marcados como simulação. */
@@ -23,25 +23,20 @@ export default async function PaginaSimulacao() {
   }));
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao
-        titulo="Simulação de data/hora"
-        subtitulo="Só para demonstração — não é uma entrada/saída real"
-        voltarHref="/admin"
-        voltarLabel="Administração"
-      />
+    <PaginaInterna
+      titulo="Simulação de data/hora"
+      subtitulo="Só para demonstração — não é uma entrada/saída real"
+      voltarHref="/admin"
+      voltarLabel="Administração">
+      <p className="aviso aviso-amarelo mb-4">
+        Esta ferramenta aplica as mesmas regras do Portão Teste (horário da
+        turma, atrasos, suspensões, autorização de saída), mas à data e
+        hora que escolheres, em vez do momento real. Os registos criados
+        aqui ficam marcados como <strong>Simulação</strong> e nunca contam
+        para a assiduidade real de nenhum aluno.
+      </p>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
-        <p className="mb-6 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
-          Esta ferramenta aplica as mesmas regras do Portão Teste (horário da
-          turma, atrasos, suspensões, autorização de saída), mas à data e
-          hora que escolheres, em vez do momento real. Os registos criados
-          aqui ficam marcados como <strong>Simulação</strong> e nunca contam
-          para a assiduidade real de nenhum aluno.
-        </p>
-
-        <FormularioSimulacao alunos={alunosParaSeletor} />
-      </main>
-    </div>
+      <FormularioSimulacao alunos={alunosParaSeletor} />
+    </PaginaInterna>
   );
 }

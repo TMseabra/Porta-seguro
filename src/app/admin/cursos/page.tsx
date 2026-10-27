@@ -5,7 +5,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Curso, Turma, Utilizador } from "@/models";
 import { removerCurso } from "./acoes";
 import { BotaoConfirmar } from "../botao-confirmar";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 
 export default async function PaginaCursos({
   searchParams,
@@ -38,87 +38,79 @@ export default async function PaginaCursos({
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao
-        titulo="Cursos"
-        voltarHref="/admin"
-        voltarLabel="Administração"
-        acao={
-          <Link
-            href="/admin/cursos/novo"
-            className="rounded-lg bg-blue-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-blue-800"
-          >
-            + Novo curso
-          </Link>
-        }
-      />
+    <PaginaInterna
+      titulo="Cursos"
+      voltarHref="/admin"
+      voltarLabel="Administração"
+      acao={
+        <Link
+          href="/admin/cursos/novo"
+          className="botao"
+        >
+          + Novo curso
+        </Link>
+      }>
+      {erro && (
+        <p className="aviso aviso-vermelho mb-4">
+          {erro}
+        </p>
+      )}
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-        {erro && (
-          <p className="mb-4 rounded-lg border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-            {erro}
-          </p>
-        )}
-
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <th className="px-5 py-3 font-medium">Nome</th>
-                <th className="px-5 py-3 font-medium">Sigla</th>
-                <th className="px-5 py-3 font-medium">Anos</th>
-                <th className="px-5 py-3 font-medium">Coordenador</th>
-                <th className="px-5 py-3 font-medium">Turmas</th>
-                <th className="px-5 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {cursos.map((curso) => (
-                <tr
-                  key={curso._id.toString()}
-                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
-                >
-                  <td className="px-5 py-3 font-medium">{curso.nome}</td>
-                  <td className="px-5 py-3">{curso.sigla}</td>
-                  <td className="px-5 py-3 tabular-nums">{curso.anosDuracao}</td>
-                  <td className="px-5 py-3">
-                    {curso.coordenadorId
-                      ? (nomeCoordenadorPorId.get(curso.coordenadorId.toString()) ?? "—")
-                      : "—"}
-                  </td>
-                  <td className="px-5 py-3 tabular-nums">
-                    {turmasPorCurso.get(curso._id.toString()) ?? 0}
-                  </td>
-                  <td className="px-5 py-3 text-right whitespace-nowrap">
-                    <Link
-                      href={`/admin/cursos/${curso._id}`}
-                      className="font-medium text-blue-700 hover:underline dark:text-blue-400"
+      <div className="tabela-rolavel">
+        <table className="tabela">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Sigla</th>
+              <th>Anos</th>
+              <th>Coordenador</th>
+              <th>Turmas</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {cursos.map((curso) => (
+              <tr key={curso._id.toString()}>
+                <td>{curso.nome}</td>
+                <td>{curso.sigla}</td>
+                <td>{curso.anosDuracao}</td>
+                <td>
+                  {curso.coordenadorId
+                    ? (nomeCoordenadorPorId.get(curso.coordenadorId.toString()) ?? "—")
+                    : "—"}
+                </td>
+                <td>
+                  {turmasPorCurso.get(curso._id.toString()) ?? 0}
+                </td>
+                <td>
+                  <Link
+                    href={`/admin/cursos/${curso._id}`}
+                    className="underline"
+                  >
+                    Editar
+                  </Link>{" "}
+                  <form action={removerCurso} className="inline">
+                    <input type="hidden" name="id" value={curso._id.toString()} />
+                    <BotaoConfirmar
+                      mensagem={`Remover o curso "${curso.nome}"?`}
+                      className="ml-2 underline"
                     >
-                      Editar
-                    </Link>{" "}
-                    <form action={removerCurso} className="inline">
-                      <input type="hidden" name="id" value={curso._id.toString()} />
-                      <BotaoConfirmar
-                        mensagem={`Remover o curso "${curso.nome}"?`}
-                        className="ml-2 font-medium text-red-600 hover:underline dark:text-red-400"
-                      >
-                        Remover
-                      </BotaoConfirmar>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-              {cursos.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-500 dark:text-slate-400">
-                    Ainda sem cursos.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+                      Remover
+                    </BotaoConfirmar>
+                  </form>
+                </td>
+              </tr>
+            ))}
+            {cursos.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center">
+                  Ainda sem cursos.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </PaginaInterna>
   );
 }

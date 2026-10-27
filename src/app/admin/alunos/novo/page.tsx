@@ -3,7 +3,7 @@ import { ligarBaseDados } from "@/lib/mongoose";
 import { Turma } from "@/models";
 import { FormularioAluno } from "../formulario-aluno";
 import { criarAluno } from "../acoes";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 
 export default async function PaginaNovoAluno() {
   await exigirPerfil(["gestor", "admin"]);
@@ -12,17 +12,14 @@ export default async function PaginaNovoAluno() {
   const turmas = await Turma.find().select("nome").sort({ nome: 1 }).lean();
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao titulo="Novo aluno" voltarHref="/admin/alunos" voltarLabel="Alunos" />
-
-      <main className="mx-auto w-full max-w-md flex-1 px-6 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-          <FormularioAluno
-            acao={criarAluno}
-            turmas={turmas.map((t) => ({ id: t._id.toString(), nome: t.nome }))}
-          />
-        </div>
-      </main>
-    </div>
+    <PaginaInterna titulo="Novo aluno" voltarHref="/admin/alunos" voltarLabel="Alunos"
+      estreita>
+      <div className="cartao">
+        <FormularioAluno
+          acao={criarAluno}
+          turmas={turmas.map((t) => ({ id: t._id.toString(), nome: t.nome }))}
+        />
+      </div>
+    </PaginaInterna>
   );
 }

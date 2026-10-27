@@ -10,47 +10,30 @@ export interface TurmaComHorario {
   blocos: BlocoHorario[];
 }
 
-/** Escolhe a turma e só então mostra o horário. Os dados já vêm do servidor: trocar de turma não vai à rede. */
+/** Escolhe a turma e mostra o horário dela. Os dados já vêm do servidor: trocar de turma não vai à rede. */
 export function SeletorTurma({ turmas }: { turmas: TurmaComHorario[] }) {
   const [idSelecionado, setIdSelecionado] = useState(turmas[0]?.id ?? "");
   const selecionada = turmas.find((t) => t.id === idSelecionado) ?? turmas[0];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Escolher turma">
-        {turmas.map((turma) => {
-          const ativa = turma.id === idSelecionado;
-          return (
-            <button
-              key={turma.id}
-              type="button"
-              role="tab"
-              aria-selected={ativa}
-              onClick={() => setIdSelecionado(turma.id)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                ativa
-                  ? "border-blue-700 bg-blue-700 text-white"
-                  : "border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-600 dark:hover:text-blue-400"
-              }`}
-            >
+    <div className="empilhado">
+      <label className="campo" style={{ maxWidth: "16rem" }}>
+        Turma
+        <select value={idSelecionado} onChange={(evento) => setIdSelecionado(evento.target.value)}>
+          {turmas.map((turma) => (
+            <option key={turma.id} value={turma.id}>
               {turma.nome}
-            </button>
-          );
-        })}
-      </div>
+            </option>
+          ))}
+        </select>
+      </label>
 
       {selecionada && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="mb-4 font-semibold">
-            {selecionada.nome}{" "}
-            <span className="font-normal text-slate-500 dark:text-slate-400">
-              ({selecionada.ano}.º ano)
-            </span>
+        <section className="cartao">
+          <h2>
+            {selecionada.nome} ({selecionada.ano}.º ano)
           </h2>
-          {/* `key` força a recriar o acordeão do zero ao trocar de turma —
-           * sem isto, um dia deixado aberto numa turma continuava "aberto"
-           * ao mudar para outra, o que confundia mais do que ajudava. */}
-          <HorarioSemanal key={selecionada.id} blocos={selecionada.blocos} mostrarProfessor />
+          <HorarioSemanal blocos={selecionada.blocos} mostrarProfessor />
         </section>
       )}
     </div>

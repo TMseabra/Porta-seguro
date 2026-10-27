@@ -1,7 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
 
-const PAGINAS_PUBLICAS = new Set(["/", "/funcionalidades", "/seguranca", "/sobre"]);
-
 /**
  * Configuração "leve" do Auth.js: só decide quem pode ver que páginas. Fica separada do auth.ts para o
  * proxy não importar módulos nativos (Argon2id) nem o Mongoose; os fornecedores de login só existem no auth.ts.
@@ -25,12 +23,6 @@ export const authConfig = {
     authorized({ auth, request }) {
       const autenticado = !!auth?.user;
       const caminho = request.nextUrl.pathname;
-
-      // Páginas de apresentação, públicas e sem redirecionar quem tem sessão. Lista fechada: uma página
-      // nova só é pública se for acrescentada aqui.
-      if (PAGINAS_PUBLICAS.has(caminho)) {
-        return true;
-      }
 
       if (caminho === "/login") {
         if (autenticado) {

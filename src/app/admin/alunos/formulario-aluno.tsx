@@ -32,66 +32,60 @@ export function FormularioAluno({
   const [erro, executarAcao, aEnviar] = useActionState(acao, undefined);
 
   return (
-    <form action={executarAcao} className="flex max-w-md flex-col gap-3">
+    <form action={executarAcao} className="empilhado">
       {alunoInicial && <input type="hidden" name="id" value={alunoInicial.id} />}
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Nome completo
         <input
           name="nomeCompleto"
           required
           defaultValue={alunoInicial?.nomeCompleto}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Email institucional
         <input
           name="email"
           type="email"
           required
           defaultValue={alunoInicial?.email}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         {alunoInicial ? "Nova palavra-passe (deixa em branco para não alterar)" : "Palavra-passe (opcional — sem ela, só entra com conta Google)"}
         <input
           name="palavraPasse"
           type="password"
           autoComplete="new-password"
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         />
       </label>
 
       <div className="flex gap-3">
-        <label className="flex flex-1 flex-col gap-1 text-sm">
+        <label className="campo">
           Número de aluno
           <input
             name="numeroAluno"
             type="number"
             defaultValue={alunoInicial?.numeroAluno}
-            className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
           />
         </label>
-        <label className="flex flex-1 flex-col gap-1 text-sm">
+        <label className="campo">
           Número do cartão
           <input
             name="numeroCartao"
             defaultValue={alunoInicial?.numeroCartao}
-            className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
           />
         </label>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="campo">
         Turma
         <select
           name="turmaId"
           defaultValue={alunoInicial?.turmaId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent"
         >
           <option value="">— Sem turma atribuída —</option>
           {turmas.map((turma) => (
@@ -103,7 +97,7 @@ export function FormularioAluno({
       </label>
 
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="maiorIdade" defaultChecked={alunoInicial?.maiorIdade} className="accent-blue-700" />
+        <input type="checkbox" name="maiorIdade" defaultChecked={alunoInicial?.maiorIdade} />
         Maior de idade
       </label>
       <label className="flex items-center gap-2 text-sm">
@@ -111,23 +105,23 @@ export function FormularioAluno({
           type="checkbox"
           name="autorizacaoPais"
           defaultChecked={alunoInicial?.autorizacaoPais}
-          className="accent-blue-700"
+         
         />
         Tem autorização dos pais para sair fora do horário
       </label>
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="suspenso" defaultChecked={alunoInicial?.suspenso} className="accent-blue-700" />
+        <input type="checkbox" name="suspenso" defaultChecked={alunoInicial?.suspenso} />
         Suspenso (bloqueia a entrada)
       </label>
 
       {alunoInicial && <CampoPasskey />}
 
-      {erro && <p className="text-sm text-red-600 dark:text-red-400">{erro}</p>}
+      {erro && <p className="aviso aviso-vermelho">{erro}</p>}
 
       <button
         type="submit"
         disabled={aEnviar}
-        className="mt-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
+        className="botao"
       >
         {aEnviar ? "A guardar..." : "Guardar"}
       </button>

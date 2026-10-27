@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { simularPassagem, confirmarSaidaSimulada } from "./acoes";
 import type { AlunoResumo, ResultadoMovimento } from "@/lib/movimento";
 import type { TipoRegisto } from "@/lib/constantes";
-import { SelectPersonalizado } from "@/components/select-personalizado";
 import { EscolhaTipoPassagem, type TipoEscolhido } from "@/components/escolha-tipo-passagem";
 import {
   CartaoAluno,
@@ -106,93 +105,79 @@ export function FormularioSimulacao({ alunos }: { alunos: AlunoParaSeletor[] }) 
     });
   }
 
-  const opcoesAlunos = alunos.map((aluno) => ({
-    valor: aluno.id,
-    rotulo: aluno.turma ? `${aluno.nome} — ${aluno.turma}` : aluno.nome,
-  }));
-
   return (
-    <div className="flex flex-col gap-6">
-      <form
-        onSubmit={simular}
-        className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
-      >
-        <SelectPersonalizado
-          rotulo="Aluno"
-          valor={alunoId}
-          onAlterar={setAlunoId}
-          opcoes={opcoesAlunos}
-        />
+    <div className="empilhado">
+      <form onSubmit={simular} className="cartao empilhado">
+        <label className="campo">
+          Aluno
+          <select value={alunoId} onChange={(evento) => setAlunoId(evento.target.value)}>
+            {alunos.map((aluno) => (
+              <option key={aluno.id} value={aluno.id}>
+                {aluno.turma ? `${aluno.nome} — ${aluno.turma}` : aluno.nome}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <div className="flex flex-wrap gap-4">
-          <label className="flex flex-col gap-1 text-sm">
+        <div className="filtros">
+          <label className="campo">
             Dia
             <input
               type="date"
               value={data}
               onChange={(evento) => setDataHora((atual) => ({ ...atual, data: evento.target.value }))}
               required
-              className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="campo">
             Hora
             <input
               type="time"
               value={hora}
               onChange={(evento) => setDataHora((atual) => ({ ...atual, hora: evento.target.value }))}
               required
-              className="rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
             />
           </label>
-          <button
-            type="button"
-            onClick={() => setDataHora(agoraNoBrowser())}
-            className="self-end rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:border-blue-400 hover:text-blue-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-600 dark:hover:text-blue-400"
-          >
+          <button type="button" onClick={() => setDataHora(agoraNoBrowser())} className="botao-claro">
             Agora
           </button>
         </div>
 
         <EscolhaTipoPassagem valor={tipo} onAlterar={setTipo} />
 
-        <button
-          type="submit"
-          disabled={aEnviar || !alunoId}
-          className="self-start rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
-        >
+        <button type="submit" disabled={aEnviar || !alunoId} className="botao self-start">
           {aEnviar ? "A simular..." : "Simular passagem"}
         </button>
       </form>
 
-      {estado.passo === "erro" && (
-        <p className="rounded-xl border-l-4 border-red-600 bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-          {estado.mensagem}
-        </p>
-      )}
+      {estado.passo === "erro" && <p className="aviso aviso-vermelho">{estado.mensagem}</p>}
 
       {estado.passo === "resultado" && (
-        <Semaforo cor={estado.autorizado ? "verde" : "vermelho"}>
+        <div className="cartao empilhado">
           <CartaoAluno aluno={estado.aluno} />
-          <p className="mt-2 text-sm">{estado.motivo}</p>
           <EstadoPortaEHorario aluno={estado.aluno} tipo={estado.tipo} />
-        </Semaforo>
+          <Semaforo cor={estado.autorizado ? "verde" : "vermelho"}>
+            <b>{estado.autorizado ? "Autorizado" : "Não autorizado"}</b> — {estado.motivo}
+          </Semaforo>
+        </div>
       )}
 
       {estado.passo === "pendente" && (
-        <Semaforo cor="amarelo">
+        <div className="cartao empilhado">
           <CartaoAluno aluno={estado.aluno} />
-          <p className="mt-2 text-sm">{estado.motivo}</p>
-          <p className="mt-3 text-sm font-medium">Os pais autorizam a saída?</p>
-          <div className="mt-2 flex gap-2">
-            <BotaoResposta onClick={() => responderContactoPais(true)} disabled={aEnviar}>
-              Sim
-            </BotaoResposta>
-            <BotaoResposta onClick={() => responderContactoPais(false)} disabled={aEnviar}>
-              Não
-            </BotaoResposta>
-          </div>
-        </Semaforo>
+          <Semaforo cor="amarelo">
+            <p className="mb-2">{estado.motivo}</p>
+            <p className="mb-2 font-bold">Os pais autorizam a saída?</p>
+            <div className="flex gap-2">
+              <BotaoResposta onClick={() => responderContactoPais(true)} disabled={aEnviar} principal>
+                Sim
+              </BotaoResposta>
+              <BotaoResposta onClick={() => responderContactoPais(false)} disabled={aEnviar}>
+                Não
+              </BotaoResposta>
+            </div>
+          </Semaforo>
+        </div>
       )}
     </div>
   );

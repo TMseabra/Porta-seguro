@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { exigirPerfil } from "@/lib/permissoes";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Turma } from "@/models";
-import { CabecalhoSecao } from "@/components/cabecalho-secao";
+import { PaginaInterna } from "@/components/pagina-interna";
 import { FormularioImportar } from "./formulario-importar";
 
 export default async function PaginaImportarHorario({
@@ -18,16 +18,11 @@ export default async function PaginaImportarHorario({
   if (!turma) notFound();
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <CabecalhoSecao
-        titulo={`Importar horário — ${turma.nome}`}
-        voltarHref={`/admin/turmas/${id}`}
-        voltarLabel={turma.nome}
-      />
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
-        <FormularioImportar turmaId={id} turmaNome={turma.nome} />
-      </main>
-    </div>
+    <PaginaInterna
+      titulo={`Importar horário — ${turma.nome}`}
+      voltarHref={`/admin/turmas/${id}`}
+      voltarLabel={turma.nome}>
+      <FormularioImportar turmaId={id} turmaNome={turma.nome} />
+    </PaginaInterna>
   );
 }

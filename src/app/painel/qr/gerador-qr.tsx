@@ -50,20 +50,24 @@ export function GeradorQR({
   const [{ data: dataSimulada, hora: horaSimulada }, setDataHoraSimulada] =
     useState(agoraNoBrowser);
 
-  // Um só intervalo atualiza a contagem e pergunta ao servidor se o código já foi lido.
+  // Dois temporizadores: o relógio desce de 1 em 1 s, e a pergunta ao servidor (que custa um pedido de rede)
+  // faz-se só de 2 em 2 s.
   useEffect(() => {
     if (!token || estado.usado) return;
 
-    const intervalo = setInterval(async () => {
-      setSegundos(segundosRestantes(token.validoAteISO));
+    const relogio = setInterval(() => setSegundos(segundosRestantes(token.validoAteISO)), 1000);
 
+    const perguntarAoServidor = setInterval(async () => {
       const novoEstado = await consultarEstadoTokenQR(token.id);
       if (novoEstado.usado) {
         setEstado(novoEstado);
       }
     }, INTERVALO_VERIFICACAO_MS);
 
-    return () => clearInterval(intervalo);
+    return () => {
+      clearInterval(relogio);
+      clearInterval(perguntarAoServidor);
+    };
   }, [token, estado.usado]);
 
   function gerar() {

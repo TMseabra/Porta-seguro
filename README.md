@@ -4,6 +4,7 @@ A school entry/exit logging system: students identify themselves at the gate wit
 
 ## What it does
 
+
 - **QR-based check-in/out.** Each student generates a one-time QR code from their phone (valid for 1 minute, single use, locked to either an entry or an exit). The gate keeper scans it, confirms the student's identity against their photo, and the system logs the movement.
 - **Schedule-aware decisions.** Whether an arrival counts as "on time" or "late", and whether a student is even allowed to leave, is derived from the class timetable — never entered by hand.
 - **Parental confirmation for early exits.** If a student tries to leave in the middle of a class and isn't of legal age (or doesn't have standing parental authorization), the gate keeper is prompted to call the parents before the exit is logged.

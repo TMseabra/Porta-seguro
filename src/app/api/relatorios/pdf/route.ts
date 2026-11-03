@@ -1,8 +1,3 @@
-/**
- * Relatório em PDF (RF11/UC04). Rota normal e não Server Action: um link direto é o que faz o browser
- * descarregar. Só admin e coordenador, com a mesma verificação de âmbito (senão bastava trocar o `alvo`
- * no endereço).
- */
 import { exigirPerfil } from "@/lib/permissoes";
 import { calcularResultadoConsulta, podeConsultar, ambitoValido } from "@/app/consultas/logica";
 import { gerarPDFRelatorio } from "./gerarPDF";

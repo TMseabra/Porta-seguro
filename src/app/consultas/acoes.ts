@@ -9,10 +9,6 @@ import {
   type ResultadoConsulta,
 } from "./logica";
 
-/**
- * UC02. Só admin e coordenador (o porteiro não acompanha faltas). O âmbito verifica-se aqui no servidor:
- * o id da turma vem do browser e podia ser trocado.
- */
 export async function consultarAssiduidade(
   ambito: Ambito,
   alvo: string,

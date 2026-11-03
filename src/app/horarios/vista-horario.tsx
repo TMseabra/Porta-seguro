@@ -10,7 +10,6 @@ export interface ProfessorComHorario {
   blocos: BlocoHorario[];
 }
 
-/** Professor vê só as SUAS aulas; admin e gestor alternam entre por turma e por professor; os outros só por turma. */
 export function VistaHorario({
   turmas,
   meuHorario,
@@ -20,7 +19,6 @@ export function VistaHorario({
   turmas: TurmaComHorario[];
   meuHorario?: BlocoHorario[];
   professores?: ProfessorComHorario[];
-  /** Vista inicial, vinda do atalho do Painel. */
   vistaInicial?: "turma" | "pessoal";
 }) {
   if (meuHorario) {

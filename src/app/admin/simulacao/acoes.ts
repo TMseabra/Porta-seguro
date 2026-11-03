@@ -1,10 +1,5 @@
 "use server";
 
-/**
- * Simulação (só admin): as MESMAS regras e o mesmo `movimento.ts` do Portão Teste, a uma data/hora
- * escolhida. Os registos ficam com `metodo: "simulacao"` e são excluídos da assiduidade (RF07).
- */
-
 import { ligarBaseDados } from "@/lib/mongoose";
 import { exigirPerfil } from "@/lib/permissoes";
 import { horaLisboaParaUtc } from "@/lib/datas";
@@ -16,7 +11,6 @@ import {
   type ResultadoConfirmacao,
 } from "@/lib/movimento";
 
-/** `dataISO`/`horaISO` vêm de inputs date + time, interpretados como hora de Lisboa. */
 export async function simularPassagem(
   alunoId: string,
   data: string,
@@ -36,7 +30,6 @@ export async function simularPassagem(
     return { ok: false, erro: "Data ou hora inválida." };
   }
 
-  // Vem do browser: uma Server Action é um endereço HTTP e o tipo TypeScript não existe em runtime.
   const tipoForcado = tipo === "entrada" || tipo === "saida" ? tipo : undefined;
 
   return processarMovimento(aluno, sessao.user.id, "simulacao", momento, tipoForcado);

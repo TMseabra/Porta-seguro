@@ -1,9 +1,3 @@
-/**
- * Modelo: codigosVerificacao. Código de 6 dígitos enviado por email às contas admin/gestor (2.º fator,
- * decisão do aluno): são as que podem mudar passwords e ver todos os dados. Guarda-se o hash Argon2id,
- * nunca o código. Só 6 dígitos: o que trava ataques é expirar em 10 min, uso único e 3 tentativas.
- */
-
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 
 export const VALIDADE_CODIGO_MINUTOS = 10;
@@ -24,7 +18,6 @@ const CodigoVerificacaoSchema = new Schema<ICodigoVerificacao>({
   criadoEm: { type: Date, required: true, default: Date.now },
 });
 
-// O MongoDB apaga os códigos expirados.
 CodigoVerificacaoSchema.index(
   { criadoEm: 1 },
   { expireAfterSeconds: VALIDADE_CODIGO_MINUTOS * 60 },

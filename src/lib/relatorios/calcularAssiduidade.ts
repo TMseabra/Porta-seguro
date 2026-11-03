@@ -1,8 +1,3 @@
-/**
- * Presenças, faltas e atrasos (RF05). Função pura: nunca se guardam, recalculam-se sempre a partir de
- * `horarios` + `registos`.
- */
-
 import type { Types } from "mongoose";
 import { diaDaSemanaEmLisboa, limitesDoDiaEmLisboa } from "@/lib/datas";
 import type { TipoRegisto, EstadoRegisto } from "@/lib/constantes";
@@ -31,11 +26,6 @@ export interface ResultadoAssiduidade {
   dias: DiaAssiduidade[];
 }
 
-/**
- * Dia letivo = há pelo menos um bloco nesse dia da semana (não há calendário escolar). Presença = há
- * entrada autorizada; atraso = essa entrada tem `horarioId`. Sem entrada autorizada (incluindo bloqueio
- * por suspensão) é falta.
- */
 export function calcularAssiduidade(
   horariosDaTurma: Array<{ diaSemana: number }>,
   registosDoAluno: RegistoParaAssiduidade[],
@@ -44,7 +34,6 @@ export function calcularAssiduidade(
   const diasComAula = new Set(horariosDaTurma.map((h) => h.diaSemana));
   const dias: DiaAssiduidade[] = [];
 
-  // Recalcula os limites de cada dia em Lisboa em vez de somar 24h, por causa das mudanças de hora.
   let cursor = limitesDoDiaEmLisboa(periodo.inicio).inicio;
 
   while (cursor < periodo.fim) {

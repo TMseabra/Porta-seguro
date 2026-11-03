@@ -1,8 +1,3 @@
-/**
- * Modelo: registos. Cada entrada/saída com a decisão tomada. Presenças, faltas e atrasos calculam-se daqui
- * (com `horarios`), nunca se introduzem à mão.
- */
-
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 import {
   TIPOS_REGISTO,
@@ -51,7 +46,6 @@ const RegistoSchema = new Schema<IRegisto>(
   { timestamps: true },
 );
 
-// O histórico de um aluno consulta-se sempre do mais recente para o mais antigo.
 RegistoSchema.index({ alunoId: 1, dataHora: -1 });
 
 export const Registo: Model<IRegisto> =

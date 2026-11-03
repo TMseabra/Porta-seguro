@@ -1,9 +1,5 @@
 "use client";
 
-/**
- * Submit que pede confirmação (UC03) e a palavra-chave via `prompt()`, injetada num campo escondido; a
- * Server Action é que a valida.
- */
 export function BotaoConfirmar({
   mensagem,
   className,

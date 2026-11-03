@@ -1,6 +1,5 @@
 import type { Perfil } from "@/lib/constantes";
 
-/** Atalhos dos perfis que não são aluno, usados no menu lateral e nos cartões de /painel. */
 export interface AtalhoDoPainel {
   href: string;
   titulo: string;

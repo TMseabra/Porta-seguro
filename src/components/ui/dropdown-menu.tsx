@@ -4,8 +4,6 @@ import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check } from "lucide-react";
 
-/** Menu suspenso estilo shadcn/ui sobre o Radix (teclado, foco, leitores de ecrã), com as cores do site. */
-
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;

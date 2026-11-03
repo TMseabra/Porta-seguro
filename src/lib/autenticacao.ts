@@ -1,5 +1,3 @@
-/** Login por email + palavra-passe, separado do auth.ts para se poder testar sem simular um pedido ao Auth.js. */
-
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Utilizador, TentativaLogin, MAX_TENTATIVAS, JANELA_MINUTOS } from "@/models";
 import { verificarPassword } from "@/lib/senha";
@@ -13,18 +11,12 @@ export interface UtilizadorAutenticado {
   perfil: Perfil;
 }
 
-/**
- * Verifica email + palavra-passe, sem o 2FA. Existe à parte porque o ecrã de login precisa dela no 1.º passo:
- * só depois de confirmar a palavra-passe se envia o código (senão qualquer pessoa fazia o sistema mandar
- * emails para contas alheias). Devolve null tanto para email inexistente como para password errada,
- * para não revelar que contas existem.
- */
 export async function verificarCredenciais(
   email: unknown,
   palavraPasse: unknown,
   ip?: string,
 ): Promise<UtilizadorAutenticado | null> {
-  // typeof: sem isto, um objeto ({"$ne": null}) entrava como operador na consulta (injeção NoSQL).
+  // typeof: evita injeção NoSQL ({"$ne": null}).
   if (typeof email !== "string" || typeof palavraPasse !== "string") {
     return null;
   }
@@ -33,8 +25,7 @@ export async function verificarCredenciais(
 
   const emailNormalizado = email.trim().toLowerCase();
 
-  // Limite de tentativas ANTES do Argon2id: trava quem adivinha passwords e evita gastar 19 MiB de
-  // memória por tentativa de quem já está bloqueado.
+  // Limite ANTES do Argon2id: não gastar memória com quem já está bloqueado.
   const desde = new Date(Date.now() - JANELA_MINUTOS * 60 * 1000);
   const falhasRecentes = await TentativaLogin.countDocuments({
     email: emailNormalizado,
@@ -44,12 +35,10 @@ export async function verificarCredenciais(
     return null;
   }
 
-  // select("+palavraPasse"): o campo tem select: false no modelo.
   const utilizador = await Utilizador.findOne({
     email: emailNormalizado,
   }).select("+palavraPasse");
 
-  // Sem conta, ou conta só com login por Google.
   if (!utilizador || !utilizador.palavraPasse) {
     await registarFalha(emailNormalizado, ip);
     return null;
@@ -65,7 +54,6 @@ export async function verificarCredenciais(
     return null;
   }
 
-  // Entrou: as falhas anteriores deixam de contar.
   await TentativaLogin.deleteMany({ email: emailNormalizado });
 
   return {
@@ -76,11 +64,7 @@ export async function verificarCredenciais(
   };
 }
 
-/**
- * Chamado pelo Auth.js para decidir se alguém entra: password certa e, em admin/gestor, o código por email.
- * O código verifica-se AQUI e não só no ecrã: uma Server Action é um endereço HTTP normal, e quem soubesse
- * a password do admin chamava o signIn diretamente e saltava o passo.
- */
+/** O 2FA verifica-se aqui e não só no ecrã: uma Server Action é chamável diretamente. */
 export async function autorizarCredenciais(
   email: unknown,
   palavraPasse: unknown,
@@ -101,11 +85,9 @@ export async function autorizarCredenciais(
   return utilizador;
 }
 
-/** Guarda uma falha de login (o índice TTL apaga-a sozinho). Se a escrita falhar, o login segue em frente. */
 async function registarFalha(email: string, ip?: string): Promise<void> {
   try {
     await TentativaLogin.create({ email, ip, quando: new Date() });
   } catch {
-    // Ignorado de propósito — ver comentário acima.
   }
 }

@@ -1,5 +1,3 @@
-/** Ponto único de acesso aos modelos: `import { Utilizador } from "@/models"`. */
-
 export { Curso, type ICurso } from "./Curso";
 export { Turma, type ITurma } from "./Turma";
 export { Utilizador, type IUtilizador } from "./Utilizador";

@@ -11,7 +11,7 @@ function segundaFeira(hora: string): Date {
 const blocoMatematica: IHorario = {
   _id: new Types.ObjectId(),
   turmaId: new Types.ObjectId(),
-  diaSemana: 1, // segunda-feira
+  diaSemana: 1,
   horaInicio: "08:30",
   horaFim: "10:00",
   disciplina: "Matemática",

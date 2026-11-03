@@ -10,7 +10,6 @@ const OPCOES: { valor: TipoEscolhido; rotulo: string }[] = [
   { valor: "saida", rotulo: "Saída" },
 ];
 
-/** Direção numa simulação: "Automático" alterna com o último registo; as outras forçam. */
 export function EscolhaTipoPassagem({
   valor,
   onAlterar,

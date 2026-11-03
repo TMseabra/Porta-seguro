@@ -5,7 +5,7 @@ import { validarTokenQR, type DadosTokenQR } from "./validarTokenQR";
 const alunoId = new Types.ObjectId();
 const outroAlunoId = new Types.ObjectId();
 const criadoEm = new Date("2026-01-05T08:30:00.000Z");
-const validoAte = new Date(criadoEm.getTime() + 1 * 60 * 1000); // válido 1 minuto
+const validoAte = new Date(criadoEm.getTime() + 1 * 60 * 1000);
 
 function tokenBase(): DadosTokenQR {
   return { alunoId, validoAte, usado: false, tipo: "entrada" };
@@ -43,8 +43,6 @@ describe("validarTokenQR", () => {
     const resultado = validarTokenQR(token, outroAlunoId, "entrada", new Date(validoAte.getTime() + 1000));
     expect(resultado).toEqual({ valido: false, motivo: "aluno_diferente" });
   });
-
-  // --- Direção do código (gerado para entrar não serve para sair) -------
 
   it("recusa um código gerado para ENTRAR quando se espera uma SAÍDA", () => {
     const token = { ...tokenBase(), tipo: "entrada" as const };

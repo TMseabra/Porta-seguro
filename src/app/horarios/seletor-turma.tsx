@@ -10,7 +10,6 @@ export interface TurmaComHorario {
   blocos: BlocoHorario[];
 }
 
-/** Escolhe a turma e mostra o horário dela. Os dados já vêm do servidor: trocar de turma não vai à rede. */
 export function SeletorTurma({ turmas }: { turmas: TurmaComHorario[] }) {
   const [idSelecionado, setIdSelecionado] = useState(turmas[0]?.id ?? "");
   const selecionada = turmas.find((t) => t.id === idSelecionado) ?? turmas[0];

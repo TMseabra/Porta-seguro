@@ -10,10 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/**
- * Botão do tema como no shadcn/ui. Sol e lua trocam só com CSS (`dark:`): o servidor e o browser desenham
- * o mesmo HTML e não há piscar.
- */
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
 

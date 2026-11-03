@@ -1,12 +1,8 @@
 @import "tailwindcss";
 
-/* Ativa o modo escuro por CLASSE: as regras `dark:` aplicam-se quando a
-   etiqueta <html> tem a classe "dark". Por omissão o Tailwind seguiria apenas
-   a preferência do sistema operativo, mas o RNF07 pede um modo escuro que o
-   utilizador possa ligar e desligar — daí precisarmos da classe. */
+/* Modo escuro por classe (RNF07): as regras `dark:` valem com a classe "dark" no <html>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Cores do tema claro (as que valem por omissão). */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,7 +18,6 @@
   --cor-cabecalho-tabela: #e4e8f0;
 }
 
-/* Cores do tema escuro: só substituímos os valores das mesmas variáveis. */
 .dark {
   --background: #000000;
   --foreground: #ededed;
@@ -37,16 +32,10 @@
   --cor-botao-hover: #5a9bd6;
   --cor-cabecalho-tabela: #1f1f1f;
 
-  /* O site inteiro usa as cores "slate" do Tailwind, que têm um tom azulado:
-     no modo escuro o fundo ficava azul-escuro e, onde a página não chegava ao
-     fundo do ecrã, aparecia o preto do <body> — duas cores diferentes na
-     mesma página. Aqui trocam-se, só no modo escuro, por cinzentos NEUTROS
-     (sem azul), com o fundo da página em preto puro. Como é uma variável do
-     Tailwind, vale para todas as classes de uma vez (dark:bg-slate-900,
-     dark:border-slate-800, ...) sem mexer em nenhum componente. */
-  --color-slate-950: #000000; /* fundo da página */
-  --color-slate-900: #0a0a0a; /* cartões, cabeçalhos, menus */
-  --color-slate-800: #1f1f1f; /* bordas e campos */
+  /* O slate do Tailwind é azulado: no modo escuro troca-se por cinzentos neutros. */
+  --color-slate-950: #000000;
+  --color-slate-900: #0a0a0a;
+  --color-slate-800: #1f1f1f;
   --color-slate-700: #2e2e2e;
   --color-slate-600: #525252;
   --color-slate-500: #737373;
@@ -70,7 +59,6 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Feedback discreto para cartões, botões e links que recebem foco ou hover. */
 .hover-highlight {
   transition:
     transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -127,8 +115,6 @@ body {
     transform: scale(0.99);
   }
 }
-
-/* ---------- Estilo simples (barra, cartões, botões, tabelas) ---------- */
 
 .barra {
   display: flex;
@@ -375,7 +361,7 @@ body {
   font-weight: 700;
   text-decoration: none;
 }
-/* Telemóvel: as ligações passam para uma linha própria por baixo do título. */
+
 .barra-links {
   order: 3;
   display: flex;

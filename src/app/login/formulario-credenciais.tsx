@@ -3,7 +3,6 @@
 import { useActionState, useState } from "react";
 import { entrarComCredenciais, type EstadoLogin } from "./acoes";
 
-/** Cliente por causa do `useActionState`. */
 export function FormularioCredenciais() {
   const [estado, acao, aEnviar] = useActionState<EstadoLogin, FormData>(entrarComCredenciais, {
     passo: "credenciais",
@@ -11,7 +10,6 @@ export function FormularioCredenciais() {
   const [passwordVisivel, setPasswordVisivel] = useState(false);
   const [codigo, setCodigo] = useState("");
   const pedeCodigo = estado.passo === "codigo";
-  // Controlados: depois de uma Server Action sem navegação o browser repunha o <form> e apagava o escrito.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -57,7 +55,6 @@ export function FormularioCredenciais() {
         <label className="campo">
           Código de acesso
           <input
-            // `inputMode="numeric"` abre o teclado de números; `one-time-code` deixa o iOS/Android sugerir o código.
             type="text"
             name="codigo"
             required

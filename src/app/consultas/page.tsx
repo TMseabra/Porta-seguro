@@ -6,7 +6,6 @@ import { turmasDoUtilizador } from "@/lib/ambito";
 import { FiltroConsulta } from "./filtro-consulta";
 import { BarraTopo } from "@/components/barra-topo";
 
-/** Consultas (UC02/UC04): assiduidade por aluno, turma ou ano, com PDF. Só admin e coordenador. */
 export default async function PaginaConsultas() {
   const sessao = await exigirPerfil(["coordenador", "gestor", "admin"]);
   await ligarBaseDados();

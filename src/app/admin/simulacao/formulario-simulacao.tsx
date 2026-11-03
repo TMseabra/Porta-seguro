@@ -30,7 +30,6 @@ type Estado =
       momentoISO: string;
     };
 
-/** Relógio do browser, de propósito (não o fuso de Lisboa): "agora" é o de quem usa o site. */
 function agoraNoBrowser(): { data: string; hora: string } {
   const agora = new Date();
   const doisDigitos = (n: number) => String(n).padStart(2, "0");

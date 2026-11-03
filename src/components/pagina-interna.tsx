@@ -1,6 +1,5 @@
 import { BarraTopo } from "@/components/barra-topo";
 
-/** Esqueleto das páginas internas: barra azul, título e o conteúdo. `acao` é um botão à direita do título. */
 export function PaginaInterna({
   titulo,
   subtitulo,

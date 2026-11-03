@@ -6,8 +6,6 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { atalhosDoPerfil } from "./atalhos";
 import { MenuPainel, TituloAtual, type ItemNav } from "./nav-painel";
 
-/** Barra de topo e menu comuns a todas as páginas da área reservada; usada uma vez, no layout. */
-
 export const ROTULO_PERFIL: Record<Perfil, string> = {
   aluno: "Aluno",
   porteiro: "Porteiro",

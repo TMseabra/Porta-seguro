@@ -1,8 +1,3 @@
-/**
- * Modelo: utilizadores. Todas as pessoas do sistema, distinguidas por `perfil`. Alguns campos só fazem
- * sentido para certos perfis (ex.: numeroAluno), mas ficam no mesmo modelo: é a mesma pessoa que faz login.
- */
-
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 import { PERFIS, type Perfil } from "@/lib/constantes";
 
@@ -10,7 +5,6 @@ export interface IUtilizador {
   _id: Types.ObjectId;
   nomeCompleto: string;
   email: string;
-  /** Hash Argon2id. Ausente se só usar login Google. */
   palavraPasse?: string;
   perfil: Perfil;
   telemovel?: string;
@@ -18,15 +12,10 @@ export interface IUtilizador {
   numeroCartao?: string;
   turmaId?: Types.ObjectId;
   maiorIdade: boolean;
-  /** Só alunos: os pais autorizaram a saída fora do horário. */
   autorizacaoPais: boolean;
-  /** Só alunos: impede a entrada. */
   suspenso: boolean;
-  /** Mostrada na portaria para confirmar a identidade. */
   fotoUrl?: string;
-  /** Espelho preenchido só pelo seed; a fonte é Turma.diretorTurmaId (ver ambito.ts). */
   turmasQueCoordena: Types.ObjectId[];
-  /** Espelho preenchido só pelo seed; a fonte é Curso.coordenadorId (ver ambito.ts). */
   cursosQueCoordena: Types.ObjectId[];
 }
 
@@ -42,8 +31,7 @@ const UtilizadorSchema = new Schema<IUtilizador>(
       lowercase: true,
     },
 
-    // select: false: o hash nunca vem numa consulta normal, só com `.select("+palavraPasse")` na
-    // autenticação. Evita enviá-lo para o browser por engano.
+    // select: false: o hash só vem com .select("+palavraPasse").
     palavraPasse: { type: String, select: false },
 
     perfil: { type: String, enum: PERFIS, required: true, default: "aluno" },
@@ -52,8 +40,6 @@ const UtilizadorSchema = new Schema<IUtilizador>(
 
     numeroAluno: { type: Number },
 
-    // unique + sparse: não há dois cartões iguais, mas quem não tem cartão (porteiro, admin...) não
-    // conta como duplicado de null.
     numeroCartao: { type: String, unique: true, sparse: true, trim: true },
 
     turmaId: { type: Schema.Types.ObjectId, ref: "Turma" },
@@ -70,7 +56,6 @@ const UtilizadorSchema = new Schema<IUtilizador>(
   { timestamps: true },
 );
 
-// Consulta frequente: os alunos de uma turma.
 UtilizadorSchema.index({ turmaId: 1 });
 
 export const Utilizador: Model<IUtilizador> =

@@ -3,7 +3,6 @@ import { signOut } from "@/auth";
 import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
 
-/** Barra azul de topo das páginas internas: título à esquerda, ligações à direita. */
 export function BarraTopo({
   titulo,
   voltar,

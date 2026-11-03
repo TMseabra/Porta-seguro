@@ -21,8 +21,6 @@ type Estado =
   | { passo: "a-ler" }
   | { passo: "erro"; mensagem: string }
   | { passo: "resultado"; aluno: AlunoResumo; autorizado: boolean; motivo: string; tipo: TipoRegisto }
-  // `idToken` é o único fio que liga os passos: quem, quando e como são
-  // sempre recalculados no servidor a partir dele (ver acoes.ts).
   | { passo: "pendente"; aluno: AlunoResumo; motivo: string; idToken: string }
   | { passo: "confirmar-identidade"; aluno: AlunoResumo; idToken: string; tipo: TipoRegisto };
 
@@ -37,7 +35,6 @@ const ROTULOS_TIPO: Record<string, string> = {
   saida: "Saída",
 };
 
-/** Sem espera mínima o resultado aparecia de repente e não se via que tinha havido leitura. */
 const ESPERA_MINIMA_MS = 900;
 
 export function PainelPortao({ linhasIniciais }: { linhasIniciais: LinhaRegisto[] }) {

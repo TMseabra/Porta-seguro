@@ -3,7 +3,6 @@ import { Types } from "mongoose";
 import type { IHorario } from "@/models/Horario";
 import { decidirSaida } from "./decidirSaida";
 
-// Janeiro em Lisboa é UTC+0: a hora UTC coincide com a de Lisboa.
 function segundaFeira(hora: string): Date {
   const [h, m] = hora.split(":").map(Number);
   return new Date(Date.UTC(2026, 0, 5, h, m));
@@ -12,7 +11,7 @@ function segundaFeira(hora: string): Date {
 const blocoMatematica: IHorario = {
   _id: new Types.ObjectId(),
   turmaId: new Types.ObjectId(),
-  diaSemana: 1, // segunda-feira
+  diaSemana: 1,
   horaInicio: "08:30",
   horaFim: "10:00",
   disciplina: "Matemática",

@@ -1,5 +1,3 @@
-/** Modelo: turmas. Pertence a um curso e tem um diretor de turma (perfil "dt"); os alunos apontam-lhe por `turmaId`. */
-
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 
 export interface ITurma {
@@ -23,7 +21,6 @@ const TurmaSchema = new Schema<ITurma>(
   { timestamps: true },
 );
 
-// Para listar as turmas de um curso (relatórios).
 TurmaSchema.index({ cursoId: 1 });
 
 export const Turma: Model<ITurma> =

@@ -1,11 +1,6 @@
-/** Peças visuais partilhadas pelo ecrã da portaria (/portao-teste) e pela simulação do admin. */
 import type { AlunoResumo } from "@/lib/movimento";
 import type { TipoRegisto } from "@/lib/constantes";
 
-/**
- * Foto do aluno ao lado do nome (RF17): o porteiro compara-a com a pessoa à frente. Sem foto, mostram-se
- * as iniciais, para não parecer uma imagem que não carregou.
- */
 export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
   return (
     <div className="flex items-center gap-3">
@@ -26,10 +21,6 @@ export function CartaoAluno({ aluno }: { aluno: AlunoResumo }) {
   );
 }
 
-/**
- * Estado da porta e horário do dia, para quem identifica ver se a pessoa devia estar ali. `tipo` vem de quem
- * chama: "há aula a decorrer" só quer dizer "chegou atrasado" numa entrada.
- */
 export function EstadoPortaEHorario({ aluno, tipo }: { aluno: AlunoResumo; tipo: TipoRegisto }) {
   const estadoPorta = aluno.estadoPorta;
   if (!estadoPorta) return null;

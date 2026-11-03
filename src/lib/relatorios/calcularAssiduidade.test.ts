@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calcularAssiduidade, type RegistoParaAssiduidade } from "./calcularAssiduidade";
 
-// Semana de 5 a 11 de janeiro de 2026; janeiro em Lisboa é UTC+0.
 const HORARIOS_SEG_QUA_SEX = [{ diaSemana: 1 }, { diaSemana: 3 }, { diaSemana: 5 }];
 const PERIODO_SEMANA = {
   inicio: new Date("2026-01-05T00:00:00.000Z"),
@@ -20,7 +19,7 @@ function entradaAutorizada(dataHoraISO: string, comAtraso = false): RegistoParaA
 describe("calcularAssiduidade", () => {
   it("conta só os dias em que a turma tem aula", () => {
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, [], PERIODO_SEMANA);
-    expect(resultado.diasLetivos).toBe(3); // segunda, quarta e sexta
+    expect(resultado.diasLetivos).toBe(3);
   });
 
   it("marca falta quando não há entrada autorizada num dia letivo", () => {
@@ -30,7 +29,7 @@ describe("calcularAssiduidade", () => {
   });
 
   it("marca presença sem atraso quando a entrada não tem horarioId", () => {
-    const registos = [entradaAutorizada("2026-01-05T08:00:00.000Z")]; // segunda
+    const registos = [entradaAutorizada("2026-01-05T08:00:00.000Z")];
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
     expect(resultado.presencas).toBe(1);
     expect(resultado.atrasos).toBe(0);
@@ -38,7 +37,7 @@ describe("calcularAssiduidade", () => {
   });
 
   it("marca presença COM atraso quando a entrada tem horarioId", () => {
-    const registos = [entradaAutorizada("2026-01-07T09:15:00.000Z", true)]; // quarta
+    const registos = [entradaAutorizada("2026-01-07T09:15:00.000Z", true)];
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
     expect(resultado.presencas).toBe(1);
     expect(resultado.atrasos).toBe(1);
@@ -57,7 +56,7 @@ describe("calcularAssiduidade", () => {
   });
 
   it("fronteira: um registo exatamente à meia-noite do dia seguinte não conta para o dia anterior", () => {
-    const registos = [entradaAutorizada("2026-01-06T00:00:00.000Z")]; // terça à meia-noite, não é dia letivo
+    const registos = [entradaAutorizada("2026-01-06T00:00:00.000Z")];
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
     expect(resultado.faltas).toBe(3);
   });
@@ -70,8 +69,7 @@ describe("calcularAssiduidade", () => {
 
   it("guarda a hora exata da entrada num dia de presença, e nenhuma numa falta", () => {
     const registos = [
-      entradaAutorizada("2026-01-05T08:12:00.000Z"), // segunda: presença às 08:12
-      // quarta: sem registo -> falta, sem hora
+      entradaAutorizada("2026-01-05T08:12:00.000Z"),
     ];
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
     const segunda = resultado.dias.find((d) => d.data.toISOString() === "2026-01-05T00:00:00.000Z");
@@ -82,9 +80,8 @@ describe("calcularAssiduidade", () => {
 
   it("calcula a taxa de presença corretamente com presenças e faltas misturadas", () => {
     const registos = [
-      entradaAutorizada("2026-01-05T08:00:00.000Z"), // segunda: presença
-      entradaAutorizada("2026-01-07T09:15:00.000Z", true), // quarta: presença c/ atraso
-      // sexta: sem registo -> falta
+      entradaAutorizada("2026-01-05T08:00:00.000Z"),
+      entradaAutorizada("2026-01-07T09:15:00.000Z", true),
     ];
     const resultado = calcularAssiduidade(HORARIOS_SEG_QUA_SEX, registos, PERIODO_SEMANA);
     expect(resultado.presencas).toBe(2);

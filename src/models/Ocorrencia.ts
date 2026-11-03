@@ -1,8 +1,3 @@
-/**
- * Modelo: ocorrencias. Tentativas irregulares para auditoria (RF16): QR expirado, usado ou de outro aluno,
- * e entradas bloqueadas por suspensão (RF03). À parte dos `registos`.
- */
-
 import mongoose, { Schema, type Model, type Types } from "mongoose";
 import { TIPOS_OCORRENCIA, type TipoOcorrencia } from "@/lib/constantes";
 

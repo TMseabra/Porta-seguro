@@ -1,8 +1,4 @@
-/**
- * Datas e horas no fuso de Lisboa. Guardam-se em UTC na BD, mas apresentam-se e comparam-se
- * sempre em Europe/Lisbon: com a hora de verão, comparar UTC com o horário da turma dava uma
- * hora de diferença e atrasos que não existem.
- */
+/** Guarda-se em UTC; compara-se e apresenta-se em Europe/Lisbon (a hora de verão dava atrasos falsos). */
 
 export const FUSO_LISBOA = "Europe/Lisbon";
 
@@ -28,12 +24,12 @@ const DIAS_EM_INGLES: Record<string, number> = {
 
 export interface PartesData {
   ano: number;
-  mes: number; // 1 a 12
-  dia: number; // 1 a 31
-  horas: number; // 0 a 23
-  minutos: number; // 0 a 59
-  segundos: number; // 0 a 59
-  diaSemana: number; // 0 = domingo, 1 = segunda, ... 6 = sábado
+  mes: number;
+  dia: number;
+  horas: number;
+  minutos: number;
+  segundos: number;
+  diaSemana: number;
 }
 
 export function partesEmLisboa(data: Date): PartesData {
@@ -46,7 +42,7 @@ export function partesEmLisboa(data: Date): PartesData {
     minute: "2-digit",
     second: "2-digit",
     weekday: "short",
-    hourCycle: "h23", // garante 00-23 e nunca "24"
+    hourCycle: "h23",
   });
 
   const partes: Record<string, string> = {};
@@ -69,13 +65,11 @@ export function diaDaSemanaEmLisboa(data: Date): number {
   return partesEmLisboa(data).diaSemana;
 }
 
-/** Ex.: 08:30 devolve 510. Permite comparar com os blocos do horário só com inteiros. */
 export function minutosDoDiaEmLisboa(data: Date): number {
   const p = partesEmLisboa(data);
   return p.horas * 60 + p.minutos;
 }
 
-/** "AAAA-MM-DD" em Lisboa, para agrupar registos por dia. */
 export function chaveDoDiaEmLisboa(data: Date): string {
   const p = partesEmLisboa(data);
   const mes = String(p.mes).padStart(2, "0");
@@ -83,7 +77,6 @@ export function chaveDoDiaEmLisboa(data: Date): string {
   return `${p.ano}-${mes}-${dia}`;
 }
 
-/** Converte "08:30" em minutos desde a meia-noite (os horários guardam-se como texto). */
 export function horaParaMinutos(hora: string): number {
   const encaixe = /^(\d{1,2}):(\d{2})$/.exec(hora.trim());
 
@@ -122,18 +115,11 @@ export function formatarData(data: Date): string {
   }).format(data);
 }
 
-/**
- * Intervalo [inicio, fim) em UTC do dia de Lisboa em que cai `data`.
- * Date.UTC só percebe UTC: cria-se um candidato à meia-noite e corrige-se pelo desvio que
- * Lisboa tem nesse dia. O fim é a meia-noite SEGUINTE, não inicio + 24h: no dia em que a hora
- * de verão acaba (25h) isso caía dentro do mesmo dia e calcularAssiduidade ficava num ciclo
- * infinito que encravava o servidor.
- */
+/** [inicio, fim) em UTC do dia de Lisboa. O fim é a meia-noite seguinte, não +24h (dia de 25h). */
 export function limitesDoDiaEmLisboa(data: Date): { inicio: Date; fim: Date } {
   const { ano, mes, dia } = partesEmLisboa(data);
   return {
     inicio: meiaNoiteEmLisboa(ano, mes, dia),
-    // `Date.UTC` aceita dia 32, 33... e passa sozinho para o mês seguinte.
     fim: meiaNoiteEmLisboa(ano, mes, dia + 1),
   };
 }
@@ -144,21 +130,12 @@ function meiaNoiteEmLisboa(ano: number, mes: number, dia: number): Date {
   return new Date(candidato.getTime() - desvioMinutos * 60 * 1000);
 }
 
-/**
- * Intervalo [inicio, fim) de um mês (mes de 1 a 12), usado nas consultas por mês (RF07).
- * Parte do meio-dia do dia 1, que nunca muda de dia em Lisboa.
- */
 export function limitesDoMesEmLisboa(ano: number, mes: number): { inicio: Date; fim: Date } {
   const inicio = limitesDoDiaEmLisboa(new Date(Date.UTC(ano, mes - 1, 1, 12))).inicio;
   const fim = limitesDoDiaEmLisboa(new Date(Date.UTC(ano, mes, 1, 12))).inicio;
   return { inicio, fim };
 }
 
-/**
- * Converte uma data/hora "de parede" em Lisboa no instante UTC. Usada nas simulações: um
- * new Date() leria no fuso do servidor (UTC na Vercel). Mesma correção por desvio de
- * limitesDoDiaEmLisboa.
- */
 export function horaLisboaParaUtc(
   ano: number,
   mes: number,

@@ -6,7 +6,6 @@ import { Registo, Utilizador } from "@/models";
 import { PainelPortao } from "./painel-portao";
 import type { LinhaRegisto } from "@/lib/movimento";
 
-/** Portão Teste (UC01): QR, semáforo e registos do dia. Só porteiro e admin: cria registos verdadeiros. */
 export default async function PaginaPortaoTeste() {
   await exigirPerfil(["porteiro", "admin"]);
   await ligarBaseDados();

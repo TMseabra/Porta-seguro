@@ -1,8 +1,3 @@
-/**
- * Que turmas cada perfil pode consultar. Verifica-se no servidor (horários e assiduidade): filtrar só
- * o menu não impede ninguém de enviar à mão o id de outra turma.
- */
-
 import type { Types } from "mongoose";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Turma, Horario, Curso } from "@/models";
@@ -14,12 +9,6 @@ export interface TurmaDoAmbito {
   ano: number;
 }
 
-/**
- * Turmas visíveis: admin/gestor -> todas; coordenador -> as dos cursos que coordena; professor/dt ->
- * onde têm aulas e as que dirigem; outros perfis -> nenhuma. Consulta-se sempre a fonte
- * (Curso.coordenadorId, Turma.diretorTurmaId) e não os campos-espelho de Utilizador, que só o seed
- * preenche: usá-los escondia os coordenadores/DTs atribuídos depois do seed.
- */
 export async function turmasDoUtilizador(
   idUtilizador: string,
   perfil: Perfil,
@@ -48,7 +37,6 @@ export async function turmasDoUtilizador(
       Turma.find({ diretorTurmaId: idUtilizador }).select("_id").lean(),
     ]);
 
-    // Set: um professor tem vários blocos na mesma turma.
     const ids = new Set<string>(blocos.map((bloco) => bloco.turmaId.toString()));
     for (const turma of turmasDirigidas) {
       ids.add(turma._id.toString());

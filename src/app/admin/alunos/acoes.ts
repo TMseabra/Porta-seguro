@@ -68,8 +68,7 @@ export async function atualizarAluno(
   const novaPalavraPasse = String(formData.get("palavraPasse") ?? "");
 
   try {
-    // `perfil: "aluno"` é segurança, não otimização: sem ele aceitava-se o id de qualquer utilizador e um
-    // gestor mudava a password do admin e entrava como ele. O id vem do browser.
+    // perfil: "aluno" é segurança: sem ele um gestor mudava a password do admin.
     const aluno = await Utilizador.findOne({ _id: id, perfil: "aluno" });
     if (!aluno) return "Aluno não encontrado.";
 
@@ -86,7 +85,6 @@ export async function atualizarAluno(
   redirect("/admin/alunos");
 }
 
-/** Leva o histórico (registos, ocorrências, códigos QR): sem o aluno, falsearia os relatórios. */
 export async function removerAluno(formData: FormData): Promise<void> {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();
@@ -97,7 +95,6 @@ export async function removerAluno(formData: FormData): Promise<void> {
     redirect(`/admin/alunos?erro=${encodeURIComponent(ERRO_PASSKEY)}`);
   }
 
-  // Mesma razão de segurança que em `atualizarAluno`. Só se apagou um aluno é que se apaga o histórico.
   const aluno = await Utilizador.findOneAndDelete({ _id: id, perfil: "aluno" });
   if (!aluno) {
     redirect(`/admin/alunos?erro=${encodeURIComponent("Aluno não encontrado.")}`);

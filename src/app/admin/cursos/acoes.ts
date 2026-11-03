@@ -63,7 +63,6 @@ export async function atualizarCurso(
   redirect("/admin/cursos");
 }
 
-/** UC03: um curso com turmas não se remove (evita turmas órfãs). */
 export async function removerCurso(formData: FormData): Promise<void> {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();

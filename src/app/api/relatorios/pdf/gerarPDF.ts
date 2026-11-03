@@ -1,8 +1,3 @@
-/**
- * Relatório em PDF (RF11) com `pdf-lib`, que não tem tabelas: `escrever`/`novaLinha` fazem de cursor de
- * escrita de cima para baixo, com paginação automática.
- */
-
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { ResultadoConsulta } from "@/app/consultas/logica";
 

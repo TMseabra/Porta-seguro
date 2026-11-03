@@ -4,7 +4,6 @@ import { Utilizador, Turma } from "@/models";
 import { PaginaInterna } from "@/components/pagina-interna";
 import { FormularioSimulacao, type AlunoParaSeletor } from "./formulario-simulacao";
 
-/** Simulação de data/hora (admin/gestor) para a defesa oral; os registos ficam marcados como simulação. */
 export default async function PaginaSimulacao() {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();

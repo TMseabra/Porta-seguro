@@ -1,8 +1,3 @@
-/**
- * Consulta de assiduidade (RF05-RF07, RF12): junta `calcularAssiduidade` com a BD. Fica à parte de
- * `acoes.ts` para a rota do PDF a poder reutilizar.
- */
-
 import { ligarBaseDados } from "@/lib/mongoose";
 import { Utilizador, Turma, Registo, Horario } from "@/models";
 import { turmasDoUtilizador } from "@/lib/ambito";
@@ -18,15 +13,10 @@ export type Ambito = "aluno" | "turma" | "ano";
 
 const AMBITOS: Ambito[] = ["aluno", "turma", "ano"];
 
-/** O tipo TypeScript não existe em runtime e o valor vem do browser. */
 export function ambitoValido(valor: unknown): valor is Ambito {
   return typeof valor === "string" && (AMBITOS as string[]).includes(valor);
 }
 
-/**
- * Confirma que o alvo está no âmbito de quem pergunta. Fica aqui porque cada função exportada de um
- * ficheiro "use server" fica chamável a partir do browser.
- */
 export async function podeConsultar(
   idUtilizador: string,
   perfil: Perfil,
@@ -45,7 +35,6 @@ export async function podeConsultar(
     return turmas.some((turma) => String(turma.ano) === alvo);
   }
 
-  // Âmbito "aluno": só se estiver numa turma do coordenador.
   await ligarBaseDados();
   const aluno = await Utilizador.findOne({ _id: alvo, perfil: "aluno" })
     .select("turmaId")
@@ -122,7 +111,6 @@ export async function calcularResultadoConsulta(
     const horarios = aluno.turmaId
       ? await Horario.find({ turmaId: aluno.turmaId }).select("diaSemana").lean()
       : [];
-    // Fora os registos de simulação: não são movimentos reais.
     const registos = await Registo.find({
       alunoId: aluno._id,
       dataHora: { $gte: periodo.inicio, $lt: periodo.fim },

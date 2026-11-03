@@ -7,10 +7,6 @@ import type { TurmaComHorario } from "./seletor-turma";
 import { VistaHorario, type ProfessorComHorario } from "./vista-horario";
 import type { BlocoHorario } from "@/components/horario-semanal";
 
-/**
- * Horários das turmas: professor/diretor de turma vê as suas; coordenador as dos seus cursos; admin a
- * escola toda. Sem assiduidade (isso é /consultas).
- */
 export default async function PaginaHorarios({
   searchParams,
 }: {
@@ -27,7 +23,6 @@ export default async function PaginaHorarios({
     .sort({ diaSemana: 1, horaInicio: 1 })
     .lean();
 
-  // O type guard é preciso porque `.filter(Boolean)` não estreita o tipo para o TypeScript.
   const idsProfessores = [
     ...new Set(
       blocos
@@ -41,7 +36,6 @@ export default async function PaginaHorarios({
   const nomePorId = new Map(professores.map((p) => [p._id.toString(), p.nomeCompleto]));
   const nomeTurmaPorId = new Map(turmas.map((t) => [t.id, t.nome]));
 
-  // Os mesmos blocos agrupados por turma e por professor (ver VistaHorario).
   const blocosPorTurma = new Map<string, BlocoHorario[]>();
   const blocosPorProfessor = new Map<string, BlocoHorario[]>();
   for (const bloco of blocos) {
@@ -68,7 +62,6 @@ export default async function PaginaHorarios({
     }
   }
 
-  // Feito no servidor para o cliente não ir à rede ao trocar de turma.
   const turmasComHorario: TurmaComHorario[] = turmas.map((turma) => ({
     id: turma.id,
     nome: turma.nome,

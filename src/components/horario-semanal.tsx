@@ -7,11 +7,9 @@ export interface BlocoHorario {
   disciplina: string;
   sala?: string;
   professor?: string;
-  /** Só na vista "por professor" (RF10), onde os blocos vêm de turmas diferentes. */
   turma?: string;
 }
 
-/** Horário da semana numa tabela: segunda a domingo, e dentro de cada dia por hora de início. */
 export function HorarioSemanal({
   blocos,
   mostrarProfessor = false,
@@ -21,7 +19,6 @@ export function HorarioSemanal({
   mostrarProfessor?: boolean;
   mostrarTurma?: boolean;
 }) {
-  // 0 = domingo: passa para o fim para a semana começar à segunda.
   const ordemDia = (dia: number) => (dia === 0 ? 7 : dia);
   const ordenados = [...blocos].sort(
     (a, b) => ordemDia(a.diaSemana) - ordemDia(b.diaSemana) || a.horaInicio.localeCompare(b.horaInicio),

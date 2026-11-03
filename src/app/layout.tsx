@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // suppressHydrationWarning: o next-themes muda a classe do <html> antes de o React arrancar.
     <html
       lang="pt-PT"
       suppressHydrationWarning

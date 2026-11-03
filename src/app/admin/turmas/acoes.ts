@@ -63,7 +63,6 @@ export async function atualizarTurma(
   redirect(`/admin/turmas/${id}`);
 }
 
-/** Apaga os horários da turma e deixa os alunos sem turma, em vez de apontarem para uma que não existe. */
 export async function removerTurma(formData: FormData): Promise<void> {
   await exigirPerfil(["gestor", "admin"]);
   await ligarBaseDados();

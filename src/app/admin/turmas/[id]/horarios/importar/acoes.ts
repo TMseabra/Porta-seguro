@@ -1,10 +1,5 @@
 "use server";
 
-/**
- * Importação de horário por Excel (RF10): `analisarExcel` só lê e pré-visualiza; `confirmarImportacao`
- * substitui o horário da turma (por isso pede a palavra-chave de confirmação).
- */
-
 import * as XLSX from "xlsx";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { exigirPerfil } from "@/lib/permissoes";
@@ -30,7 +25,6 @@ export async function analisarExcel(turmaId: string, formData: FormData): Promis
     return { ok: false, erro: "Escolhe um ficheiro Excel (.xlsx)." };
   }
 
-  // Um horário são dezenas de linhas; o limite evita descomprimir ficheiros enormes em memória.
   const MAX_BYTES = 2 * 1024 * 1024;
   if (ficheiro.size > MAX_BYTES) {
     return { ok: false, erro: "O ficheiro é demasiado grande (máximo 2 MB)." };
@@ -67,7 +61,6 @@ export async function analisarExcel(turmaId: string, formData: FormData): Promis
 
 export type ResultadoImportacao = { ok: true; total: number } | { ok: false; erro: string };
 
-/** Substitui TODO o horário da turma numa operação só, para nunca ficar sem horário se algo falhar. */
 export async function confirmarImportacao(
   turmaId: string,
   linhas: LinhaImportada[],
@@ -92,7 +85,7 @@ export async function confirmarImportacao(
     return { ok: false, erro: "Não há nenhuma linha válida para importar." };
   }
 
-  // Transação só aqui: sem ela, uma falha depois de apagar os blocos antigos deixava a turma sem horário.
+  // Transação: sem ela, uma falha deixava a turma sem horário.
   const session = await Horario.startSession();
   try {
     await session.withTransaction(async () => {

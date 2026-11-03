@@ -3,7 +3,7 @@ export function mensagemDeErroMongoose(erro: unknown, mensagemDuplicado: string)
     return mensagemDuplicado;
   }
 
-  // Só mostra mensagens nossas: um erro do servidor da BD pode revelar coleções, índices ou o cluster.
+  // Só mensagens nossas: erros da BD revelam coleções e cluster.
   if (erro instanceof Error && (erro.name === "ValidationError" || erro.name === "Error")) {
     return erro.message;
   }

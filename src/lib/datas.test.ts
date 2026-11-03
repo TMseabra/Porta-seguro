@@ -20,15 +20,14 @@ describe("limitesDoDiaEmLisboa", () => {
   });
 
   it("um momento perto da meia-noite continua a cair dentro do intervalo do seu próprio dia", () => {
-    const momento = new Date("2026-01-05T23:59:00.000Z"); // 23:59 em Lisboa (janeiro = UTC+0)
+    const momento = new Date("2026-01-05T23:59:00.000Z");
     const { inicio, fim } = limitesDoDiaEmLisboa(momento);
     expect(momento.getTime()).toBeGreaterThanOrEqual(inicio.getTime());
     expect(momento.getTime()).toBeLessThan(fim.getTime());
     expect(diaDaSemanaEmLisboa(inicio)).toBe(diaDaSemanaEmLisboa(momento));
   });
 
-  // Regressão: o fim do dia era `inicio + 24h`; no dia com 25 horas calcularAssiduidade entrava num ciclo
-  // infinito e encravava o servidor.
+  // Regressão: dia de 25h encravava calcularAssiduidade.
   it("no fim da hora de verão (25 de outubro de 2026), o dia tem 25 horas e o fim é a meia-noite seguinte", () => {
     const { inicio, fim } = limitesDoDiaEmLisboa(new Date("2026-10-25T12:00:00.000Z"));
     expect(inicio.toISOString()).toBe("2026-10-24T23:00:00.000Z");
@@ -90,7 +89,7 @@ describe("horaLisboaParaUtc", () => {
   it("perto da meia-noite, com deslocamento de fuso, o dia civil UTC muda mas continua a mostrar a hora pedida em Lisboa", () => {
     const data = horaLisboaParaUtc(2026, 7, 15, 0, 15);
     expect(data.toISOString()).toBe("2026-07-14T23:15:00.000Z");
-    expect(diaDaSemanaEmLisboa(data)).toBe(3); // 15 de julho de 2026 é quarta-feira
+    expect(diaDaSemanaEmLisboa(data)).toBe(3);
   });
 
   it("é o inverso de partesEmLisboa: reconstruir a partir das partes devolve o mesmo instante", () => {

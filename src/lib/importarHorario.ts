@@ -1,18 +1,9 @@
-/**
- * Interpreta as linhas de um Excel de horário (RF10). Função pura: recebe as linhas lidas pelo `xlsx`
- * e a lista de professores, e devolve cada linha com o que percebeu e os erros, para pré-visualizar
- * antes de gravar. Formato (cabeçalhos na 1.ª linha, ordem livre): Dia | Início | Fim | Disciplina |
- * Professor | Sala. "Dia" aceita o nome ou 0-6 (0 = domingo); "Professor" tem de ser o nome completo
- * de uma conta professor/dt.
- */
-
 export interface ProfessorDisponivel {
   id: string;
   nome: string;
 }
 
 export interface LinhaImportada {
-  /** Número da linha no Excel (a 1.ª de dados é a 2), para localizar o erro na folha. */
   numeroLinha: number;
   diaSemana?: number;
   horaInicio?: string;
@@ -39,7 +30,6 @@ const NOMES_DIAS: Record<string, number> = {
   sabado: 6,
 };
 
-/** Tira acentos e maiúsculas: "Terça", "terca" e "TERÇA-FEIRA" contam todos. */
 function normalizar(texto: string): string {
   return texto
     .normalize("NFD")
@@ -60,7 +50,6 @@ export function diaSemanaDeTexto(valor: string): number | undefined {
 
 const REGEX_HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
-/** Aceita "08:30" ou o decimal que o Excel usa por vezes para horas (0.3541... = 08:30). */
 function normalizarHora(valor: unknown): string | undefined {
   if (typeof valor === "string") {
     const texto = valor.trim();
@@ -80,7 +69,6 @@ function textoDaCelula(valor: unknown): string {
   return String(valor).trim();
 }
 
-/** Cada linha vem como objeto (cabeçalho -> célula), o formato de XLSX.utils.sheet_to_json. */
 export function interpretarLinhasExcel(
   linhas: Array<Record<string, unknown>>,
   professoresDisponiveis: ProfessorDisponivel[],
@@ -90,7 +78,6 @@ export function interpretarLinhasExcel(
   );
 
   return linhas.map((linha, indice) => {
-    // Aceita os cabeçalhos com ou sem acento e maiúsculas.
     const porChaveNormalizada = new Map(
       Object.entries(linha).map(([chave, valor]) => [normalizar(chave), valor]),
     );

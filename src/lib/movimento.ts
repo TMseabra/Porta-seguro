@@ -1,10 +1,3 @@
-/**
- * Lógica partilhada de processar um movimento (entrada/saída), usada pelo /portao-teste (QR real,
- * hora verdadeira) e pela simulação do admin (data/hora escolhida, mesmas regras).
- * Não é "use server": é chamada por Server Actions, e o exigirPerfil fica sempre em quem chama
- * (o Portão Teste deixa entrar porteiro e admin, a simulação só admin).
- */
-
 import { ligarBaseDados } from "@/lib/mongoose";
 import { formatarHora, diaDaSemanaEmLisboa } from "@/lib/datas";
 import { Utilizador, Turma, Horario, Registo, Ocorrencia, TokenQR } from "@/models";
@@ -26,10 +19,6 @@ export interface AlunoResumo {
   fotoUrl?: string;
   numeroAluno?: number;
   turma?: string;
-  /**
-   * Horário do dia e estado da porta, para quem identifica ver se a pessoa devia estar ali.
-   * Sem assiduidade: o histórico de faltas não é da conta do porteiro.
-   */
   blocosHoje?: BlocoHorario[];
   estadoPorta?: ResultadoEstadoPorta;
 }
@@ -76,7 +65,6 @@ export type AlunoParaMovimento = Pick<
   | "suspenso"
 >;
 
-/** Qualquer movimento (também simulado) torna obsoleto um código QR por usar: já não reflete o estado. */
 async function invalidarTokenQRPendente(alunoId: IUtilizador["_id"], momento: Date): Promise<void> {
   await TokenQR.updateMany({ alunoId, usado: false }, { usado: true, usadoEm: momento });
 }
@@ -111,16 +99,11 @@ export function resumoDoAluno(
   };
 }
 
-/**
- * Aplica as regras de entrada/saída a um aluno já identificado, no momento dado
- * (o real no QR, o escolhido na simulação).
- */
 export async function processarMovimento(
   aluno: AlunoParaMovimento,
   registadoPorId: string,
   metodo: MetodoRegisto,
   momento: Date,
-  /** Só nas simulações: escolhe entrada/saída em vez da alternância. Num movimento real é undefined. */
   tipoForcado?: TipoRegisto,
 ): Promise<ResultadoMovimento> {
   await ligarBaseDados();
@@ -132,10 +115,6 @@ export async function processarMovimento(
 
   const resumo = resumoDoAluno(aluno, turma?.nome, horarios, momento);
 
-  // O tipo alterna com o último registo ANTES deste momento (mesma regra da geração do QR,
-  // proximoTipoRegisto), contando também os simulados: depois de uma entrada simulada, o próximo só
-  // pode ser uma saída. O filtro `dataHora < momento` importa nas simulações: sem ele, uma hora do
-  // passado olhava ao registo mais recente de sempre.
   const ultimoRegisto = await Registo.findOne({ alunoId: aluno._id, dataHora: { $lt: momento } })
     .sort({ dataHora: -1 })
     .lean();
@@ -248,7 +227,6 @@ export type ResultadoConfirmacao =
   | { ok: false; erro: string }
   | { ok: true; autorizado: boolean; linha: LinhaRegisto };
 
-/** Grava a saída pendente depois do contacto com os pais (RF04); na simulação é "como se". */
 export async function confirmarSaidaComPais(
   alunoId: string,
   horarioId: string | undefined,

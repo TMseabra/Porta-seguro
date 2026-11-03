@@ -1,8 +1,3 @@
-/**
- * Modelo de Excel para horários (RF10). Rota normal e não Server Action: um link direto é o que faz o
- * browser descarregar um ficheiro. A folha "Professores" existe porque o importador exige o nome
- * EXATAMENTE igual ao da conta.
- */
 import * as XLSX from "xlsx";
 import { ligarBaseDados } from "@/lib/mongoose";
 import { exigirPerfil } from "@/lib/permissoes";
@@ -25,7 +20,6 @@ export async function GET() {
 
   const livro = XLSX.utils.book_new();
 
-  // Duas linhas de exemplo (a apagar) para se perceber cada coluna.
   const linhasExemplo = [
     ["Dia", "Início", "Fim", "Disciplina", "Professor", "Sala"],
     ["Segunda-feira", "08:30", "10:00", "Programação", professores[0]?.nomeCompleto ?? "", "1.12"],
@@ -33,16 +27,15 @@ export async function GET() {
   ];
   const folhaHorario = XLSX.utils.aoa_to_sheet(linhasExemplo);
   folhaHorario["!cols"] = [
-    { wch: 14 }, // Dia
-    { wch: 9 }, // Início
-    { wch: 9 }, // Fim
-    { wch: 22 }, // Disciplina
-    { wch: 26 }, // Professor
-    { wch: 8 }, // Sala
+    { wch: 14 },
+    { wch: 9 },
+    { wch: 9 },
+    { wch: 22 },
+    { wch: 26 },
+    { wch: 8 },
   ];
   XLSX.utils.book_append_sheet(livro, folhaHorario, "Horário");
 
-  // Folha de consulta: nomes exatos dos professores e das turmas; o importador não a lê.
   const linhasInstrucoes = [
     ["Como preencher a folha \"Horário\"", ""],
     ["", ""],

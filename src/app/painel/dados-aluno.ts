@@ -1,7 +1,3 @@
-/**
- * Dados das páginas do aluno. Não é "use server": são chamadas por páginas, não pelo browser. O id vem
- * sempre da sessão.
- */
 import QRCode from "qrcode";
 import { headers } from "next/headers";
 import { ligarBaseDados } from "@/lib/mongoose";
@@ -21,7 +17,6 @@ export async function tokenInicialDoAluno(alunoId: string): Promise<TokenGerado 
   };
 }
 
-/** RF15: o código gera-se no telemóvel; só a conta de teste gera no PC. */
 export async function permissoesQR(email?: string | null) {
   const userAgent = (await headers()).get("user-agent");
   const ehContaDeTeste = email === EMAIL_CONTA_DE_TESTE_QR;

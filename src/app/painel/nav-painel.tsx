@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/** Do lado do browser porque o layout não é redesenhado ao mudar de página: quem destaca o item é o usePathname(). */
-
 export interface ItemNav {
   href: string;
   label: string;

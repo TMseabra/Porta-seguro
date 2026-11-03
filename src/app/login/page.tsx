@@ -5,10 +5,6 @@ import { FormularioCredenciais } from "./formulario-credenciais";
 import { entrarComGoogle } from "./acoes";
 import { BarraTopo } from "@/components/barra-topo";
 
-/**
- * Mensagens para os `?error=` do Auth.js (ex.: conta Google sem `Utilizador` na escola); sem elas a
- * recusa não mostrava nada.
- */
 const MENSAGENS_ERRO_LOGIN: Record<string, string> = {
   AccessDenied:
     "Esta conta Google não tem acesso ao PortãoSeguro. Só entra quem já tiver uma conta criada na escola — fala com a administração.",
@@ -20,7 +16,6 @@ export default async function PaginaLogin({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  // O proxy já redireciona; repete-se por segurança.
   const sessao = await auth();
   if (sessao?.user) {
     redirect("/painel");

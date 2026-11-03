@@ -1,10 +1,6 @@
 import type { MetodoRegisto, TipoRegisto } from "@/lib/constantes";
 import { proximoTipoRegisto } from "./proximoTipo";
 
-/**
- * Direção de um QR quando a conta de teste a escolheu à mão. Só conta numa SIMULAÇÃO: o `metodo` deduz-se
- * do código na BD, nunca do browser, e um código real segue sempre a alternância.
- */
 export interface CodigoParaTipo {
   tipo: TipoRegisto;
   tipoEscolhido?: boolean;

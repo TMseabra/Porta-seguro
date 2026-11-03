@@ -1,10 +1,3 @@
-/**
- * Estado da porta para uma pessoa num momento, a partir do horário da turma. Função pura, como as outras
- * regras. Serve o porteiro: perceber de relance se a pessoa devia estar ali.
- * Não sabe se o movimento é entrada ou saída: só descreve o horário. Quem o usa decide o que `atrasado`
- * quer dizer (numa entrada, chegou tarde; numa saída, está a sair a meio de uma aula).
- */
-
 import type { IHorario } from "@/models/Horario";
 import { diaDaSemanaEmLisboa, minutosDoDiaEmLisboa, horaParaMinutos } from "@/lib/datas";
 import { encontrarBlocoADecorrer } from "./horarios";
@@ -14,14 +7,9 @@ export type EstadoPorta = "aberta" | "fechada";
 export interface ResultadoEstadoPorta {
   estado: EstadoPorta;
   motivo: string;
-  /** Há uma aula já a decorrer na hora da leitura. */
   atrasado: boolean;
 }
 
-/**
- * Por ordem: sem blocos hoje -> fechada; aula a decorrer -> aberta e `atrasado`; antes da 1.ª aula ->
- * aberta, a horas; entre blocos -> aberta; depois do último bloco -> fechada.
- */
 export function calcularEstadoPorta(
   horariosDaTurma: IHorario[],
   momento: Date,

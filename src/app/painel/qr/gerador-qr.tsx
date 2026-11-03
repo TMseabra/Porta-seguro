@@ -17,7 +17,6 @@ function segundosRestantes(validoAteISO: string): number {
   return Math.max(0, restam);
 }
 
-/** Data e hora do browser, como em `/admin/simulacao`: poupa escrever à mão. */
 function agoraNoBrowser(): { data: string; hora: string } {
   const agora = new Date();
   const doisDigitos = (n: number) => String(n).padStart(2, "0");
@@ -33,9 +32,7 @@ export function GeradorQR({
   podeEscolherHora,
 }: {
   tokenInicial: TokenGerado | null;
-  /** Falso em PC (RF15: o código é para o telemóvel), exceto na conta de teste. */
   podeGerar: boolean;
-  /** Só na conta de teste: data/hora que a portaria usa em vez da real. */
   podeEscolherHora: boolean;
 }) {
   const [token, setToken] = useState<TokenGerado | null>(tokenInicial);
@@ -50,8 +47,6 @@ export function GeradorQR({
   const [{ data: dataSimulada, hora: horaSimulada }, setDataHoraSimulada] =
     useState(agoraNoBrowser);
 
-  // Dois temporizadores: o relógio desce de 1 em 1 s, e a pergunta ao servidor (que custa um pedido de rede)
-  // faz-se só de 2 em 2 s.
   useEffect(() => {
     if (!token || estado.usado) return;
 
@@ -88,7 +83,6 @@ export function GeradorQR({
   }
 
   const expirado = token !== null && !estado.usado && segundos <= 0;
-  // Depois de lido, a imagem desaparece sempre, para ninguém a mostrar a outra pessoa.
   const mostrarImagem = token && !expirado && !estado.usado;
 
   return (

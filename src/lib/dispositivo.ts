@@ -7,5 +7,4 @@ export function ehUserAgentDeTelemovel(userAgent: string | null): boolean {
   return /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
 }
 
-/** Único aluno que gera o QR num PC, para a defesa oral. */
 export const EMAIL_CONTA_DE_TESTE_QR = "5802@eclisboa.net";
